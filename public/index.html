@@ -3,70 +3,143 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Titulo de pestana solicitado -->
   <title>Howgarts</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%E2%9A%A1</text></svg>" />
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/login.css" />
 </head>
-<body>
-  <!-- Fondo compartido: cielo, luna y castillo -->
-  <div class="cielo"></div>
-  <div class="luna"></div>
-  <svg class="castillo" viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-    <!-- Silueta sencilla del castillo (placeholder: sustituible por arte real) -->
-    <g fill="#0a0820">
-      <rect x="120" y="180" width="60" height="140"/>
-      <polygon points="150,140 120,180 180,180"/>
-      <rect x="200" y="210" width="120" height="110"/>
-      <rect x="340" y="120" width="80" height="200"/>
-      <polygon points="380,70 340,120 420,120"/>
-      <rect x="450" y="190" width="200" height="130"/>
-      <rect x="520" y="110" width="70" height="90"/>
-      <polygon points="555,60 520,110 590,110"/>
-      <rect x="680" y="150" width="90" height="170"/>
-      <polygon points="725,95 680,150 770,150"/>
-      <rect x="800" y="200" width="220" height="120"/>
-      <rect x="880" y="120" width="70" height="90"/>
-      <polygon points="915,70 880,120 950,120"/>
-      <rect x="1050" y="170" width="80" height="150"/>
-      <polygon points="1090,120 1050,170 1130,170"/>
-      <rect x="1160" y="210" width="160" height="110"/>
-      <rect x="1230" y="140" width="60" height="80"/>
-      <polygon points="1260,95 1230,140 1290,140"/>
-    </g>
-    <!-- Ventanas iluminadas -->
-    <g fill="#ffcf5c" opacity="0.85">
-      <rect x="360" y="160" width="12" height="20"/>
-      <rect x="390" y="160" width="12" height="20"/>
-      <rect x="700" y="190" width="12" height="20"/>
-      <rect x="735" y="190" width="12" height="20"/>
-      <rect x="900" y="160" width="12" height="20"/>
-      <rect x="1075" y="210" width="12" height="20"/>
-    </g>
-  </svg>
+<body class="login-body">
 
-  <!-- Pantalla de login -->
+  <!-- ============================================================= -->
+  <!--  ESCENA NOCTURNA DEL CASTILLO (original, paleta de referencia) -->
+  <!--  Si colocas public/assets/castle.jpg se usará esa imagen;      -->
+  <!--  si no existe, se muestra esta escena SVG/CSS animada.         -->
+  <!-- ============================================================= -->
+  <div class="escena" aria-hidden="true">
+    <img id="foto-fondo" src="assets/castle.jpg" alt="" onerror="this.remove()" />
+    <div class="scrim"></div>
+
+    <div class="cielo-noche"></div>
+    <div class="estrellas"></div>
+    <div class="luna-grande"></div>
+    <div class="nubes"><span></span><span></span><span></span></div>
+
+    <!-- Silueta del castillo (dos capas para dar profundidad) -->
+    <svg class="castillo-svg" viewBox="0 0 1200 520" preserveAspectRatio="xMidYMax slice">
+      <!-- Capa lejana -->
+      <g class="capa-lejana">
+        <polygon points="120,300 150,250 180,300"/>
+        <rect x="140" y="290" width="20" height="230"/>
+        <rect x="300" y="240" width="90" height="280"/>
+        <polygon points="300,240 345,190 390,240"/>
+        <rect x="900" y="250" width="80" height="270"/>
+        <polygon points="900,250 940,200 980,250"/>
+        <rect x="1040" y="280" width="60" height="240"/>
+        <polygon points="1040,280 1070,235 1100,280"/>
+      </g>
+
+      <!-- Capa cercana (castillo principal) -->
+      <g class="capa-cerca">
+        <!-- muralla base -->
+        <rect x="180" y="360" width="840" height="160"/>
+        <!-- torre izquierda -->
+        <rect x="210" y="250" width="90" height="270"/>
+        <polygon points="205,252 255,185 305,252"/>
+        <!-- torre media-izq -->
+        <rect x="330" y="300" width="70" height="220"/>
+        <!-- torre central alta (reloj) -->
+        <rect x="520" y="140" width="120" height="380"/>
+        <polygon points="512,145 580,40 648,145"/>
+        <circle class="reloj" cx="580" cy="230" r="26"/>
+        <!-- torre centro-der -->
+        <rect x="680" y="230" width="80" height="290"/>
+        <polygon points="674,232 720,170 766,232"/>
+        <!-- torre derecha ancha -->
+        <rect x="800" y="285" width="130" height="235"/>
+        <polygon points="795,288 865,220 935,288"/>
+        <!-- almenas sobre la muralla -->
+        <g class="almenas">
+          <rect x="190" y="350" width="16" height="16"/><rect x="226" y="350" width="16" height="16"/>
+          <rect x="262" y="350" width="16" height="16"/><rect x="430" y="350" width="16" height="16"/>
+          <rect x="466" y="350" width="16" height="16"/><rect x="900" y="350" width="16" height="16"/>
+          <rect x="936" y="350" width="16" height="16"/><rect x="972" y="350" width="16" height="16"/>
+        </g>
+      </g>
+
+      <!-- Ventanas iluminadas (titilan) -->
+      <g class="ventanas">
+        <rect x="245" y="300" width="9" height="16"/><rect x="262" y="330" width="9" height="16"/>
+        <rect x="352" y="340" width="9" height="16"/><rect x="372" y="380" width="9" height="16"/>
+        <rect x="548" y="200" width="11" height="20"/><rect x="600" y="200" width="11" height="20"/>
+        <rect x="548" y="300" width="11" height="20"/><rect x="600" y="300" width="11" height="20"/>
+        <rect x="560" y="400" width="11" height="22"/><rect x="700" y="280" width="9" height="16"/>
+        <rect x="718" y="320" width="9" height="16"/><rect x="700" y="380" width="9" height="16"/>
+        <rect x="835" y="330" width="10" height="18"/><rect x="875" y="330" width="10" height="18"/>
+        <rect x="835" y="400" width="10" height="18"/><rect x="875" y="400" width="10" height="18"/>
+        <rect x="300" y="430" width="9" height="18"/><rect x="420" y="430" width="9" height="18"/>
+        <rect x="640" y="440" width="9" height="18"/><rect x="760" y="440" width="9" height="18"/>
+      </g>
+
+      <!-- Roca sobre la que se asienta -->
+      <polygon class="roca" points="180,520 180,470 320,500 560,440 820,500 1020,470 1020,520"/>
+    </svg>
+
+    <!-- Lago -->
+    <div class="lago">
+      <div class="reflejo-luna"></div>
+      <div class="niebla n1"></div>
+      <div class="niebla n2"></div>
+      <div class="niebla n3"></div>
+      <!-- Barcas con faroles -->
+      <div class="barcas">
+        <div class="barca b1"><span class="farol"></span></div>
+        <div class="barca b2"><span class="farol"></span></div>
+        <div class="barca b3"><span class="farol"></span></div>
+        <div class="barca b4"><span class="farol"></span></div>
+      </div>
+    </div>
+
+    <!-- Partículas mágicas (brasas doradas) -->
+    <div class="particulas">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!--  LOGIN                                                         -->
+  <!-- ============================================================= -->
   <main class="pantalla login-layout">
     <section class="login-hero">
-      <div class="escudo">⚡</div>
+      <div class="crest">✦</div>
       <h1>Howgarts</h1>
       <p class="subtitulo">Colegio de Magia y Hechicería</p>
+      <p class="lema">« Draco dormiens nunquam titillandus »</p>
     </section>
 
     <section class="login-card">
+      <div class="sello">⚷</div>
       <h2>Entrada al Castillo</h2>
+
       <form id="form-login" autocomplete="off" novalidate>
         <div class="campo">
           <label for="username">Nombre de mago</label>
-          <input type="text" id="username" name="username" placeholder="Escribe tu usuario…" required />
+          <div class="campo-input">
+            <span class="icono">🪄</span>
+            <input type="text" id="username" name="username" placeholder="Escribe tu usuario…" required />
+          </div>
         </div>
+
         <div class="campo">
-          <label for="password">Palabra mágica (contraseña)</label>
-          <input type="password" id="password" name="password" placeholder="••••••••" />
+          <label for="password">Palabra mágica</label>
+          <div class="campo-input">
+            <span class="icono">🗝️</span>
+            <input type="password" id="password" name="password" placeholder="••••••••" />
+          </div>
         </div>
-        <button type="submit" class="btn-magico">Alohomora ✦ Entrar</button>
+
+        <button type="submit" class="btn-entrar"><span>Alohomora ✦ Entrar</span></button>
       </form>
+
       <div id="mensaje" class="mensaje" role="status" aria-live="polite"></div>
       <p class="pista-login">Solo los magos registrados pueden entrar… ¿o habrá otra forma?</p>
     </section>

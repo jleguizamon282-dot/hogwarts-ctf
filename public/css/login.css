@@ -1,109 +1,256 @@
 /* =============================================================================
-   login.css — Pantalla de inicio de sesion (index.html)
-   Formulario ubicado a un lado; castillo ocupando la escena.
+   login.css — Pantalla de inicio de sesion "Howgarts"
+   Fondo: imagen del castillo (public/assets/castle.jpg).
+   Paleta derivada de esa imagen: violetas nocturnos + ambar calido de faroles.
+   (Si la imagen faltara, se muestra una escena SVG/CSS de respaldo.)
    ============================================================================= */
 
+.login-body {
+  /* Paleta tomada de la imagen de referencia (noche violeta de Hogwarts) */
+  --noche-top:  #120d1f;
+  --noche-mid:  #1b1430;
+  --noche-baja: #241a3d;
+  --violeta:    #2a2142;
+  --violeta-2:  #3a2f59;
+  --agua:       #0b0814;
+  --niebla-col: rgba(198, 190, 224, .40);
+  --luna-col:   #e9e3f6;
+  --ambar:      #f0a850;   /* faroles / ventanas calidas */
+  --ambar-cal:  #ffcf8a;
+  --verde-cast: #8fd69a;   /* acento verde del castillo (sutil) */
+  --oro:        #d9b566;   /* acentos / bordes */
+  --oro-claro:  #f3deac;
+  --texto-fr:   #ece8f8;   /* lavanda casi blanco */
+  --slate:      #6a6090;   /* violeta-gris para bordes de inputs */
+
+  min-height: 100vh;
+  background: transparent;   /* la escena fija (.escena) se ve por detras */
+  color: var(--texto-fr);
+  overflow: hidden;
+}
+
+/* =========================================================================
+   ESCENA (imagen de fondo + capas)
+   ========================================================================= */
+.escena { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
+
+/* Imagen del castillo (si existe assets/castle.jpg) */
+#foto-fondo {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center 40%;
+  z-index: 3;
+  filter: brightness(.86) saturate(1.08) contrast(1.02);
+  animation: respirar 16s ease-in-out infinite;  /* leve zoom vivo */
+}
+@keyframes respirar { 50% { transform: scale(1.04); } }
+
+/* Capa de legibilidad: vineta + oscurecido tras la tarjeta (derecha) y abajo */
+.scrim {
+  position: absolute; inset: 0; z-index: 4; pointer-events: none;
+  background:
+    radial-gradient(135% 100% at 48% 38%, transparent 42%, rgba(9,6,16,.55) 100%),
+    linear-gradient(90deg, rgba(9,6,16,.30) 0%, transparent 34%, transparent 54%, rgba(9,6,16,.58) 100%),
+    linear-gradient(0deg, rgba(9,6,16,.60) 0%, transparent 32%);
+}
+
+/* Particulas / brasas doradas por encima de la foto */
+.particulas { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+.particulas i {
+  position: absolute; bottom: -10px;
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--ambar-cal);
+  box-shadow: 0 0 8px 2px rgba(255,207,138,.7);
+  opacity: 0;
+  animation: subir 10s linear infinite;
+}
+.particulas i:nth-child(1){ left: 8%;  animation-delay: 0s;   }
+.particulas i:nth-child(2){ left: 20%; animation-delay: 1.6s; }
+.particulas i:nth-child(3){ left: 33%; animation-delay: 3.2s; }
+.particulas i:nth-child(4){ left: 46%; animation-delay: .8s;  }
+.particulas i:nth-child(5){ left: 58%; animation-delay: 2.4s; }
+.particulas i:nth-child(6){ left: 67%; animation-delay: 4.3s; }
+.particulas i:nth-child(7){ left: 78%; animation-delay: 1.2s; }
+.particulas i:nth-child(8){ left: 88%; animation-delay: 3.8s; }
+.particulas i:nth-child(9){ left: 95%; animation-delay: 5.4s; }
+.particulas i:nth-child(10){left: 40%; animation-delay: 6.6s; }
+@keyframes subir {
+  0%   { opacity: 0; transform: translateY(0) scale(.6); }
+  12%  { opacity: .9; }
+  100% { opacity: 0; transform: translateY(-88vh) scale(1.1); }
+}
+
+/* ---- Escena SVG de respaldo (solo visible si falta la imagen) ------------- */
+.cielo-noche {
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(120% 90% at 50% 8%, #2c2347 0%, transparent 44%),
+    linear-gradient(180deg, var(--noche-top) 0%, var(--noche-mid) 46%, var(--noche-baja) 64%, var(--agua) 100%);
+}
+.estrellas {
+  position: absolute; inset: 0; height: 60%; z-index: 0;
+  background:
+    radial-gradient(1.5px 1.5px at 20% 18%, #fff, transparent),
+    radial-gradient(1px 1px at 65% 12%, #e5dcff, transparent),
+    radial-gradient(1.5px 1.5px at 80% 26%, #fff, transparent),
+    radial-gradient(1px 1px at 42% 30%, #fff, transparent);
+  animation: titilar 5s ease-in-out infinite alternate;
+}
+@keyframes titilar { from { opacity: .3; } to { opacity: .8; } }
+.luna-grande {
+  position: absolute; top: 7%; left: 50%; transform: translateX(-50%); z-index: 0;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle at 42% 38%, #fff, var(--luna-col) 55%, #b7add0 80%, #8a80ad);
+  box-shadow: 0 0 80px 30px rgba(197,185,235,.28);
+}
+.nubes, .castillo-svg, .lago { z-index: 1; }
+.nubes span {
+  position: absolute; left: -30%; height: 46px; width: 300px; border-radius: 50%;
+  background: linear-gradient(90deg, transparent, rgba(45,38,66,.55), transparent);
+  filter: blur(8px);
+}
+.nubes span:nth-child(1){ top: 10%; animation: derivar 60s linear infinite; }
+.nubes span:nth-child(2){ top: 18%; width: 420px; opacity: .7; animation: derivar 90s linear infinite; }
+.nubes span:nth-child(3){ top: 6%;  width: 240px; opacity: .6; animation: derivar 75s linear infinite reverse; }
+@keyframes derivar { to { transform: translateX(160vw); } }
+.castillo-svg { position: absolute; left: 0; right: 0; bottom: 42%; width: 100%; height: 56%; }
+.capa-lejana { fill: #241b3b; opacity: .75; }
+.capa-cerca, .almenas { fill: #160f28; }
+.roca { fill: #0c0818; }
+.reloj { fill: #322850; stroke: var(--ambar); stroke-width: 2; }
+.ventanas rect { fill: var(--ambar); }
+.lago { position: absolute; left: 0; right: 0; bottom: 0; height: 44%;
+  background: linear-gradient(180deg, #120c22 0%, var(--agua) 100%); }
+.reflejo-luna, .niebla, .barcas { display: none; } /* la foto ya los aporta */
+
+/* =========================================================================
+   LAYOUT DEL LOGIN
+   ========================================================================= */
 .login-layout {
+  position: relative; z-index: 1;
   display: grid;
-  grid-template-columns: 1.1fr .9fr;
+  grid-template-columns: 1.05fr .95fr;
   align-items: center;
   min-height: 100vh;
   gap: 2rem;
-  padding: 2rem clamp(1rem, 5vw, 5rem);
+  padding: 2rem clamp(1.2rem, 6vw, 6rem);
 }
 
-/* Columna izquierda: titulo / bienvenida */
+/* Columna izquierda */
 .login-hero { text-align: center; }
+.login-hero .crest {
+  font-size: 2.2rem; color: var(--oro);
+  text-shadow: 0 0 20px rgba(217,181,102,.8); margin-bottom: .2rem;
+}
 .login-hero h1 {
   font-family: var(--fuente-titulo);
-  font-size: clamp(2.4rem, 6vw, 4.5rem);
-  margin: 0;
-  color: var(--oro-claro);
-  text-shadow: 0 0 18px rgba(217,182,78,.6), 0 4px 0 #3a2d0a;
-  letter-spacing: 2px;
+  font-size: clamp(2.6rem, 7vw, 5.4rem);
+  margin: 0; color: var(--oro-claro); letter-spacing: 3px;
+  text-shadow: 0 0 30px rgba(240,168,80,.55), 0 3px 0 #2a1d05, 0 10px 36px rgba(0,0,0,.8);
 }
 .login-hero .subtitulo {
   font-family: var(--fuente-magica);
   font-size: clamp(1rem, 2.4vw, 1.5rem);
-  color: var(--magia-2);
-  opacity: .9;
+  color: var(--texto-fr); opacity: .92; margin: .3rem 0;
+  text-shadow: 0 2px 12px rgba(0,0,0,.7);
 }
-.login-hero .escudo {
-  font-size: clamp(3rem, 9vw, 6rem);
-  filter: drop-shadow(0 0 20px rgba(124,92,255,.6));
-  animation: flotar 4s ease-in-out infinite;
+.login-hero .lema {
+  font-family: var(--fuente-magica); font-size: .95rem;
+  color: var(--oro); opacity: .75; font-style: italic; letter-spacing: .5px;
+  text-shadow: 0 2px 10px rgba(0,0,0,.7);
 }
-@keyframes flotar { 50% { transform: translateY(-14px); } }
 
-/* Columna derecha: tarjeta de login (glassmorphism dorado) */
+/* Tarjeta de login (cristal violeta con doble borde dorado) */
 .login-card {
-  justify-self: center;
-  width: min(420px, 92vw);
-  background: linear-gradient(160deg, rgba(30,27,75,.85), rgba(11,10,26,.9));
-  border: 1.5px solid rgba(217,182,78,.5);
-  border-radius: var(--radio);
-  padding: 2.2rem 2rem;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 24px 60px rgba(0,0,0,.55), inset 0 0 30px rgba(124,92,255,.12);
+  position: relative; justify-self: center;
+  width: min(430px, 92vw);
+  padding: 2.4rem 2.1rem 2rem;
+  border-radius: 20px;
+  background: linear-gradient(160deg, rgba(34,25,58,.82), rgba(15,10,26,.93));
+  border: 1px solid rgba(217,181,102,.55);
+  box-shadow:
+    0 30px 70px rgba(0,0,0,.65),
+    0 0 0 6px rgba(217,181,102,.08),
+    inset 0 1px 0 rgba(255,207,138,.22),
+    inset 0 0 44px rgba(120,90,170,.16);
+  backdrop-filter: blur(16px) saturate(1.1);
+  animation: aparecer-card .7s cubic-bezier(.22,.61,.36,1) both;
+}
+@keyframes aparecer-card { from { opacity: 0; transform: translateY(24px) scale(.97); } to { opacity: 1; transform: none; } }
+
+.login-card .sello {
+  position: absolute; top: -26px; left: 50%; transform: translateX(-50%);
+  width: 52px; height: 52px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 1.5rem; color: #3a1410;
+  background: radial-gradient(circle at 38% 34%, #b23b2e, #7a1f18 70%, #5a130d);
+  box-shadow: 0 6px 16px rgba(0,0,0,.5), inset 0 2px 4px rgba(255,255,255,.25);
+  border: 2px solid rgba(255,255,255,.12);
 }
 .login-card h2 {
-  font-family: var(--fuente-titulo);
-  text-align: center;
-  margin: 0 0 1.4rem;
-  color: var(--oro);
-  font-size: 1.5rem;
+  font-family: var(--fuente-titulo); text-align: center;
+  margin: .6rem 0 1.6rem; color: var(--oro-claro); font-size: 1.45rem;
+  text-shadow: 0 0 16px rgba(240,168,80,.4);
 }
 
-.campo { margin-bottom: 1.1rem; }
+/* Campos */
+.campo { margin-bottom: 1.15rem; }
 .campo label {
-  display: block;
-  font-weight: 700;
-  margin-bottom: .4rem;
-  color: var(--oro-claro);
-  font-size: .95rem;
+  display: block; font-size: .72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--oro); margin-bottom: .45rem;
 }
-.campo input {
-  width: 100%;
-  padding: .85rem 1rem;
-  border-radius: 12px;
-  border: 1.5px solid rgba(217,182,78,.35);
-  background: rgba(0,0,0,.35);
-  color: #fff;
-  font-family: var(--fuente-texto);
-  font-size: 1rem;
-  transition: border-color .2s, box-shadow .2s;
+.campo-input {
+  display: flex; align-items: center;
+  background: rgba(12,8,22,.72);
+  border: 1.5px solid rgba(106,96,144,.55);
+  border-radius: 12px; padding: 0 .9rem;
+  transition: border-color .2s, box-shadow .25s, background .2s;
 }
-.campo input:focus {
-  outline: none;
-  border-color: var(--magia-2);
-  box-shadow: 0 0 0 3px rgba(56,189,248,.25);
+.campo-input .icono { font-size: 1.05rem; opacity: .8; margin-right: .5rem; }
+.campo-input input {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--texto-fr); font-family: var(--fuente-texto); font-size: 1rem;
+  padding: .85rem 0;
 }
-.campo input::placeholder { color: rgba(244,228,184,.4); }
-
-.login-card .btn-magico { width: 100%; margin-top: .4rem; }
-
-/* Mensaje de resultado (exito / error) */
-.mensaje {
-  margin-top: 1rem;
-  min-height: 1.4rem;
-  text-align: center;
-  font-weight: 700;
-  border-radius: 10px;
-  padding: .3rem;
-  transition: background .2s;
-}
-.mensaje.error   { color: #ffb4b4; background: rgba(155,28,28,.25); }
-.mensaje.exito   { color: #b9ffce; background: rgba(61,220,132,.18); }
-
-.pista-login {
-  margin-top: 1.2rem;
-  font-size: .8rem;
-  text-align: center;
-  color: rgba(244,228,184,.5);
-  font-style: italic;
+.campo-input input::placeholder { color: rgba(200,192,224,.42); }
+.campo-input:focus-within {
+  border-color: var(--ambar);
+  background: rgba(18,12,30,.85);
+  box-shadow: 0 0 0 3px rgba(240,168,80,.22), 0 0 28px rgba(240,168,80,.3);
 }
 
-@media (max-width: 820px) {
+/* Boton entrar */
+.btn-entrar {
+  position: relative; overflow: hidden; width: 100%; margin-top: .6rem;
+  padding: .95rem 1rem; border: 1.5px solid #f6e4b0; border-radius: 999px;
+  font-family: var(--fuente-titulo); font-size: 1.05rem; letter-spacing: .5px;
+  color: #241a05; cursor: pointer;
+  background: linear-gradient(145deg, #f6dd8e, var(--oro) 55%, #b1842f);
+  box-shadow: 0 8px 0 #6b5018, 0 14px 30px rgba(0,0,0,.45), inset 0 1px 0 #fff3cf;
+  transition: transform .12s, box-shadow .12s, filter .2s;
+}
+.btn-entrar span { position: relative; z-index: 1; }
+.btn-entrar::before {
+  content: ""; position: absolute; top: 0; left: -120%; width: 60%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.65), transparent);
+  transform: skewX(-20deg); transition: left .6s ease;
+}
+.btn-entrar:hover { filter: brightness(1.06); transform: translateY(-2px); }
+.btn-entrar:hover::before { left: 130%; }
+.btn-entrar:active { transform: translateY(5px); box-shadow: 0 3px 0 #6b5018, 0 6px 14px rgba(0,0,0,.45), inset 0 1px 0 #fff3cf; }
+
+/* Mensaje y pista */
+.mensaje { margin-top: 1rem; min-height: 1.4rem; text-align: center;
+  font-weight: 700; border-radius: 10px; padding: .35rem; font-size: .95rem; }
+.mensaje.error { color: #ffc2c2; background: rgba(155,28,28,.3); }
+.mensaje.exito { color: #c6f5d4; background: rgba(90,200,130,.2); }
+.pista-login { margin-top: 1rem; font-size: .78rem; text-align: center;
+  color: rgba(222,214,244,.5); font-style: italic; }
+
+/* Responsive */
+@media (max-width: 860px) {
   .login-layout { grid-template-columns: 1fr; text-align: center; }
-  .login-hero { order: -1; }
+  .login-hero { order: -1; margin-top: 2rem; }
+  .scrim { background:
+    radial-gradient(140% 100% at 50% 35%, transparent 30%, rgba(9,6,16,.7) 100%); }
 }

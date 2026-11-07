@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Titulo de pestana solicitado -->
+  <title>Mapa del Merodeador</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%97%BA%EF%B8%8F</text></svg>" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/mapa.css" />
+</head>
+<body class="mapa-body">
+
+  <!-- ======================= HUD SUPERIOR ======================= -->
+  <header class="hud">
+    <div class="hud-bloque">
+      <span>⏳</span>
+      <span id="temporizador">20:00</span>
+    </div>
+
+    <div class="hud-bloque vidas" id="vidas" aria-label="Vidas restantes">
+      <span class="vida">❤️</span>
+      <span class="vida">❤️</span>
+      <span class="vida">❤️</span>
+    </div>
+
+    <div class="hud-bloque">
+      <button id="btn-pistas" class="btn-magico">
+        📜 Pistas <span class="pistas-contador" id="pistas-contador">0/8</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ======================= MUNDO / MAPA ======================= -->
+  <div id="mundo">
+    <div id="escena">
+      <!-- Jugador (su tunica usa --tunica segun la casa elegida) -->
+      <div id="jugador">
+        <div class="jug-tunica"></div>
+        <div class="jug-cara"></div>
+      </div>
+      <!-- Los 8 puntos de interes se generan por JS dentro de #escena -->
+    </div>
+
+    <!-- Niebla de guerra (overlay con agujero de vision sobre el jugador) -->
+    <div id="niebla"></div>
+  </div>
+
+  <!-- ======================= CARTA DE HOGWARTS ======================= -->
+  <div id="carta-icono" title="Tienes una carta sin leer" role="button" tabindex="0">✉️</div>
+
+  <!-- Caja del secreto (reto de inspeccion de codigo). Se oculta al resolverse -->
+  <div id="caja-secreto">
+    <input type="text" id="input-secreto" placeholder="¿Conoces el juramento del Mapa del Merodeador?" />
+    <button id="btn-secreto" class="btn-magico">Conjurar</button>
+  </div>
+
+  <!-- ======================= POP-UP INICIAR MISION ======================= -->
+  <div id="popup-mision">
+    <h3 id="popup-titulo">Profesor McGonagall</h3>
+    <p id="popup-texto">¿Deseas iniciar esta misión?</p>
+    <div class="fila">
+      <button id="popup-aceptar" class="btn-magico">Iniciar misión</button>
+      <button id="popup-cancelar" class="btn-no">Ahora no</button>
+    </div>
+  </div>
+
+  <!-- ======================= MODAL: CARTA (pergamino) ======================= -->
+  <div id="modal-carta" class="overlay-modal oculto">
+    <div class="pergamino">
+      <button class="cerrar" data-cerrar="modal-carta" aria-label="Cerrar">×</button>
+      <h2>Colegio Hogwarts de Magia y Hechicería</h2>
+      <p>
+        Estimado(a) alumno(a):<br/><br/>
+        Tenemos el placer de informarle de que ha sido <strong>aceptado(a)</strong> en el
+        Colegio Hogwarts de Magia y Hechicería. Encontrará adjunta la lista de todos los
+        libros y el equipo necesarios. (…)
+      </p>
+      <div class="acertijo">
+        «Si a nuestra escuela quieres entrar,<br/>
+        en la <strong>fuente</strong> del castillo debes mirar.»
+      </div>
+      <p style="margin-top:1rem;font-size:.95rem;opacity:.8">
+        — La "fuente" es el origen. A veces lo que buscas no está en la pantalla… sino detrás de ella.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================= MODAL: PISTAS ======================= -->
+  <div id="modal-pistas" class="overlay-modal oculto">
+    <div class="pergamino">
+      <button class="cerrar" data-cerrar="modal-pistas" aria-label="Cerrar">×</button>
+      <h2>📜 Pistas recolectadas</h2>
+      <ul class="lista-pistas" id="lista-pistas"><!-- se rellena por JS --></ul>
+    </div>
+  </div>
+
+  <!-- ======================= ESCENARIOS DE ANIMACION (placeholders) ======================= -->
+
+  <!-- Espada de Gryffindor (recompensa del reto de la frase) -->
+  <div id="anim-espada" class="cinematica oculto">
+    <div class="escena-2d" style="display:grid;place-items:center;text-align:center">
+      <div class="espada">🗡️</div>
+      <div class="mensaje-magico">Has conseguido la espada de Gryffindor</div>
+    </div>
+  </div>
+
+  <!-- Destruccion de Horrocrux con la espada -->
+  <div id="anim-horrocrux" class="cinematica oculto">
+    <div class="escena-2d" style="display:grid;place-items:center">
+      <div class="humo-oscuro"></div>
+      <div style="font-size:3rem">🧙‍♂️🗡️ ⚔️ <span class="horrocrux">🏺</span></div>
+    </div>
+  </div>
+
+  <!-- Game Over: Voldemort elimina al jugador -->
+  <div id="anim-gameover" class="cinematica oculto">
+    <div class="titulo-final derrota">Has caído…</div>
+    <div class="escena-2d">
+      <div class="duelo">
+        <div class="mago" id="go-villano">🧙‍♂️</div>
+        <div class="rayo-hechizo" style="--rayo-color:#2ecc71"></div>
+        <div class="mago golpeado" id="go-heroe">🧑‍🎓</div>
+      </div>
+    </div>
+    <button class="btn-magico" onclick="location.reload()">Volver a intentarlo</button>
+  </div>
+
+  <!-- Victoria: el jugador lanza Avada Kedavra sobre Voldemort -->
+  <div id="anim-victoria" class="cinematica oculto">
+    <div class="titulo-final victoria">¡Avada Kedavra!</div>
+    <div class="escena-2d">
+      <div class="duelo">
+        <div class="mago" id="vic-heroe">🧑‍🎓</div>
+        <div class="rayo-hechizo" style="--rayo-color:#2ecc71"></div>
+        <div class="mago golpeado" id="vic-villano">🧙‍♂️</div>
+      </div>
+    </div>
+    <button class="btn-magico" onclick="location.href='/'">Fin de la aventura ✦</button>
+  </div>
+
+  <!-- =========================================================================
+       SECRETO DEL CTF — FRASE OCULTA EN EL DOM
+       El jugador, guiado por la carta ("en la fuente... debes mirar"), debe
+       abrir las herramientas de desarrollador (inspeccionar codigo fuente),
+       encontrar esta frase y escribirla en la caja de texto para disipar la
+       niebla y obtener la espada de Gryffindor.
+       (Esto es parte de la mecanica del CTF: no eliminar.)
+       ========================================================================= -->
+  <div id="secreto-merodeador" style="display:none" aria-hidden="true" data-flag="map">Juro solemnemente que mis intenciones no son buenas</div>
+
+  <!-- Scripts: primero animaciones y HUD, luego la logica del mapa -->
+  <script src="js/animaciones.js"></script>
+  <script src="js/hud.js"></script>
+  <script src="js/mapa.js"></script>
+</body>
+</html>

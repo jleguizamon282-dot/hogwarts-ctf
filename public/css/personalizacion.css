@@ -1,0 +1,148 @@
+/* =============================================================================
+   personalizacion.css — Sala de personalizacion del personaje
+   ============================================================================= */
+
+.perso-wrap {
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 2.5rem 1.2rem 4rem;
+}
+.perso-wrap h1 {
+  font-family: var(--fuente-titulo);
+  text-align: center;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  color: var(--oro-claro);
+  text-shadow: 0 0 16px rgba(217,182,78,.5);
+  margin-bottom: .2rem;
+}
+.perso-wrap .intro {
+  text-align: center;
+  font-family: var(--fuente-magica);
+  color: var(--magia-2);
+  margin-bottom: 2.2rem;
+}
+
+.perso-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+/* --- Previsualizacion del avatar (placeholder dibujado con CSS/emoji) ------ */
+.avatar-preview {
+  position: sticky;
+  top: 2rem;
+  background: linear-gradient(160deg, rgba(30,27,75,.8), rgba(11,10,26,.9));
+  border: 1.5px solid rgba(217,182,78,.4);
+  border-radius: var(--radio);
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 20px 48px rgba(0,0,0,.5);
+}
+.avatar-stage {
+  position: relative;
+  width: 220px; height: 260px;
+  margin: 0 auto 1rem;
+  display: grid;
+  place-items: center;
+}
+/* Cuerpo = tunica (color segun casa, via variable --tunica) */
+.avatar-tunica {
+  position: absolute;
+  bottom: 0;
+  width: 150px; height: 160px;
+  border-radius: 75px 75px 30px 30px;
+  background: linear-gradient(160deg, var(--tunica, #555), #111);
+  border: 3px solid rgba(255,255,255,.15);
+  box-shadow: inset 0 -10px 20px rgba(0,0,0,.4);
+}
+/* Cabeza */
+.avatar-cara {
+  position: absolute;
+  top: 36px;
+  width: 92px; height: 92px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #ffe0bd, #e8b58a);
+  border: 3px solid rgba(0,0,0,.15);
+  z-index: 2;
+}
+/* Pelo: 3 variantes controladas por data-pelo en el contenedor */
+.avatar-pelo {
+  position: absolute;
+  top: 20px;
+  width: 104px; height: 70px;
+  z-index: 3;
+  background: #3a2a1a;
+}
+[data-pelo="1"] .avatar-pelo { border-radius: 60px 60px 0 0; }                 /* corto */
+[data-pelo="2"] .avatar-pelo { border-radius: 60px 60px 40px 40px; height: 95px; } /* largo */
+[data-pelo="3"] .avatar-pelo { border-radius: 60px 60px 50% 50% / 60px 60px 80% 80%; width: 120px; height: 60px; } /* alborotado */
+/* Gafas */
+.avatar-gafas {
+  position: absolute;
+  top: 66px;
+  width: 78px; height: 26px;
+  z-index: 4;
+  display: none;
+}
+[data-gafas="si"] .avatar-gafas { display: block; }
+.avatar-gafas::before, .avatar-gafas::after {
+  content: ""; position: absolute; top: 0;
+  width: 30px; height: 26px; border: 3px solid #1a1a1a; border-radius: 50%;
+  background: rgba(200,230,255,.25);
+}
+.avatar-gafas::before { left: 0; }
+.avatar-gafas::after  { right: 0; }
+
+.avatar-nombre {
+  font-family: var(--fuente-magica);
+  font-size: 1.2rem;
+  color: var(--oro);
+}
+
+/* --- Panel de opciones ----------------------------------------------------- */
+.opciones { display: grid; gap: 1.6rem; }
+.grupo {
+  background: rgba(20,18,51,.6);
+  border: 1px solid rgba(217,182,78,.25);
+  border-radius: var(--radio);
+  padding: 1.2rem 1.4rem;
+}
+.grupo h3 {
+  font-family: var(--fuente-titulo);
+  margin: 0 0 1rem;
+  color: var(--oro);
+  font-size: 1.15rem;
+}
+.chips { display: flex; flex-wrap: wrap; gap: .7rem; }
+.chip {
+  cursor: pointer;
+  border: 2px solid rgba(217,182,78,.35);
+  background: rgba(0,0,0,.3);
+  color: var(--oro-claro);
+  padding: .6rem 1.1rem;
+  border-radius: 999px;
+  font-family: var(--fuente-texto);
+  font-weight: 700;
+  transition: transform .12s, border-color .2s, background .2s;
+}
+.chip:hover { transform: translateY(-2px); }
+.chip.activo {
+  border-color: var(--oro);
+  background: linear-gradient(145deg, rgba(217,182,78,.35), rgba(124,92,255,.25));
+  box-shadow: 0 0 0 3px rgba(217,182,78,.2);
+}
+/* Chips de casa con su color */
+.chip[data-casa="Gryffindor"].activo { box-shadow: 0 0 0 3px var(--gryffindor-2); }
+.chip[data-casa="Slytherin"].activo  { box-shadow: 0 0 0 3px var(--slytherin-1); }
+.chip[data-casa="Ravenclaw"].activo  { box-shadow: 0 0 0 3px var(--ravenclaw-2); }
+.chip[data-casa="Hufflepuff"].activo { box-shadow: 0 0 0 3px var(--hufflepuff-1); }
+
+.acciones { margin-top: 2rem; text-align: center; }
+.acciones .btn-magico { font-size: 1.2rem; padding: 1rem 3rem; }
+
+@media (max-width: 760px) {
+  .perso-grid { grid-template-columns: 1fr; }
+  .avatar-preview { position: static; }
+}

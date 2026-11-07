@@ -1,0 +1,11 @@
+# Dependencias (se recrean con: npm install)
+node_modules/
+
+# Base de datos generada (se recrea con: npm run initdb)
+db/hogwarts.db
+db/*.db
+
+# Logs y temporales
+*.log
+npm-debug.log*
+.DS_Store

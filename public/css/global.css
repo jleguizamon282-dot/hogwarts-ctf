@@ -1,0 +1,129 @@
+/* =============================================================================
+   global.css — Tema compartido "Howgarts"
+   Estetica: oscura pero amigable, estilo cartoon / videojuego clasico.
+   ============================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=MedievalSharp&family=Quicksand:wght@500;700&display=swap');
+
+:root {
+  /* Paleta magica */
+  --noche-1: #0b0a1a;
+  --noche-2: #141233;
+  --noche-3: #1e1b4b;
+  --oro:      #d9b64e;
+  --oro-claro:#f4e4b8;
+  --magia:    #7c5cff;
+  --magia-2:  #38bdf8;
+  --rojo-gryff:#9b1c1c;
+  --verde-ok: #3ddc84;
+  --sombra-oscura: rgba(0,0,0,.55);
+
+  /* Casas */
+  --gryffindor-1:#7f0909; --gryffindor-2:#ffc500;
+  --slytherin-1: #0d6218; --slytherin-2:#aaaaaa;
+  --ravenclaw-1: #0e1a40; --ravenclaw-2:#946b2d;
+  --hufflepuff-1:#ecb939; --hufflepuff-2:#372e29;
+
+  --fuente-titulo: 'Cinzel Decorative', serif;
+  --fuente-magica: 'MedievalSharp', cursive;
+  --fuente-texto:  'Quicksand', system-ui, sans-serif;
+
+  --radio: 18px;
+  --transicion: .45s cubic-bezier(.22,.61,.36,1);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: var(--fuente-texto);
+  color: var(--oro-claro);
+  background: radial-gradient(ellipse at 50% -10%, var(--noche-3), var(--noche-1) 60%);
+  overflow-x: hidden;
+}
+
+/* --- Cielo estrellado animado (capa de fondo reutilizable) ----------------- */
+.cielo {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  background:
+    radial-gradient(2px 2px at 20% 30%, #fff, transparent),
+    radial-gradient(2px 2px at 60% 70%, #fff, transparent),
+    radial-gradient(1px 1px at 80% 20%, #cfe8ff, transparent),
+    radial-gradient(1.5px 1.5px at 35% 80%, #fff, transparent),
+    radial-gradient(1px 1px at 90% 60%, #fff, transparent),
+    radial-gradient(2px 2px at 10% 60%, #ffe9a8, transparent);
+  background-repeat: repeat;
+  background-size: 400px 400px;
+  animation: parpadeo 6s ease-in-out infinite alternate;
+  opacity: .8;
+}
+@keyframes parpadeo { from { opacity: .5; } to { opacity: .95; } }
+
+/* --- Luna --- */
+.luna {
+  position: fixed;
+  top: 6vh; right: 8vw;
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff7d6, #e9d08a 70%, #c9a84a);
+  box-shadow: 0 0 60px 20px rgba(249, 231, 159, .35);
+  z-index: -2;
+}
+
+/* --- Silueta del castillo de Hogwarts (SVG de fondo) ----------------------- */
+.castillo {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  width: 100%;
+  z-index: -1;
+  pointer-events: none;
+  filter: drop-shadow(0 -4px 24px rgba(124, 92, 255, .25));
+}
+
+/* --- Botones magicos reutilizables ---------------------------------------- */
+.btn-magico {
+  font-family: var(--fuente-titulo);
+  font-size: 1.05rem;
+  letter-spacing: .5px;
+  color: #231a05;
+  background: linear-gradient(145deg, #f6dd8e, var(--oro) 60%, #a9812f);
+  border: 2px solid #f8edc0;
+  border-radius: 999px;
+  padding: .85rem 2rem;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #6e521b, 0 10px 24px rgba(0,0,0,.4);
+  transition: transform .12s ease, box-shadow .12s ease, filter .2s ease;
+}
+.btn-magico:hover { filter: brightness(1.08); transform: translateY(-2px); }
+.btn-magico:active { transform: translateY(4px); box-shadow: 0 2px 0 #6e521b, 0 4px 10px rgba(0,0,0,.4); }
+.btn-magico:disabled { filter: grayscale(.6) brightness(.8); cursor: not-allowed; }
+
+/* --- Transiciones entre pantallas ----------------------------------------- */
+.pantalla {
+  animation: aparecer var(--transicion) both;
+}
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(18px) scale(.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Clase que aplicamos justo antes de redirigir para hacer fundido de salida */
+body.saliendo { animation: fundido-salida .4s ease forwards; }
+@keyframes fundido-salida { to { opacity: 0; transform: scale(1.02); } }
+
+/* --- Utilidades ----------------------------------------------------------- */
+.oculto { display: none !important; }
+.centrado { display: grid; place-items: center; min-height: 100vh; }
+
+/* Scrollbar tematica */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-thumb { background: var(--oro); border-radius: 999px; }
+::-webkit-scrollbar-track { background: var(--noche-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

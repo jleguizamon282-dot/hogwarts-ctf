@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Personaliza tu mago · Howgarts</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%A7%99</text></svg>" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/personalizacion.css" />
+</head>
+<body>
+  <div class="cielo"></div>
+  <div class="luna"></div>
+
+  <main class="pantalla perso-wrap">
+    <h1>Crea tu Mago</h1>
+    <p class="intro">Antes de entrar al castillo, elige tu aspecto…</p>
+
+    <div class="perso-grid">
+      <!-- Previsualizacion en vivo del avatar -->
+      <aside class="avatar-preview">
+        <div class="avatar-stage" id="avatar" data-pelo="1" data-gafas="no" style="--tunica:#9b1c1c">
+          <div class="avatar-tunica"></div>
+          <div class="avatar-pelo"></div>
+          <div class="avatar-cara"></div>
+          <div class="avatar-gafas"></div>
+        </div>
+        <div class="avatar-nombre" id="avatar-casa">Gryffindor</div>
+      </aside>
+
+      <!-- Opciones -->
+      <section class="opciones">
+        <div class="grupo">
+          <h3>1 · Peinado</h3>
+          <div class="chips" data-opcion="pelo">
+            <button class="chip activo" data-valor="1">Corto</button>
+            <button class="chip" data-valor="2">Largo</button>
+            <button class="chip" data-valor="3">Alborotado</button>
+          </div>
+        </div>
+
+        <div class="grupo">
+          <h3>2 · ¿Gafas?</h3>
+          <div class="chips" data-opcion="gafas">
+            <button class="chip" data-valor="si">Sí, con gafas</button>
+            <button class="chip activo" data-valor="no">No, sin gafas</button>
+          </div>
+        </div>
+
+        <div class="grupo">
+          <h3>3 · Túnica de tu casa</h3>
+          <div class="chips" data-opcion="casa">
+            <button class="chip activo" data-casa="Gryffindor" data-valor="Gryffindor" data-color="#9b1c1c">Gryffindor</button>
+            <button class="chip" data-casa="Slytherin" data-valor="Slytherin" data-color="#0d6218">Slytherin</button>
+            <button class="chip" data-casa="Ravenclaw" data-valor="Ravenclaw" data-color="#0e1a40">Ravenclaw</button>
+            <button class="chip" data-casa="Hufflepuff" data-valor="Hufflepuff" data-color="#ecb939">Hufflepuff</button>
+          </div>
+        </div>
+
+        <div class="acciones">
+          <button id="btn-comenzar" class="btn-magico">Comenzar Aventura ✦</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="js/personalizacion.js"></script>
+</body>
+</html>

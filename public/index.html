@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Titulo de pestana solicitado -->
+  <title>Howgarts</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%E2%9A%A1</text></svg>" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/login.css" />
+</head>
+<body>
+  <!-- Fondo compartido: cielo, luna y castillo -->
+  <div class="cielo"></div>
+  <div class="luna"></div>
+  <svg class="castillo" viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <!-- Silueta sencilla del castillo (placeholder: sustituible por arte real) -->
+    <g fill="#0a0820">
+      <rect x="120" y="180" width="60" height="140"/>
+      <polygon points="150,140 120,180 180,180"/>
+      <rect x="200" y="210" width="120" height="110"/>
+      <rect x="340" y="120" width="80" height="200"/>
+      <polygon points="380,70 340,120 420,120"/>
+      <rect x="450" y="190" width="200" height="130"/>
+      <rect x="520" y="110" width="70" height="90"/>
+      <polygon points="555,60 520,110 590,110"/>
+      <rect x="680" y="150" width="90" height="170"/>
+      <polygon points="725,95 680,150 770,150"/>
+      <rect x="800" y="200" width="220" height="120"/>
+      <rect x="880" y="120" width="70" height="90"/>
+      <polygon points="915,70 880,120 950,120"/>
+      <rect x="1050" y="170" width="80" height="150"/>
+      <polygon points="1090,120 1050,170 1130,170"/>
+      <rect x="1160" y="210" width="160" height="110"/>
+      <rect x="1230" y="140" width="60" height="80"/>
+      <polygon points="1260,95 1230,140 1290,140"/>
+    </g>
+    <!-- Ventanas iluminadas -->
+    <g fill="#ffcf5c" opacity="0.85">
+      <rect x="360" y="160" width="12" height="20"/>
+      <rect x="390" y="160" width="12" height="20"/>
+      <rect x="700" y="190" width="12" height="20"/>
+      <rect x="735" y="190" width="12" height="20"/>
+      <rect x="900" y="160" width="12" height="20"/>
+      <rect x="1075" y="210" width="12" height="20"/>
+    </g>
+  </svg>
+
+  <!-- Pantalla de login -->
+  <main class="pantalla login-layout">
+    <section class="login-hero">
+      <div class="escudo">⚡</div>
+      <h1>Howgarts</h1>
+      <p class="subtitulo">Colegio de Magia y Hechicería</p>
+    </section>
+
+    <section class="login-card">
+      <h2>Entrada al Castillo</h2>
+      <form id="form-login" autocomplete="off" novalidate>
+        <div class="campo">
+          <label for="username">Nombre de mago</label>
+          <input type="text" id="username" name="username" placeholder="Escribe tu usuario…" required />
+        </div>
+        <div class="campo">
+          <label for="password">Palabra mágica (contraseña)</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" />
+        </div>
+        <button type="submit" class="btn-magico">Alohomora ✦ Entrar</button>
+      </form>
+      <div id="mensaje" class="mensaje" role="status" aria-live="polite"></div>
+      <p class="pista-login">Solo los magos registrados pueden entrar… ¿o habrá otra forma?</p>
+    </section>
+  </main>
+
+  <script src="js/login.js"></script>
+</body>
+</html>

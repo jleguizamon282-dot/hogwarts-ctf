@@ -1,0 +1,17 @@
+{
+  "name": "hogwarts-ctf",
+  "version": "0.1.0",
+  "description": "CTF educativo con tematica Harry Potter. Entorno de pruebas controlado para ensenar inyeccion SQL e inspeccion de codigo fuente.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "initdb": "node db/init.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["ctf", "educativo", "seguridad", "harry-potter", "sql-injection"],
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "express": "^4.19.2"
+  }
+}

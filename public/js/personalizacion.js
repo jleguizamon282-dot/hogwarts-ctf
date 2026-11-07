@@ -1,53 +1,75 @@
 /* =============================================================================
-   personalizacion.js — Sala de creacion del personaje
-   Actualiza la previsualizacion en vivo y guarda la config en localStorage.
+   personalizacion.js — Creación del personaje
+   Actualiza el avatar SVG en vivo (peinado, gafas, bufanda de casa) y guarda
+   la configuración en localStorage antes de ir al mapa.
    ============================================================================= */
 
-// Config por defecto
-const config = {
-  pelo: '1',
-  gafas: 'no',
-  casa: 'Gryffindor',
-  color: '#9b1c1c',
+// Colores de bufanda por casa (a = principal, b = secundario)
+const CASAS = {
+  Gryffindor: { a: '#7f0909', b: '#e4b835' },
+  Slytherin:  { a: '#1a472a', b: '#b9bfc4' },
+  Ravenclaw:  { a: '#222f5b', b: '#9a6f33' },
+  Hufflepuff: { a: '#e8b72a', b: '#2b2520' },
 };
 
-const avatar = document.getElementById('avatar');
-const avatarCasa = document.getElementById('avatar-casa');
+const config = { pelo: '1', gafas: 'si', casa: 'Gryffindor' };
 
-// Aplica la config actual a la previsualizacion
-function pintarAvatar() {
+const avatar = document.getElementById('avatar');
+const stageCasa = document.getElementById('stage-casa');
+const toggle = document.querySelector('.toggle');
+
+function pintar() {
   avatar.dataset.pelo = config.pelo;
   avatar.dataset.gafas = config.gafas;
-  avatar.style.setProperty('--tunica', config.color);
-  avatarCasa.textContent = config.casa;
+  avatar.dataset.casa = config.casa;
+  stageCasa.textContent = config.casa;
+  toggle.dataset.sel = config.gafas; // mueve el indicador del toggle
 }
 
-// Maneja clics en cualquier grupo de chips
-document.querySelectorAll('.chips').forEach((grupo) => {
-  const opcion = grupo.dataset.opcion; // pelo | gafas | casa
-  grupo.addEventListener('click', (e) => {
-    const chip = e.target.closest('.chip');
-    if (!chip) return;
-
-    // Marcar activo
-    grupo.querySelectorAll('.chip').forEach((c) => c.classList.remove('activo'));
-    chip.classList.add('activo');
-
-    // Guardar valor
-    config[opcion] = chip.dataset.valor;
-    if (opcion === 'casa') {
-      config.casa = chip.dataset.valor;
-      config.color = chip.dataset.color;
-    }
-    pintarAvatar();
-  });
+/* --- Peinado (chips) --- */
+document.querySelector('.chips[data-opcion="pelo"]').addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  document.querySelectorAll('.chips .chip').forEach((c) => c.classList.remove('activo'));
+  chip.classList.add('activo');
+  config.pelo = chip.dataset.valor;
+  pintar();
 });
 
-// Boton comenzar: guarda y va al mapa
+/* --- Gafas (toggle) --- */
+toggle.addEventListener('click', (e) => {
+  const seg = e.target.closest('.seg');
+  if (!seg) return;
+  toggle.querySelectorAll('.seg').forEach((s) => s.classList.remove('activo'));
+  seg.classList.add('activo');
+  config.gafas = seg.dataset.valor;
+  pintar();
+});
+
+/* --- Casa / bufanda --- */
+document.querySelector('.casas[data-opcion="casa"]').addEventListener('click', (e) => {
+  const btn = e.target.closest('.casa-btn');
+  if (!btn) return;
+  document.querySelectorAll('.casa-btn').forEach((b) => b.classList.remove('activo'));
+  btn.classList.add('activo');
+  config.casa = btn.dataset.casa;
+  pintar();
+});
+
+/* --- Comenzar aventura --- */
 document.getElementById('btn-comenzar').addEventListener('click', () => {
-  localStorage.setItem('howgarts_personaje', JSON.stringify(config));
+  const casa = CASAS[config.casa] || CASAS.Gryffindor;
+  const guardar = {
+    pelo: config.pelo,
+    gafas: config.gafas,
+    casa: config.casa,
+    scarfA: casa.a,
+    scarfB: casa.b,
+    color: casa.a, // compatibilidad con el mapa (color de túnica = color de casa)
+  };
+  localStorage.setItem('howgarts_personaje', JSON.stringify(guardar));
   document.body.classList.add('saliendo');
   setTimeout(() => (location.href = 'mapa.html'), 400);
 });
 
-pintarAvatar();
+pintar();

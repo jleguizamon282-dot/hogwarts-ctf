@@ -3,63 +3,217 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Personaliza tu mago · Howgarts</title>
+  <title>Crea tu mago · Howgarts</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%A7%99</text></svg>" />
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/personalizacion.css" />
 </head>
-<body>
-  <div class="cielo"></div>
-  <div class="luna"></div>
+<body class="perso-body">
+
+  <!-- Fondo (misma gama que el login) -->
+  <div class="escena" aria-hidden="true">
+    <img id="foto-fondo" src="assets/castle.jpg" alt="" onerror="this.remove()" />
+    <div class="scrim"></div>
+    <div class="particulas"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
 
   <main class="pantalla perso-wrap">
-    <h1>Crea tu Mago</h1>
-    <p class="intro">Antes de entrar al castillo, elige tu aspecto…</p>
+    <header class="perso-head">
+      <div class="crest">✦</div>
+      <h1>Crea tu Mago</h1>
+      <p class="intro">Elige tu aspecto antes de cruzar el lago…</p>
+    </header>
 
     <div class="perso-grid">
-      <!-- Previsualizacion en vivo del avatar -->
-      <aside class="avatar-preview">
-        <div class="avatar-stage" id="avatar" data-pelo="1" data-gafas="no" style="--tunica:#9b1c1c">
-          <div class="avatar-tunica"></div>
-          <div class="avatar-pelo"></div>
-          <div class="avatar-cara"></div>
-          <div class="avatar-gafas"></div>
-        </div>
-        <div class="avatar-nombre" id="avatar-casa">Gryffindor</div>
-      </aside>
 
-      <!-- Opciones -->
-      <section class="opciones">
+      <!-- ====================== ESCENARIO DEL PERSONAJE ====================== -->
+      <section class="stage">
+        <div class="stage-glow"></div>
+
+        <div id="avatar" class="avatar" data-pelo="1" data-gafas="si" data-casa="Gryffindor">
+          <svg class="avatar-svg" viewBox="0 0 300 395" role="img" aria-label="Tu personaje">
+            <defs>
+              <radialGradient id="skinGrad" cx="42%" cy="36%" r="72%">
+                <stop offset="0%" stop-color="#ffe9d2"/>
+                <stop offset="100%" stop-color="#f1c59a"/>
+              </radialGradient>
+              <linearGradient id="hairGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#7d5430"/>
+                <stop offset="55%" stop-color="#5c3c20"/>
+                <stop offset="100%" stop-color="#432a15"/>
+              </linearGradient>
+              <linearGradient id="robeGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#2a2833"/>
+                <stop offset="100%" stop-color="#0d0c12"/>
+              </linearGradient>
+              <linearGradient id="wandGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#7c4f27"/>
+                <stop offset="100%" stop-color="#452a13"/>
+              </linearGradient>
+            </defs>
+
+            <!-- sombra -->
+            <ellipse class="sombra" cx="150" cy="379" rx="80" ry="15" fill="rgba(0,0,0,.5)"/>
+
+            <!-- piernas / zapatos -->
+            <g stroke="#15111d" stroke-width="3">
+              <rect x="126" y="332" width="20" height="42" rx="9" fill="#3a3550"/>
+              <rect x="154" y="332" width="20" height="42" rx="9" fill="#3a3550"/>
+              <ellipse cx="128" cy="377" rx="19" ry="10" fill="#15121c"/>
+              <ellipse cx="172" cy="377" rx="19" ry="10" fill="#15121c"/>
+            </g>
+
+            <!-- brazos / manos / varita -->
+            <g>
+              <path d="M92 250 q-30 8 -34 46 q14 11 32 3 Z" fill="url(#robeGrad)" stroke="#15111d" stroke-width="3"/>
+              <path d="M208 250 q30 8 34 46 q-14 11 -32 3 Z" fill="url(#robeGrad)" stroke="#15111d" stroke-width="3"/>
+              <circle cx="240" cy="300" r="12.5" fill="#ffe1c2" stroke="#e3a97f" stroke-width="2"/>
+              <!-- varita en la mano izquierda -->
+              <g class="varita" stroke-linecap="round">
+                <line x1="58" y1="300" x2="16" y2="250" stroke="#3a2410" stroke-width="8"/>
+                <line x1="56" y1="298" x2="18" y2="252" stroke="url(#wandGrad)" stroke-width="4"/>
+                <circle cx="16" cy="250" r="4" fill="#ffe3a0"/>
+                <circle cx="16" cy="250" r="9" fill="#ffe3a0" opacity=".22"/>
+              </g>
+              <circle cx="60" cy="300" r="12.5" fill="#ffe1c2" stroke="#e3a97f" stroke-width="2"/>
+            </g>
+
+            <!-- túnica -->
+            <path class="tunica" d="M98 198 q52 -16 104 0 q18 74 26 152 q-80 24 -156 0 q8 -80 26 -152 Z"
+                  fill="url(#robeGrad)" stroke="#15111d" stroke-width="3"/>
+            <path d="M150 214 L150 334" stroke="#0b0a10" stroke-width="3" fill="none"/>
+            <path d="M108 206 q-10 70 -2 138 q9 4 15 0 q-10 -70 2 -138 Z" fill="#ffffff" opacity=".05"/>
+
+            <!-- bufanda (colores por casa) -->
+            <g class="bufanda" stroke="#0e0c14" stroke-width="2.4" stroke-linejoin="round">
+              <path class="sc-a" d="M108 186 q42 26 84 0 l7 17 q-48 28 -98 0 Z"/>
+              <rect class="sc-b" x="122" y="196" width="34" height="16"/>
+              <rect class="sc-a" x="122" y="212" width="34" height="16"/>
+              <rect class="sc-b" x="122" y="228" width="34" height="16"/>
+              <rect class="sc-a" x="122" y="244" width="34" height="16"/>
+              <rect class="sc-b" x="122" y="260" width="34" height="14"/>
+              <g class="sc-a">
+                <rect x="124" y="274" width="6" height="13"/>
+                <rect x="136" y="274" width="6" height="13"/>
+                <rect x="148" y="274" width="6" height="13"/>
+              </g>
+            </g>
+
+            <!-- orejas -->
+            <circle cx="74" cy="128" r="12" fill="#f7cba0" stroke="#e3a97f" stroke-width="2"/>
+            <circle cx="226" cy="128" r="12" fill="#f7cba0" stroke="#e3a97f" stroke-width="2"/>
+
+            <!-- cabeza -->
+            <circle class="cara" cx="150" cy="122" r="82" fill="url(#skinGrad)" stroke="#e8b48c" stroke-width="2.5"/>
+
+            <!-- ojos -->
+            <g class="ojos">
+              <ellipse cx="120" cy="132" rx="17" ry="21" fill="#fff" stroke="#1a1420" stroke-width="2.5"/>
+              <ellipse cx="180" cy="132" rx="17" ry="21" fill="#fff" stroke="#1a1420" stroke-width="2.5"/>
+              <circle cx="122" cy="135" r="11" fill="#201712"/>
+              <circle cx="178" cy="135" r="11" fill="#201712"/>
+              <circle cx="126" cy="130" r="3.4" fill="#fff"/>
+              <circle cx="182" cy="130" r="3.4" fill="#fff"/>
+            </g>
+            <!-- cejas -->
+            <path d="M104 104 q16 -8 30 0" fill="none" stroke="#4a3017" stroke-width="4" stroke-linecap="round"/>
+            <path d="M166 104 q16 -8 30 0" fill="none" stroke="#4a3017" stroke-width="4" stroke-linecap="round"/>
+            <!-- mejillas -->
+            <ellipse cx="102" cy="154" rx="12" ry="7.5" fill="#f4a197" opacity=".5"/>
+            <ellipse cx="198" cy="154" rx="12" ry="7.5" fill="#f4a197" opacity=".5"/>
+            <!-- nariz / boca -->
+            <ellipse cx="150" cy="150" rx="5" ry="4" fill="#eab08b"/>
+            <path d="M136 162 q14 13 28 0" fill="none" stroke="#9a5a2a" stroke-width="3" stroke-linecap="round"/>
+
+            <!-- gafas -->
+            <g class="gafas" fill="none" stroke="#120f16" stroke-width="5">
+              <circle cx="120" cy="132" r="26"/>
+              <circle cx="180" cy="132" r="26"/>
+              <path d="M146 132 h8"/>
+              <path d="M94 128 l-18 -5"/>
+              <path d="M206 128 l18 -5"/>
+            </g>
+
+            <!-- PELO: 3 variantes -->
+            <g class="pelo pelo-1" fill="url(#hairGrad)" stroke="#3a2412" stroke-width="2.5" stroke-linejoin="round">
+              <path d="M60 148 Q48 48 150 36 Q252 48 240 148 Q232 116 214 126 Q222 92 194 104 Q202 74 166 92 Q172 62 144 86 Q118 68 118 100 Q98 84 94 110 Q78 106 78 134 Q70 126 60 148 Z"/>
+              <path d="M98 66 Q150 46 200 68 Q150 58 106 84 Z" fill="#9c6c3e" stroke="none" opacity=".35"/>
+            </g>
+            <g class="pelo pelo-2" fill="url(#hairGrad)" stroke="#3a2412" stroke-width="2.5" stroke-linejoin="round">
+              <path d="M62 140 Q52 46 150 36 Q248 46 238 140 Q230 112 210 122 Q216 90 190 102 Q196 72 166 90 Q170 62 146 86 Q120 66 120 98 Q100 84 96 110 Q78 104 76 134 Q70 126 62 140 Z"/>
+              <path d="M62 140 q-16 56 -6 98 q18 8 26 -6 q-12 -46 -4 -88 Z"/>
+              <path d="M238 140 q16 56 6 98 q-18 8 -26 -6 q12 -46 4 -88 Z"/>
+              <path d="M98 66 Q150 46 200 68 Q150 58 106 84 Z" fill="#9c6c3e" stroke="none" opacity=".3"/>
+            </g>
+            <g class="pelo pelo-3" fill="url(#hairGrad)" stroke="#3a2412" stroke-width="2.5" stroke-linejoin="round">
+              <path d="M62 136 Q54 48 150 40 Q248 48 238 136 Q232 112 206 124 Q214 92 180 100 Q150 80 120 102 Q108 84 100 104 Q84 100 90 124 Q76 112 62 136 Z"/>
+              <path d="M110 70 Q156 50 206 72 Q156 60 118 86 Z" fill="#9c6c3e" stroke="none" opacity=".3"/>
+            </g>
+
+            <!-- cicatriz (encima) -->
+            <path class="cicatriz" d="M170 70 l-7 13 l9 5 l-7 13" fill="none"
+                  stroke="#ef9a3d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <div class="pedestal"></div>
+        <div class="stage-casa" id="stage-casa">Gryffindor</div>
+      </section>
+
+      <!-- ====================== PANEL DE OPCIONES ====================== -->
+      <section class="panel">
+
         <div class="grupo">
-          <h3>1 · Peinado</h3>
+          <h3><span class="num">1</span> Peinado</h3>
           <div class="chips" data-opcion="pelo">
-            <button class="chip activo" data-valor="1">Corto</button>
-            <button class="chip" data-valor="2">Largo</button>
-            <button class="chip" data-valor="3">Alborotado</button>
+            <button class="chip activo" data-valor="1">
+              <span class="chip-ico">💇</span><span>Alborotado</span>
+            </button>
+            <button class="chip" data-valor="2">
+              <span class="chip-ico">🧑‍🎤</span><span>Largo</span>
+            </button>
+            <button class="chip" data-valor="3">
+              <span class="chip-ico">💈</span><span>Con raya</span>
+            </button>
           </div>
         </div>
 
         <div class="grupo">
-          <h3>2 · ¿Gafas?</h3>
-          <div class="chips" data-opcion="gafas">
-            <button class="chip" data-valor="si">Sí, con gafas</button>
-            <button class="chip activo" data-valor="no">No, sin gafas</button>
+          <h3><span class="num">2</span> Gafas</h3>
+          <div class="toggle" data-opcion="gafas" data-sel="si">
+            <button class="seg activo" data-valor="si">👓 Con gafas</button>
+            <button class="seg" data-valor="no">🚫 Sin gafas</button>
+            <span class="toggle-ind"></span>
           </div>
         </div>
 
         <div class="grupo">
-          <h3>3 · Túnica de tu casa</h3>
-          <div class="chips" data-opcion="casa">
-            <button class="chip activo" data-casa="Gryffindor" data-valor="Gryffindor" data-color="#9b1c1c">Gryffindor</button>
-            <button class="chip" data-casa="Slytherin" data-valor="Slytherin" data-color="#0d6218">Slytherin</button>
-            <button class="chip" data-casa="Ravenclaw" data-valor="Ravenclaw" data-color="#0e1a40">Ravenclaw</button>
-            <button class="chip" data-casa="Hufflepuff" data-valor="Hufflepuff" data-color="#ecb939">Hufflepuff</button>
+          <h3><span class="num">3</span> Bufanda de tu casa</h3>
+          <div class="casas" data-opcion="casa">
+            <button class="casa-btn activo" data-casa="Gryffindor" data-color="#7f0909">
+              <span class="swatch"></span>
+              <span class="casa-nom">Gryffindor</span>
+              <span class="casa-ico">🦁</span>
+            </button>
+            <button class="casa-btn" data-casa="Slytherin" data-color="#1a472a">
+              <span class="swatch"></span>
+              <span class="casa-nom">Slytherin</span>
+              <span class="casa-ico">🐍</span>
+            </button>
+            <button class="casa-btn" data-casa="Ravenclaw" data-color="#222f5b">
+              <span class="swatch"></span>
+              <span class="casa-nom">Ravenclaw</span>
+              <span class="casa-ico">🦅</span>
+            </button>
+            <button class="casa-btn" data-casa="Hufflepuff" data-color="#e8b72a">
+              <span class="swatch"></span>
+              <span class="casa-nom">Hufflepuff</span>
+              <span class="casa-ico">🦡</span>
+            </button>
           </div>
         </div>
 
-        <div class="acciones">
-          <button id="btn-comenzar" class="btn-magico">Comenzar Aventura ✦</button>
-        </div>
+        <button id="btn-comenzar" class="btn-entrar"><span>Comenzar Aventura ✦</span></button>
       </section>
     </div>
   </main>

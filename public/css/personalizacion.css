@@ -1,148 +1,202 @@
 /* =============================================================================
-   personalizacion.css — Sala de personalizacion del personaje
+   personalizacion.css — Sala de creación del personaje
+   Misma gama que el login (violetas nocturnos + ámbar). Controles estilizados.
    ============================================================================= */
 
-.perso-wrap {
-  max-width: 1050px;
-  margin: 0 auto;
-  padding: 2.5rem 1.2rem 4rem;
-}
-.perso-wrap h1 {
-  font-family: var(--fuente-titulo);
-  text-align: center;
-  font-size: clamp(1.8rem, 5vw, 3rem);
-  color: var(--oro-claro);
-  text-shadow: 0 0 16px rgba(217,182,78,.5);
-  margin-bottom: .2rem;
-}
-.perso-wrap .intro {
-  text-align: center;
-  font-family: var(--fuente-magica);
-  color: var(--magia-2);
-  margin-bottom: 2.2rem;
+.perso-body {
+  --noche-top:#120d1f; --noche-mid:#1b1430; --violeta:#2a2142; --violeta-2:#3a2f59;
+  --agua:#0b0814; --luna-col:#e9e3f6;
+  --ambar:#f0a850; --ambar-cal:#ffcf8a; --oro:#d9b566; --oro-claro:#f3deac;
+  --texto-fr:#ece8f8; --slate:#6a6090;
+  min-height:100vh; background:var(--noche-top); color:var(--texto-fr); overflow-x:hidden;
 }
 
-.perso-grid {
-  display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: 2rem;
-  align-items: start;
+/* ---- Fondo (castillo muy desenfocado + scrim) ---- */
+.escena { position:fixed; inset:0; z-index:0; overflow:hidden; }
+#foto-fondo {
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  filter:blur(16px) brightness(.42) saturate(1.1); transform:scale(1.08);
+}
+.scrim {
+  position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:
+    radial-gradient(120% 90% at 50% 30%, transparent 40%, rgba(9,6,16,.72) 100%),
+    linear-gradient(180deg, rgba(18,13,31,.5), rgba(9,6,16,.75));
+}
+.particulas { position:absolute; inset:0; z-index:2; pointer-events:none; }
+.particulas i {
+  position:absolute; bottom:-10px; width:4px; height:4px; border-radius:50%;
+  background:var(--ambar-cal); box-shadow:0 0 8px 2px rgba(255,207,138,.7);
+  opacity:0; animation:subir 11s linear infinite;
+}
+.particulas i:nth-child(1){left:10%;animation-delay:0s}
+.particulas i:nth-child(2){left:24%;animation-delay:1.8s}
+.particulas i:nth-child(3){left:38%;animation-delay:3.4s}
+.particulas i:nth-child(4){left:52%;animation-delay:.9s}
+.particulas i:nth-child(5){left:63%;animation-delay:2.6s}
+.particulas i:nth-child(6){left:75%;animation-delay:4.5s}
+.particulas i:nth-child(7){left:86%;animation-delay:1.3s}
+.particulas i:nth-child(8){left:94%;animation-delay:3.9s}
+@keyframes subir { 0%{opacity:0;transform:translateY(0) scale(.6)} 12%{opacity:.9} 100%{opacity:0;transform:translateY(-92vh) scale(1.1)} }
+
+/* ---- Layout ---- */
+.perso-wrap { position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:2rem 1.2rem 3.5rem; }
+.perso-head { text-align:center; margin-bottom:1.6rem; }
+.perso-head .crest { font-size:1.8rem; color:var(--oro); text-shadow:0 0 18px rgba(217,181,102,.8); }
+.perso-head h1 {
+  font-family:var(--fuente-titulo); font-size:clamp(2rem,5.5vw,3.4rem); margin:.1rem 0;
+  color:var(--oro-claro); letter-spacing:2px; text-shadow:0 0 26px rgba(240,168,80,.5), 0 3px 0 #2a1d05;
+}
+.perso-head .intro { font-family:var(--fuente-magica); color:var(--luna-col); opacity:.85; margin:0; }
+
+.perso-grid { display:grid; grid-template-columns:420px 1fr; gap:1.8rem; align-items:start; }
+
+/* ====================== ESCENARIO ====================== */
+.stage {
+  position:relative; align-self:stretch;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+  padding:1.5rem 1.5rem 2rem; min-height:520px;
+  background:linear-gradient(160deg, rgba(34,25,58,.7), rgba(15,10,26,.85));
+  border:1px solid rgba(217,181,102,.4); border-radius:22px;
+  box-shadow:0 30px 70px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,207,138,.18);
+  backdrop-filter:blur(10px); overflow:hidden;
+}
+.stage-glow {
+  position:absolute; top:48%; left:50%; transform:translate(-50%,-50%);
+  width:360px; height:360px; border-radius:50%;
+  background:radial-gradient(circle, rgba(240,168,80,.28), rgba(124,92,255,.12) 55%, transparent 70%);
+  filter:blur(6px); animation:latido 5s ease-in-out infinite;
+}
+@keyframes latido { 50%{ transform:translate(-50%,-50%) scale(1.08); opacity:.85 } }
+.avatar { position:relative; z-index:2; width:min(320px,80%); filter:drop-shadow(0 18px 24px rgba(0,0,0,.55)); animation:flotar 5s ease-in-out infinite; }
+@keyframes flotar { 50%{ transform:translateY(-10px) } }
+.avatar-svg { width:100%; height:auto; display:block; }
+.pedestal {
+  position:relative; z-index:1; margin-top:-18px;
+  width:230px; height:40px; border-radius:50%;
+  background:radial-gradient(ellipse at 50% 35%, rgba(240,168,80,.5), rgba(124,92,255,.25) 60%, transparent 75%);
+  filter:blur(2px);
+}
+.stage-casa {
+  position:relative; z-index:2; margin-top:.6rem;
+  font-family:var(--fuente-titulo); font-size:1.4rem; letter-spacing:1px;
+  color:var(--oro-claro); text-shadow:0 0 16px rgba(240,168,80,.5);
 }
 
-/* --- Previsualizacion del avatar (placeholder dibujado con CSS/emoji) ------ */
-.avatar-preview {
-  position: sticky;
-  top: 2rem;
-  background: linear-gradient(160deg, rgba(30,27,75,.8), rgba(11,10,26,.9));
-  border: 1.5px solid rgba(217,182,78,.4);
-  border-radius: var(--radio);
-  padding: 1.5rem;
-  text-align: center;
-  box-shadow: 0 20px 48px rgba(0,0,0,.5);
-}
-.avatar-stage {
-  position: relative;
-  width: 220px; height: 260px;
-  margin: 0 auto 1rem;
-  display: grid;
-  place-items: center;
-}
-/* Cuerpo = tunica (color segun casa, via variable --tunica) */
-.avatar-tunica {
-  position: absolute;
-  bottom: 0;
-  width: 150px; height: 160px;
-  border-radius: 75px 75px 30px 30px;
-  background: linear-gradient(160deg, var(--tunica, #555), #111);
-  border: 3px solid rgba(255,255,255,.15);
-  box-shadow: inset 0 -10px 20px rgba(0,0,0,.4);
-}
-/* Cabeza */
-.avatar-cara {
-  position: absolute;
-  top: 36px;
-  width: 92px; height: 92px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, #ffe0bd, #e8b58a);
-  border: 3px solid rgba(0,0,0,.15);
-  z-index: 2;
-}
-/* Pelo: 3 variantes controladas por data-pelo en el contenedor */
-.avatar-pelo {
-  position: absolute;
-  top: 20px;
-  width: 104px; height: 70px;
-  z-index: 3;
-  background: #3a2a1a;
-}
-[data-pelo="1"] .avatar-pelo { border-radius: 60px 60px 0 0; }                 /* corto */
-[data-pelo="2"] .avatar-pelo { border-radius: 60px 60px 40px 40px; height: 95px; } /* largo */
-[data-pelo="3"] .avatar-pelo { border-radius: 60px 60px 50% 50% / 60px 60px 80% 80%; width: 120px; height: 60px; } /* alborotado */
-/* Gafas */
-.avatar-gafas {
-  position: absolute;
-  top: 66px;
-  width: 78px; height: 26px;
-  z-index: 4;
-  display: none;
-}
-[data-gafas="si"] .avatar-gafas { display: block; }
-.avatar-gafas::before, .avatar-gafas::after {
-  content: ""; position: absolute; top: 0;
-  width: 30px; height: 26px; border: 3px solid #1a1a1a; border-radius: 50%;
-  background: rgba(200,230,255,.25);
-}
-.avatar-gafas::before { left: 0; }
-.avatar-gafas::after  { right: 0; }
+/* Avatar: mostrar peinado según data-pelo */
+.pelo { display:none; }
+#avatar[data-pelo="1"] .pelo-1 { display:block; }
+#avatar[data-pelo="2"] .pelo-2 { display:block; }
+#avatar[data-pelo="3"] .pelo-3 { display:block; }
+/* Gafas on/off */
+#avatar[data-gafas="no"] .gafas { display:none; }
+/* Bufanda por casa */
+#avatar { --scarf-a:#7f0909; --scarf-b:#e4b835; }
+#avatar[data-casa="Gryffindor"] { --scarf-a:#7f0909; --scarf-b:#e4b835; }
+#avatar[data-casa="Slytherin"]  { --scarf-a:#1a472a; --scarf-b:#b9bfc4; }
+#avatar[data-casa="Ravenclaw"]  { --scarf-a:#222f5b; --scarf-b:#9a6f33; }
+#avatar[data-casa="Hufflepuff"] { --scarf-a:#e8b72a; --scarf-b:#2b2520; }
+.sc-a { fill:var(--scarf-a); } .sc-b { fill:var(--scarf-b); }
 
-.avatar-nombre {
-  font-family: var(--fuente-magica);
-  font-size: 1.2rem;
-  color: var(--oro);
-}
-
-/* --- Panel de opciones ----------------------------------------------------- */
-.opciones { display: grid; gap: 1.6rem; }
-.grupo {
-  background: rgba(20,18,51,.6);
-  border: 1px solid rgba(217,182,78,.25);
-  border-radius: var(--radio);
-  padding: 1.2rem 1.4rem;
+/* ====================== PANEL DE OPCIONES ====================== */
+.panel {
+  display:flex; flex-direction:column; gap:1.3rem;
+  padding:1.6rem 1.6rem 1.8rem;
+  background:linear-gradient(160deg, rgba(34,25,58,.8), rgba(15,10,26,.9));
+  border:1px solid rgba(217,181,102,.45); border-radius:22px;
+  box-shadow:0 30px 70px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,207,138,.2);
+  backdrop-filter:blur(14px);
 }
 .grupo h3 {
-  font-family: var(--fuente-titulo);
-  margin: 0 0 1rem;
-  color: var(--oro);
-  font-size: 1.15rem;
+  display:flex; align-items:center; gap:.6rem; margin:0 0 .9rem;
+  font-family:var(--fuente-titulo); font-size:1.1rem; color:var(--oro-claro);
 }
-.chips { display: flex; flex-wrap: wrap; gap: .7rem; }
+.grupo h3 .num {
+  display:grid; place-items:center; width:26px; height:26px; border-radius:50%;
+  font-size:.9rem; color:#241a05; background:linear-gradient(145deg,#f6dd8e,var(--oro));
+  box-shadow:0 2px 8px rgba(0,0,0,.4);
+}
+
+/* Chips (peinado) */
+.chips { display:grid; grid-template-columns:repeat(3,1fr); gap:.6rem; }
 .chip {
-  cursor: pointer;
-  border: 2px solid rgba(217,182,78,.35);
-  background: rgba(0,0,0,.3);
-  color: var(--oro-claro);
-  padding: .6rem 1.1rem;
-  border-radius: 999px;
-  font-family: var(--fuente-texto);
-  font-weight: 700;
-  transition: transform .12s, border-color .2s, background .2s;
+  display:flex; flex-direction:column; align-items:center; gap:.3rem;
+  padding:.8rem .4rem; cursor:pointer;
+  background:rgba(12,8,22,.6); color:var(--texto-fr);
+  border:1.5px solid rgba(106,96,144,.5); border-radius:14px;
+  font-family:var(--fuente-texto); font-weight:700; font-size:.82rem;
+  transition:transform .12s, border-color .2s, box-shadow .2s, background .2s;
 }
-.chip:hover { transform: translateY(-2px); }
+.chip .chip-ico { font-size:1.5rem; }
+.chip:hover { transform:translateY(-2px); border-color:var(--ambar); }
 .chip.activo {
-  border-color: var(--oro);
-  background: linear-gradient(145deg, rgba(217,182,78,.35), rgba(124,92,255,.25));
-  box-shadow: 0 0 0 3px rgba(217,182,78,.2);
+  border-color:var(--oro); background:linear-gradient(160deg, rgba(240,168,80,.22), rgba(124,92,255,.18));
+  box-shadow:0 0 0 2px rgba(217,181,102,.35), 0 8px 18px rgba(0,0,0,.4);
 }
-/* Chips de casa con su color */
-.chip[data-casa="Gryffindor"].activo { box-shadow: 0 0 0 3px var(--gryffindor-2); }
-.chip[data-casa="Slytherin"].activo  { box-shadow: 0 0 0 3px var(--slytherin-1); }
-.chip[data-casa="Ravenclaw"].activo  { box-shadow: 0 0 0 3px var(--ravenclaw-2); }
-.chip[data-casa="Hufflepuff"].activo { box-shadow: 0 0 0 3px var(--hufflepuff-1); }
 
-.acciones { margin-top: 2rem; text-align: center; }
-.acciones .btn-magico { font-size: 1.2rem; padding: 1rem 3rem; }
+/* Toggle (gafas) */
+.toggle {
+  position:relative; display:grid; grid-template-columns:1fr 1fr; gap:0;
+  background:rgba(12,8,22,.6); border:1.5px solid rgba(106,96,144,.5);
+  border-radius:999px; padding:5px;
+}
+.toggle .seg {
+  position:relative; z-index:1; border:none; background:transparent; cursor:pointer;
+  padding:.6rem .5rem; border-radius:999px; color:var(--texto-fr);
+  font-family:var(--fuente-texto); font-weight:700; font-size:.9rem; transition:color .2s;
+}
+.toggle .seg.activo { color:#241a05; }
+.toggle-ind {
+  position:absolute; z-index:0; top:5px; bottom:5px; left:5px; width:calc(50% - 5px);
+  border-radius:999px; background:linear-gradient(145deg,#f6dd8e,var(--oro));
+  box-shadow:0 4px 12px rgba(0,0,0,.4); transition:transform .25s cubic-bezier(.22,.61,.36,1);
+}
+.toggle[data-sel="no"] .toggle-ind { transform:translateX(100%); }
 
-@media (max-width: 760px) {
-  .perso-grid { grid-template-columns: 1fr; }
-  .avatar-preview { position: static; }
+/* Casas (bufanda) */
+.casas { display:grid; grid-template-columns:repeat(2,1fr); gap:.7rem; }
+.casa-btn {
+  display:flex; align-items:center; gap:.6rem; cursor:pointer;
+  padding:.7rem .8rem; text-align:left;
+  background:rgba(12,8,22,.6); color:var(--texto-fr);
+  border:1.5px solid rgba(106,96,144,.5); border-radius:14px;
+  font-family:var(--fuente-texto); font-weight:700; font-size:.92rem;
+  transition:transform .12s, border-color .2s, box-shadow .2s, background .2s;
+}
+.casa-btn .swatch {
+  width:26px; height:26px; border-radius:8px; flex:none;
+  border:2px solid rgba(255,255,255,.25); box-shadow:0 2px 6px rgba(0,0,0,.4);
+}
+.casa-btn .casa-nom { flex:1; }
+.casa-btn .casa-ico { font-size:1.2rem; }
+.casa-btn[data-casa="Gryffindor"] .swatch { background:linear-gradient(135deg,#7f0909 50%,#e4b835 50%); }
+.casa-btn[data-casa="Slytherin"]  .swatch { background:linear-gradient(135deg,#1a472a 50%,#b9bfc4 50%); }
+.casa-btn[data-casa="Ravenclaw"]  .swatch { background:linear-gradient(135deg,#222f5b 50%,#9a6f33 50%); }
+.casa-btn[data-casa="Hufflepuff"] .swatch { background:linear-gradient(135deg,#e8b72a 50%,#2b2520 50%); }
+.casa-btn:hover { transform:translateY(-2px); border-color:var(--ambar); }
+.casa-btn.activo { border-color:var(--oro); box-shadow:0 0 0 2px rgba(217,181,102,.35), 0 8px 18px rgba(0,0,0,.4); background:linear-gradient(160deg, rgba(240,168,80,.18), rgba(124,92,255,.16)); }
+
+/* Botón comenzar (dorado, igual al login) */
+.btn-entrar {
+  position:relative; overflow:hidden; width:100%; margin-top:.4rem;
+  padding:1rem 1rem; border:1.5px solid #f6e4b0; border-radius:999px;
+  font-family:var(--fuente-titulo); font-size:1.1rem; letter-spacing:.5px; color:#241a05; cursor:pointer;
+  background:linear-gradient(145deg,#f6dd8e,var(--oro) 55%,#b1842f);
+  box-shadow:0 8px 0 #6b5018, 0 14px 30px rgba(0,0,0,.45), inset 0 1px 0 #fff3cf;
+  transition:transform .12s, box-shadow .12s, filter .2s;
+}
+.btn-entrar span { position:relative; z-index:1; }
+.btn-entrar::before {
+  content:""; position:absolute; top:0; left:-120%; width:60%; height:100%;
+  background:linear-gradient(100deg, transparent, rgba(255,255,255,.65), transparent);
+  transform:skewX(-20deg); transition:left .6s ease;
+}
+.btn-entrar:hover { filter:brightness(1.06); transform:translateY(-2px); }
+.btn-entrar:hover::before { left:130%; }
+.btn-entrar:active { transform:translateY(5px); box-shadow:0 3px 0 #6b5018, 0 6px 14px rgba(0,0,0,.45), inset 0 1px 0 #fff3cf; }
+
+/* Responsive */
+@media (max-width:820px) {
+  .perso-grid { grid-template-columns:1fr; }
+  .stage { min-height:420px; }
 }

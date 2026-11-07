@@ -19,203 +19,404 @@
     <div class="particulas"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   </div>
 
-  <main class="pantalla perso-wrap">
+  <!-- #creador guarda los colores elegidos como variables CSS (--piel, --pelo,
+       --ojos, --casa-a...). Las heredan el personaje y las miniaturas. -->
+  <main class="pantalla perso-wrap" id="creador">
     <header class="perso-head">
       <div class="crest">✦</div>
       <h1>Crea tu Mago</h1>
-      <p class="intro">Elige tu aspecto antes de cruzar el lago…</p>
+      <p class="intro">Elige tu aspecto, tu equipo y tu casa antes de cruzar el lago…</p>
     </header>
 
     <div class="perso-grid">
 
       <!-- ====================== ESCENARIO DEL PERSONAJE ====================== -->
-      <section class="stage">
-        <div class="stage-glow"></div>
+      <section class="stage" aria-label="Vista previa del personaje">
+        <button type="button" class="btn-azar" id="btn-azar" title="Elegir todo al azar">🎲 Sorpréndeme</button>
 
-        <div id="avatar" class="avatar" data-pelo="1" data-gafas="si" data-casa="Gryffindor">
-          <svg class="avatar-svg" viewBox="0 0 300 395" role="img" aria-label="Tu personaje">
-            <defs>
-              <radialGradient id="skinGrad" cx="42%" cy="36%" r="72%">
-                <stop offset="0%" stop-color="#ffe9d2"/>
-                <stop offset="100%" stop-color="#f1c59a"/>
-              </radialGradient>
-              <linearGradient id="hairGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#7d5430"/>
-                <stop offset="55%" stop-color="#5c3c20"/>
-                <stop offset="100%" stop-color="#432a15"/>
-              </linearGradient>
-              <linearGradient id="robeGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#2a2833"/>
-                <stop offset="100%" stop-color="#0d0c12"/>
-              </linearGradient>
-              <linearGradient id="wandGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#7c4f27"/>
-                <stop offset="100%" stop-color="#452a13"/>
-              </linearGradient>
-            </defs>
-
-            <!-- sombra -->
-            <ellipse class="sombra" cx="150" cy="379" rx="80" ry="15" fill="rgba(0,0,0,.5)"/>
-
-            <!-- piernas / zapatos -->
-            <g stroke="#15111d" stroke-width="3">
-              <rect x="126" y="332" width="20" height="42" rx="9" fill="#3a3550"/>
-              <rect x="154" y="332" width="20" height="42" rx="9" fill="#3a3550"/>
-              <ellipse cx="128" cy="377" rx="19" ry="10" fill="#15121c"/>
-              <ellipse cx="172" cy="377" rx="19" ry="10" fill="#15121c"/>
-            </g>
-
-            <!-- brazos / manos / varita -->
-            <g>
-              <path d="M92 250 q-30 8 -34 46 q14 11 32 3 Z" fill="url(#robeGrad)" stroke="#15111d" stroke-width="3"/>
-              <path d="M208 250 q30 8 34 46 q-14 11 -32 3 Z" fill="url(#robeGrad)" stroke="#15111d" stroke-width="3"/>
-              <circle cx="240" cy="300" r="12.5" fill="#ffe1c2" stroke="#e3a97f" stroke-width="2"/>
-              <!-- varita en la mano izquierda -->
-              <g class="varita" stroke-linecap="round">
-                <line x1="58" y1="300" x2="16" y2="250" stroke="#3a2410" stroke-width="8"/>
-                <line x1="56" y1="298" x2="18" y2="252" stroke="url(#wandGrad)" stroke-width="4"/>
-                <circle cx="16" cy="250" r="4" fill="#ffe3a0"/>
-                <circle cx="16" cy="250" r="9" fill="#ffe3a0" opacity=".22"/>
+        <div class="figura">
+          <!-- Medallon de pergamino con anillo dorado y huellas, como en el Mapa -->
+          <div class="medallon" aria-hidden="true">
+            <svg class="anillo-huellas" viewBox="0 0 200 200">
+              <defs><g id="medallon-pie"><ellipse cy="-2" rx="2.1" ry="3.3" /><ellipse cy="3.9" rx="1.7" ry="1.6" /></g></defs>
+              <g fill="#3b2614" opacity=".7">
+                <use href="#medallon-pie" transform="translate(182.8 100) rotate(180)"/>
+                <use href="#medallon-pie" transform="translate(186.6 121.3) rotate(193.8)"/>
+                <use href="#medallon-pie" transform="translate(173.3 138.5) rotate(207.7)"/>
+                <use href="#medallon-pie" transform="translate(166.8 159.2) rotate(221.5)"/>
+                <use href="#medallon-pie" transform="translate(147 168.1) rotate(235.4)"/>
+                <use href="#medallon-pie" transform="translate(131.6 183.4) rotate(249.2)"/>
+                <use href="#medallon-pie" transform="translate(110 182.2) rotate(263.1)"/>
+                <use href="#medallon-pie" transform="translate(89.2 188.5) rotate(276.9)"/>
+                <use href="#medallon-pie" transform="translate(70.6 177.4) rotate(290.8)"/>
+                <use href="#medallon-pie" transform="translate(49.3 173.4) rotate(304.6)"/>
+                <use href="#medallon-pie" transform="translate(38 154.9) rotate(318.5)"/>
+                <use href="#medallon-pie" transform="translate(21 141.5) rotate(332.3)"/>
+                <use href="#medallon-pie" transform="translate(19.6 119.8) rotate(346.2)"/>
+                <use href="#medallon-pie" transform="translate(10.8 100) rotate(360)"/>
+                <use href="#medallon-pie" transform="translate(19.6 80.2) rotate(373.8)"/>
+                <use href="#medallon-pie" transform="translate(21 58.5) rotate(387.7)"/>
+                <use href="#medallon-pie" transform="translate(38 45.1) rotate(401.5)"/>
+                <use href="#medallon-pie" transform="translate(49.3 26.6) rotate(415.4)"/>
+                <use href="#medallon-pie" transform="translate(70.6 22.6) rotate(429.2)"/>
+                <use href="#medallon-pie" transform="translate(89.2 11.5) rotate(443.1)"/>
+                <use href="#medallon-pie" transform="translate(110 17.8) rotate(456.9)"/>
+                <use href="#medallon-pie" transform="translate(131.6 16.6) rotate(470.8)"/>
+                <use href="#medallon-pie" transform="translate(147 31.9) rotate(484.6)"/>
+                <use href="#medallon-pie" transform="translate(166.8 40.8) rotate(498.5)"/>
+                <use href="#medallon-pie" transform="translate(173.3 61.5) rotate(512.3)"/>
+                <use href="#medallon-pie" transform="translate(186.6 78.7) rotate(526.2)"/>
               </g>
-              <circle cx="60" cy="300" r="12.5" fill="#ffe1c2" stroke="#e3a97f" stroke-width="2"/>
-            </g>
+            </svg>
+          </div>
 
-            <!-- túnica -->
-            <path class="tunica" d="M98 198 q52 -16 104 0 q18 74 26 152 q-80 24 -156 0 q8 -80 26 -152 Z"
-                  fill="url(#robeGrad)" stroke="#15111d" stroke-width="3"/>
-            <path d="M150 214 L150 334" stroke="#0b0a10" stroke-width="3" fill="none"/>
-            <path d="M108 206 q-10 70 -2 138 q9 4 15 0 q-10 -70 2 -138 Z" fill="#ffffff" opacity=".05"/>
+          <div id="avatar" class="avatar" data-pelo="1" data-gafas="redondas" data-varita="acebo" data-mascota="lechuza" data-cicatriz="si">
+            <svg class="avatar-svg" viewBox="0 0 320 420" role="img" aria-label="Tu personaje">
+              <defs>
+                <radialGradient id="av-piel" cx=".42" cy=".34" r=".75">
+                  <stop class="st-piel-luz" offset="0" /><stop class="st-piel" offset=".62" /><stop class="st-piel-sombra" offset="1" />
+                </radialGradient>
+                <linearGradient id="av-pelo" x1=".15" y1="0" x2=".85" y2="1">
+                  <stop class="st-pelo-brillo" offset="0" /><stop class="st-pelo" offset=".45" /><stop class="st-pelo-sombra" offset="1" />
+                </linearGradient>
+                <radialGradient id="av-iris" cx=".5" cy=".65" r=".62">
+                  <stop class="st-ojos-claro" offset="0" /><stop class="st-ojos" offset=".6" /><stop class="st-ojos-oscuro" offset="1" />
+                </radialGradient>
+                <linearGradient id="av-tunica" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#3b3947" /><stop offset="1" stop-color="#17161e" />
+                </linearGradient>
+                <linearGradient id="av-manga" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#2a2933" /><stop offset=".5" stop-color="#403e4d" /><stop offset="1" stop-color="#1e1d26" />
+                </linearGradient>
+                <pattern id="av-rayas" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)">
+                  <rect class="f-casa-a" width="14" height="14" /><rect class="f-casa-b" y="9" width="14" height="5" />
+                </pattern>
+                <pattern id="av-rayas-h" width="14" height="13" patternUnits="userSpaceOnUse">
+                  <rect class="f-casa-a" width="14" height="13" /><rect class="f-casa-b" y="8" width="14" height="5" />
+                </pattern>
+                <radialGradient id="av-chispa">
+                  <stop offset="0" stop-color="#fff" /><stop class="st-chispa" offset=".35" /><stop class="st-chispa" offset="1" stop-opacity="0" />
+                </radialGradient>
+                <radialGradient id="av-plumas" cx=".4" cy=".3" r=".8">
+                  <stop offset="0" stop-color="#ffffff" /><stop offset="1" stop-color="#d6dbe4" />
+                </radialGradient>
+                <radialGradient id="av-gato" cx=".4" cy=".3" r=".8">
+                  <stop offset="0" stop-color="#f4a95e" /><stop offset="1" stop-color="#c8692a" />
+                </radialGradient>
+                <radialGradient id="av-sapo" cx=".4" cy=".3" r=".8">
+                  <stop offset="0" stop-color="#9db458" /><stop offset="1" stop-color="#58692b" />
+                </radialGradient>
+              </defs>
 
-            <!-- bufanda (colores por casa) -->
-            <g class="bufanda" stroke="#0e0c14" stroke-width="2.4" stroke-linejoin="round">
-              <path class="sc-a" d="M108 186 q42 26 84 0 l7 17 q-48 28 -98 0 Z"/>
-              <rect class="sc-b" x="122" y="196" width="34" height="16"/>
-              <rect class="sc-a" x="122" y="212" width="34" height="16"/>
-              <rect class="sc-b" x="122" y="228" width="34" height="16"/>
-              <rect class="sc-a" x="122" y="244" width="34" height="16"/>
-              <rect class="sc-b" x="122" y="260" width="34" height="14"/>
-              <g class="sc-a">
-                <rect x="124" y="274" width="6" height="13"/>
-                <rect x="136" y="274" width="6" height="13"/>
-                <rect x="148" y="274" width="6" height="13"/>
+              <!-- sombra en el suelo -->
+              <ellipse cx="160" cy="392" rx="74" ry="11" fill="#3b2a17" opacity=".35" />
+
+              <!-- PELO (capa de atras) -->
+              <g class="pelo-atras">
+                <path class="variante pelo-1 pelo-forma" d="M62 188 C46 148 50 100 82 70 C102 50 128 40 150 38 L156 27 L167 38 C200 38 230 52 248 78 C268 106 272 150 258 188 Z" />
+                <path class="variante pelo-2 pelo-forma" d="M60 150 C54 92 98 52 160 52 C222 52 266 92 260 150 C262 188 272 222 264 258 C258 282 236 290 222 276 C230 250 228 220 220 196 L100 196 C92 220 90 250 98 276 C84 290 62 282 56 258 C48 222 58 188 60 150 Z" />
+                <path class="variante pelo-3 pelo-forma" d="M62 172 C52 108 98 56 160 54 C222 56 268 108 258 172 Z" />
+                <g class="variante pelo-4 rizos">
+                  <g class="rizos-contorno"><circle cx="74" cy="156" r="28" /><circle cx="78" cy="112" r="30" /><circle cx="104" cy="76" r="32" /><circle cx="140" cy="56" r="32" /><circle cx="180" cy="56" r="32" /><circle cx="216" cy="76" r="32" /><circle cx="242" cy="112" r="30" /><circle cx="246" cy="156" r="28" /><circle cx="68" cy="198" r="22" /><circle cx="252" cy="198" r="22" /></g>
+                  <g class="rizos-relleno"><circle cx="74" cy="156" r="28" /><circle cx="78" cy="112" r="30" /><circle cx="104" cy="76" r="32" /><circle cx="140" cy="56" r="32" /><circle cx="180" cy="56" r="32" /><circle cx="216" cy="76" r="32" /><circle cx="242" cy="112" r="30" /><circle cx="246" cy="156" r="28" /><circle cx="68" cy="198" r="22" /><circle cx="252" cy="198" r="22" /></g>
+                </g>
               </g>
-            </g>
 
-            <!-- orejas -->
-            <circle cx="74" cy="128" r="12" fill="#f7cba0" stroke="#e3a97f" stroke-width="2"/>
-            <circle cx="226" cy="128" r="12" fill="#f7cba0" stroke="#e3a97f" stroke-width="2"/>
+              <!-- CUERPO -->
+              <g class="cuerpo">
+                <rect x="136" y="348" width="19" height="36" rx="7" fill="#2a2733" stroke="#14121a" stroke-width="2.4" />
+                <rect x="165" y="348" width="19" height="36" rx="7" fill="#2a2733" stroke="#14121a" stroke-width="2.4" />
+                <ellipse cx="143" cy="386" rx="20" ry="10" fill="#1b1922" stroke="#0d0b10" stroke-width="2.2" />
+                <ellipse cx="177" cy="386" rx="20" ry="10" fill="#1b1922" stroke="#0d0b10" stroke-width="2.2" />
+                <ellipse cx="136" cy="382" rx="6" ry="2.4" fill="#fff" opacity=".22" />
+                <ellipse cx="170" cy="382" rx="6" ry="2.4" fill="#fff" opacity=".22" />
+                <!-- tunica -->
+                <path d="M108 268 C110 248 124 236 142 234 L178 234 C196 236 210 248 212 268 L226 354 C200 368 120 368 94 354 Z" fill="url(#av-tunica)" stroke="#121017" stroke-width="2.6" stroke-linejoin="round" />
+                <path d="M146 240 L174 240 L174 360 C166 362 154 362 146 360 Z" fill="#4b4e5a" />
+                <path class="trazo-casa-a" d="M146 240 C148 290 147 330 145 361 M174 240 C172 290 173 330 175 361" stroke-width="5" stroke-linecap="round" />
+                <!-- corbata -->
+                <path d="M156 252 L164 252 L170 300 L160 312 L150 300 Z" fill="url(#av-rayas)" stroke="#1a1418" stroke-width="1.6" stroke-linejoin="round" />
+                <!-- escudo de la casa -->
+                <path class="f-casa-a trazo-casa-b" d="M186 278 H206 V290 C206 298 200 303 196 305 C192 303 186 298 186 290 Z" stroke-width="2.2" />
+                <path class="f-casa-b" d="M196 283 L198 288 L203 288 L199 291 L201 296 L196 293 L191 296 L193 291 L189 288 L194 288 Z" />
+              </g>
 
-            <!-- cabeza -->
-            <circle class="cara" cx="150" cy="122" r="82" fill="url(#skinGrad)" stroke="#e8b48c" stroke-width="2.5"/>
+              <!-- BUFANDA de la casa -->
+              <g class="bufanda">
+                <path d="M118 246 C115 268 113 294 115 318 L138 318 C137 294 138 270 141 250 Z" fill="url(#av-rayas-h)" stroke="#1a1418" stroke-width="2.2" stroke-linejoin="round" />
+                <path class="trazo-casa-a" d="M118 319 v8 M123 319 v9 M128 319 v8 M133 319 v9 M137 319 v8" stroke-width="2.6" stroke-linecap="round" />
+                <path d="M110 240 C128 226 192 226 210 240 C214 248 211 256 205 260 C186 250 134 250 115 260 C109 256 106 248 110 240 Z" fill="url(#av-rayas)" stroke="#1a1418" stroke-width="2.4" stroke-linejoin="round" />
+              </g>
 
-            <!-- ojos -->
-            <g class="ojos">
-              <ellipse cx="120" cy="132" rx="17" ry="21" fill="#fff" stroke="#1a1420" stroke-width="2.5"/>
-              <ellipse cx="180" cy="132" rx="17" ry="21" fill="#fff" stroke="#1a1420" stroke-width="2.5"/>
-              <circle cx="122" cy="135" r="11" fill="#201712"/>
-              <circle cx="178" cy="135" r="11" fill="#201712"/>
-              <circle cx="126" cy="130" r="3.4" fill="#fff"/>
-              <circle cx="182" cy="130" r="3.4" fill="#fff"/>
-            </g>
-            <!-- cejas -->
-            <path d="M104 104 q16 -8 30 0" fill="none" stroke="#4a3017" stroke-width="4" stroke-linecap="round"/>
-            <path d="M166 104 q16 -8 30 0" fill="none" stroke="#4a3017" stroke-width="4" stroke-linecap="round"/>
-            <!-- mejillas -->
-            <ellipse cx="102" cy="154" rx="12" ry="7.5" fill="#f4a197" opacity=".5"/>
-            <ellipse cx="198" cy="154" rx="12" ry="7.5" fill="#f4a197" opacity=".5"/>
-            <!-- nariz / boca -->
-            <ellipse cx="150" cy="150" rx="5" ry="4" fill="#eab08b"/>
-            <path d="M136 162 q14 13 28 0" fill="none" stroke="#9a5a2a" stroke-width="3" stroke-linecap="round"/>
+              <!-- BRAZOS -->
+              <g class="brazos">
+                <path d="M120 250 C102 260 90 278 80 300 L104 312 C108 298 114 286 126 276 Z" fill="url(#av-manga)" stroke="#121017" stroke-width="2.4" stroke-linejoin="round" />
+                <path class="trazo-casa-a" d="M81 301 L103 311" stroke-width="4" stroke-linecap="round" />
+                <path d="M200 250 C218 260 230 280 238 300 L214 312 C210 298 206 286 194 276 Z" fill="url(#av-manga)" stroke="#121017" stroke-width="2.4" stroke-linejoin="round" />
+                <path class="trazo-casa-a" d="M237 301 L215 311" stroke-width="4" stroke-linecap="round" />
+              </g>
 
-            <!-- gafas -->
-            <g class="gafas" fill="none" stroke="#120f16" stroke-width="5">
-              <circle cx="120" cy="132" r="26"/>
-              <circle cx="180" cy="132" r="26"/>
-              <path d="M146 132 h8"/>
-              <path d="M94 128 l-18 -5"/>
-              <path d="M206 128 l18 -5"/>
-            </g>
+              <!-- VARITAS -->
+              <g class="varita">
+                <g class="variante varita-acebo">
+                  <path d="M102.4 318.9 L87.2 297.9 L79.3 303.3 L93.6 325.1 Z" fill="#7a4a24" stroke="#2b1a0e" stroke-width="1.6" stroke-linejoin="round" />
+                  <path d="M88 297.3 L85.2 293.2 L75.6 299.8 L78.5 303.9 Z" fill="#e2bd6e" stroke="#2b1a0e" stroke-width="1.4" />
+                  <path d="M83.4 294.4 L37.2 231.1 L34.8 232.9 L77.4 298.5 Z" fill="#c68d52" stroke="#2b1a0e" stroke-width="1.4" stroke-linejoin="round" />
+                </g>
+                <g class="variante varita-sauco">
+                  <path d="M102.1 319.2 L37.3 231.1 L34.7 232.9 L93.9 324.8 Z" fill="#bcab8e" stroke="#3a3024" stroke-width="1.5" stroke-linejoin="round" />
+                  <circle cx="81" cy="297.3" r="4.6" fill="#a8977c" stroke="#3a3024" stroke-width="1.4" />
+                  <circle cx="68.5" cy="279.2" r="3.9" fill="#a8977c" stroke="#3a3024" stroke-width="1.4" />
+                  <circle cx="56" cy="261.1" r="3.2" fill="#a8977c" stroke="#3a3024" stroke-width="1.4" />
+                </g>
+                <g class="variante varita-vid">
+                  <path d="M102.9 318.6 L84.1 292.7 L75.6 298.6 L93.1 325.4 Z" fill="#4a2a18" stroke="#1e1008" stroke-width="1.6" stroke-linejoin="round" />
+                  <path d="M101.2 316.1 L89.6 319.3 M97.8 311.2 L86.2 314.4 M94.4 306.2 L82.8 309.4 M91 301.3 L79.4 304.5 M87.6 296.4 L76 299.5" stroke="#9a6a40" stroke-width="1.6" stroke-linecap="round" />
+                  <path d="M82.6 293.7 L37.2 231.2 L34.8 232.8 L77 297.6 Z" fill="#6a4026" stroke="#1e1008" stroke-width="1.4" stroke-linejoin="round" />
+                </g>
+                <circle class="chispa-punta" cx="36" cy="232" r="15" fill="url(#av-chispa)" />
+                <path class="chispitas" d="M22 214 l1.5 4 4 1.5 -4 1.5 -1.5 4 -1.5 -4 -4 -1.5 4 -1.5Z M52 210 l1 2.6 2.6 1 -2.6 1 -1 2.6 -1 -2.6 -2.6 -1 2.6 -1Z M18 244 l1 2.6 2.6 1 -2.6 1 -1 2.6 -1 -2.6 -2.6 -1 2.6 -1Z" fill="#fff6d5" />
+              </g>
 
-            <!-- PELO: 3 variantes -->
-            <g class="pelo pelo-1" fill="url(#hairGrad)" stroke="#3a2412" stroke-width="2.5" stroke-linejoin="round">
-              <path d="M60 148 Q48 48 150 36 Q252 48 240 148 Q232 116 214 126 Q222 92 194 104 Q202 74 166 92 Q172 62 144 86 Q118 68 118 100 Q98 84 94 110 Q78 106 78 134 Q70 126 60 148 Z"/>
-              <path d="M98 66 Q150 46 200 68 Q150 58 106 84 Z" fill="#9c6c3e" stroke="none" opacity=".35"/>
-            </g>
-            <g class="pelo pelo-2" fill="url(#hairGrad)" stroke="#3a2412" stroke-width="2.5" stroke-linejoin="round">
-              <path d="M62 140 Q52 46 150 36 Q248 46 238 140 Q230 112 210 122 Q216 90 190 102 Q196 72 166 90 Q170 62 146 86 Q120 66 120 98 Q100 84 96 110 Q78 104 76 134 Q70 126 62 140 Z"/>
-              <path d="M62 140 q-16 56 -6 98 q18 8 26 -6 q-12 -46 -4 -88 Z"/>
-              <path d="M238 140 q16 56 6 98 q-18 8 -26 -6 q12 -46 4 -88 Z"/>
-              <path d="M98 66 Q150 46 200 68 Q150 58 106 84 Z" fill="#9c6c3e" stroke="none" opacity=".3"/>
-            </g>
-            <g class="pelo pelo-3" fill="url(#hairGrad)" stroke="#3a2412" stroke-width="2.5" stroke-linejoin="round">
-              <path d="M62 136 Q54 48 150 40 Q248 48 238 136 Q232 112 206 124 Q214 92 180 100 Q150 80 120 102 Q108 84 100 104 Q84 100 90 124 Q76 112 62 136 Z"/>
-              <path d="M110 70 Q156 50 206 72 Q156 60 118 86 Z" fill="#9c6c3e" stroke="none" opacity=".3"/>
-            </g>
+              <!-- manos -->
+              <circle cx="88" cy="306" r="12.5" fill="url(#av-piel)" stroke="#5a3a2a" stroke-width="2" />
+              <circle cx="228" cy="308" r="12.5" fill="url(#av-piel)" stroke="#5a3a2a" stroke-width="2" />
 
-            <!-- cicatriz (encima) -->
-            <path class="cicatriz" d="M170 70 l-7 13 l9 5 l-7 13" fill="none"
-                  stroke="#ef9a3d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+              <!-- CABEZA -->
+              <g class="cabeza">
+                <circle cx="72" cy="168" r="15" fill="url(#av-piel)" stroke="#5a3a2a" stroke-width="2.2" />
+                <circle cx="248" cy="168" r="15" fill="url(#av-piel)" stroke="#5a3a2a" stroke-width="2.2" />
+                <path d="M68 162 q6 6 1 12 M252 162 q-6 6 -1 12" fill="none" stroke="#5a3a2a" stroke-opacity=".5" stroke-width="2" stroke-linecap="round" />
+                <ellipse cx="160" cy="154" rx="90" ry="86" fill="url(#av-piel)" stroke="#5a3a2a" stroke-width="2.6" />
+                <path class="trazo-ceja" d="M106 128 Q124 119 141 127 M179 127 Q196 119 214 128" stroke-width="4.5" stroke-linecap="round" />
+                <g class="ojos">
+                  <ellipse cx="124" cy="162" rx="18" ry="21" fill="#fff" stroke="#2b1a1a" stroke-width="2.4" />
+                  <ellipse cx="196" cy="162" rx="18" ry="21" fill="#fff" stroke="#2b1a1a" stroke-width="2.4" />
+                  <circle cx="127" cy="165" r="13.5" fill="url(#av-iris)" />
+                  <circle cx="193" cy="165" r="13.5" fill="url(#av-iris)" />
+                  <circle cx="127" cy="166" r="6.6" fill="#140c0a" />
+                  <circle cx="193" cy="166" r="6.6" fill="#140c0a" />
+                  <circle cx="132" cy="157" r="4.6" fill="#fff" />
+                  <circle cx="198" cy="157" r="4.6" fill="#fff" />
+                  <circle cx="121" cy="172" r="2.2" fill="#fff" opacity=".9" />
+                  <circle cx="187" cy="172" r="2.2" fill="#fff" opacity=".9" />
+                  <path d="M104 153 Q124 134 144 152 M176 152 Q196 134 216 153" fill="none" stroke="#2b1a1a" stroke-width="4.2" stroke-linecap="round" />
+                </g>
+                <ellipse cx="100" cy="196" rx="13" ry="8" fill="#ff8a8a" opacity=".38" />
+                <ellipse cx="220" cy="196" rx="13" ry="8" fill="#ff8a8a" opacity=".38" />
+                <ellipse class="f-piel-sombra" cx="160" cy="189" rx="5" ry="3.6" />
+                <path d="M147 204 Q160 218 173 204 Q160 209 147 204 Z" fill="#8a2e25" stroke="#5a1e18" stroke-width="1.6" stroke-linejoin="round" />
+              </g>
+
+              <!-- PELO (flequillo, delante de la cara) -->
+              <g class="pelo-frente">
+                <g class="variante pelo-1">
+                  <path class="pelo-forma" d="M70 136 C70 100 92 70 128 62 C160 54 204 60 230 82 C246 96 252 116 250 136 L238 120 L234 140 L220 114 L210 134 L198 108 L186 130 L174 104 L162 128 L150 104 L138 128 L128 106 L114 132 L104 110 L94 136 L86 116 Z" />
+                  <path class="brillo-pelo" d="M100 84 C120 68 150 62 178 66 M198 72 C210 76 220 84 228 94" />
+                </g>
+                <g class="variante pelo-2">
+                  <path class="pelo-forma" d="M70 150 C66 104 98 64 152 58 C204 54 244 82 250 128 C236 104 210 92 180 96 C150 100 118 116 96 140 C88 150 80 162 76 176 C72 168 70 158 70 150 Z" />
+                  <path class="pelo-forma" d="M250 128 C256 150 254 176 248 198 C242 180 238 160 240 140 Z" />
+                  <path class="brillo-pelo" d="M98 94 C122 74 156 66 186 70" />
+                </g>
+                <g class="variante pelo-3">
+                  <path class="pelo-forma" d="M130 60 C102 64 78 88 72 132 C88 112 108 100 126 94 Z" />
+                  <path class="pelo-forma" d="M130 60 C176 52 238 66 250 134 C236 112 210 100 180 102 C158 104 140 96 130 60 Z" />
+                  <path class="brillo-pelo" d="M152 66 C182 62 212 72 232 92" />
+                </g>
+                <g class="variante pelo-4 rizos">
+                  <g class="rizos-contorno"><circle cx="98" cy="104" r="18" /><circle cx="124" cy="90" r="20" /><circle cx="152" cy="84" r="20" /><circle cx="180" cy="86" r="20" /><circle cx="206" cy="96" r="19" /><circle cx="228" cy="112" r="16" /></g>
+                  <g class="rizos-relleno"><circle cx="98" cy="104" r="18" /><circle cx="124" cy="90" r="20" /><circle cx="152" cy="84" r="20" /><circle cx="180" cy="86" r="20" /><circle cx="206" cy="96" r="19" /><circle cx="228" cy="112" r="16" /></g>
+                  <path class="brillo-pelo fino" d="M118 84 q6 -6 12 0 M146 78 q6 -6 12 0 M174 80 q6 -6 12 0 M200 90 q6 -6 12 0 M96 98 q5 -5 10 0" />
+                </g>
+              </g>
+
+              <!-- GAFAS -->
+              <g class="gafas">
+                <g class="variante gafas-redondas">
+                  <circle cx="124" cy="162" r="29" fill="#fff" fill-opacity=".1" stroke="#40201a" stroke-width="5" />
+                  <circle cx="196" cy="162" r="29" fill="#fff" fill-opacity=".1" stroke="#40201a" stroke-width="5" />
+                  <path d="M153 158 Q160 151 167 158 M95 156 L74 150 M225 156 L246 150" fill="none" stroke="#40201a" stroke-width="5" stroke-linecap="round" />
+                  <path d="M104 146 Q112 138 123 136 M176 146 Q184 138 195 136" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="3" stroke-linecap="round" />
+                </g>
+                <g class="variante gafas-cuadradas">
+                  <rect x="95" y="138" width="58" height="48" rx="12" fill="#fff" fill-opacity=".1" stroke="#1d1d26" stroke-width="5" />
+                  <rect x="167" y="138" width="58" height="48" rx="12" fill="#fff" fill-opacity=".1" stroke="#1d1d26" stroke-width="5" />
+                  <path d="M153 156 H167 M95 152 L74 148 M225 152 L246 148" fill="none" stroke="#1d1d26" stroke-width="5" stroke-linecap="round" />
+                  <path d="M104 148 L116 142 M176 148 L188 142" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="3" stroke-linecap="round" />
+                </g>
+                <g class="variante gafas-media-luna">
+                  <path d="M97 164 H151 A27 27 0 0 1 97 164 Z" fill="#fff" fill-opacity=".12" stroke="#d4a83a" stroke-width="4.2" stroke-linejoin="round" />
+                  <path d="M169 164 H223 A27 27 0 0 1 169 164 Z" fill="#fff" fill-opacity=".12" stroke="#d4a83a" stroke-width="4.2" stroke-linejoin="round" />
+                  <path d="M151 164 Q160 158 169 164 M97 164 L74 152 M223 164 L246 152" fill="none" stroke="#d4a83a" stroke-width="4" stroke-linecap="round" />
+                </g>
+              </g>
+
+              <!-- CICATRIZ -->
+              <g class="variante cicatriz">
+                <path d="M205 104 L196 117 L205 118 L195 132" fill="none" stroke="#f6d3bd" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M205 104 L196 117 L205 118 L195 132" fill="none" stroke="#b8433a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+              </g>
+
+              <!-- MASCOTAS -->
+              <g class="mascota">
+                <g class="variante mascota-lechuza">
+                  <ellipse cx="272" cy="394" rx="26" ry="6" fill="#3b2a17" opacity=".3" />
+                  <path d="M254 312 L249 298 L263 307 Z M290 312 L295 298 L281 307 Z" fill="#eef1f5" stroke="#3a3540" stroke-width="1.8" stroke-linejoin="round" />
+                  <path d="M272 300 C298 300 304 330 302 352 C300 378 288 392 272 392 C256 392 244 378 242 352 C240 330 246 300 272 300 Z" fill="url(#av-plumas)" stroke="#3a3540" stroke-width="2.4" />
+                  <path d="M246 330 C234 346 236 372 250 384 C254 366 254 346 250 330 Z M298 330 C310 346 308 372 294 384 C290 366 290 346 294 330 Z" fill="#e2e6ed" stroke="#3a3540" stroke-width="2" stroke-linejoin="round" />
+                  <path d="M272 318 C286 316 296 326 294 338 C292 348 282 350 272 346 C262 350 252 348 250 338 C248 326 258 316 272 318 Z" fill="#fff" />
+                  <g class="ojos-lechuza">
+                    <circle cx="262" cy="334" r="8.5" fill="#f5c542" stroke="#3a3540" stroke-width="1.8" />
+                    <circle cx="282" cy="334" r="8.5" fill="#f5c542" stroke="#3a3540" stroke-width="1.8" />
+                    <circle cx="263" cy="335" r="4.4" fill="#1a1414" />
+                    <circle cx="281" cy="335" r="4.4" fill="#1a1414" />
+                    <circle cx="264.6" cy="332.6" r="1.6" fill="#fff" />
+                    <circle cx="282.6" cy="332.6" r="1.6" fill="#fff" />
+                  </g>
+                  <path d="M268 342 L276 342 L272 350 Z" fill="#a3a9b2" stroke="#3a3540" stroke-width="1.4" stroke-linejoin="round" />
+                  <path d="M262 364 l3 3 3 -3 M276 360 l3 3 3 -3 M266 376 l3 3 3 -3 M281 372 l3 3 3 -3" fill="none" stroke="#7f8794" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M262 390 l-4 5 m4 -5 v6 m0 -6 l4 5 M282 390 l-4 5 m4 -5 v6 m0 -6 l4 5" fill="none" stroke="#d99a3c" stroke-width="2" stroke-linecap="round" />
+                </g>
+                <g class="variante mascota-gato">
+                  <ellipse cx="272" cy="394" rx="28" ry="6" fill="#3b2a17" opacity=".3" />
+                  <path class="cola-gato" d="M294 386 C320 380 318 344 302 336" fill="none" stroke="#5a2f12" stroke-width="12" stroke-linecap="round" />
+                  <path class="cola-gato" d="M294 386 C320 380 318 344 302 336" fill="none" stroke="#d97c34" stroke-width="7.5" stroke-linecap="round" />
+                  <path d="M272 330 C292 330 300 356 298 378 C297 390 286 394 272 394 C258 394 247 390 246 378 C244 356 252 330 272 330 Z" fill="url(#av-gato)" stroke="#5a2f12" stroke-width="2.2" />
+                  <path d="M272 344 C282 350 284 372 272 382 C260 372 262 350 272 344 Z" fill="#f7e2c6" />
+                  <ellipse cx="262" cy="390" rx="7" ry="4.5" fill="#f7e2c6" stroke="#5a2f12" stroke-width="1.6" />
+                  <ellipse cx="282" cy="390" rx="7" ry="4.5" fill="#f7e2c6" stroke="#5a2f12" stroke-width="1.6" />
+                  <path d="M250 316 L252 290 L268 304 Z M294 316 L292 290 L276 304 Z" fill="#d97c34" stroke="#5a2f12" stroke-width="2" stroke-linejoin="round" />
+                  <path d="M254 308 L255 296 L263 304 Z M290 308 L289 296 L281 304 Z" fill="#f2a5a5" />
+                  <ellipse cx="272" cy="318" rx="25" ry="21" fill="url(#av-gato)" stroke="#5a2f12" stroke-width="2.2" />
+                  <path d="M266 300 l2 8 M272 298 v9 M278 300 l-2 8" fill="none" stroke="#a5521d" stroke-width="2" stroke-linecap="round" />
+                  <ellipse cx="263" cy="318" rx="5" ry="6" fill="#9be15d" stroke="#2c3a12" stroke-width="1.4" />
+                  <ellipse cx="281" cy="318" rx="5" ry="6" fill="#9be15d" stroke="#2c3a12" stroke-width="1.4" />
+                  <ellipse cx="263" cy="318.5" rx="1.7" ry="4.6" fill="#14100a" />
+                  <ellipse cx="281" cy="318.5" rx="1.7" ry="4.6" fill="#14100a" />
+                  <path d="M269 325 h6 l-3 3 Z" fill="#e88a9a" />
+                  <path d="M272 328 q-4 4 -8 1 M272 328 q4 4 8 1 M258 325 h-15 M258 329 l-14 4 M286 325 h15 M286 329 l14 4" fill="none" stroke="#5a2f12" stroke-width="1.3" stroke-linecap="round" />
+                </g>
+                <g class="variante mascota-sapo">
+                  <ellipse cx="272" cy="395" rx="34" ry="6" fill="#3b2a17" opacity=".3" />
+                  <ellipse cx="248" cy="386" rx="15" ry="8" fill="#5f7334" stroke="#2f3a16" stroke-width="2" />
+                  <ellipse cx="296" cy="386" rx="15" ry="8" fill="#5f7334" stroke="#2f3a16" stroke-width="2" />
+                  <path d="M272 342 C300 342 312 362 308 380 C304 392 290 394 272 394 C254 394 240 392 236 380 C232 362 244 342 272 342 Z" fill="url(#av-sapo)" stroke="#2f3a16" stroke-width="2.2" />
+                  <ellipse cx="272" cy="381" rx="20" ry="9" fill="#dcd69c" opacity=".85" />
+                  <circle cx="256" cy="344" r="11" fill="url(#av-sapo)" stroke="#2f3a16" stroke-width="2" />
+                  <circle cx="288" cy="344" r="11" fill="url(#av-sapo)" stroke="#2f3a16" stroke-width="2" />
+                  <circle cx="256" cy="343" r="6.6" fill="#e8c34a" stroke="#2f3a16" stroke-width="1.2" />
+                  <circle cx="288" cy="343" r="6.6" fill="#e8c34a" stroke="#2f3a16" stroke-width="1.2" />
+                  <ellipse cx="256" cy="343" rx="4" ry="1.8" fill="#14100a" />
+                  <ellipse cx="288" cy="343" rx="4" ry="1.8" fill="#14100a" />
+                  <path d="M252 364 Q272 374 292 364" fill="none" stroke="#2f3a16" stroke-width="2.4" stroke-linecap="round" />
+                  <circle cx="284" cy="356" r="2.6" fill="#45561f" opacity=".7" />
+                  <circle cx="262" cy="358" r="2" fill="#45561f" opacity=".7" />
+                  <circle cx="294" cy="370" r="2.2" fill="#45561f" opacity=".7" />
+                  <path d="M258 384 l-6 9 M286 384 l6 9" fill="none" stroke="#2f3a16" stroke-width="2.4" stroke-linecap="round" />
+                </g>
+              </g>
+            </svg>
+          </div>
         </div>
 
-        <div class="pedestal"></div>
-        <div class="stage-casa" id="stage-casa">Gryffindor</div>
+        <div class="stage-casa" id="stage-casa"><span id="stage-casa-nombre">Gryffindor</span></div>
       </section>
 
       <!-- ====================== PANEL DE OPCIONES ====================== -->
-      <section class="panel">
+      <section class="panel" aria-label="Opciones de personalización">
+        <div class="pestanas" role="tablist" aria-label="Categorías">
+          <button type="button" class="pestana activa" role="tab" id="tab-aspecto" aria-controls="sec-aspecto" aria-selected="true">✨ Aspecto</button>
+          <button type="button" class="pestana" role="tab" id="tab-equipo" aria-controls="sec-equipo" aria-selected="false" tabindex="-1">🪄 Equipo</button>
+          <button type="button" class="pestana" role="tab" id="tab-casa" aria-controls="sec-casa" aria-selected="false" tabindex="-1">🛡️ Casa</button>
+        </div>
 
-        <div class="grupo">
-          <h3><span class="num">1</span> Peinado</h3>
-          <div class="chips" data-opcion="pelo">
-            <button class="chip activo" data-valor="1">
-              <span class="chip-ico">💇</span><span>Alborotado</span>
-            </button>
-            <button class="chip" data-valor="2">
-              <span class="chip-ico">🧑‍🎤</span><span>Largo</span>
-            </button>
-            <button class="chip" data-valor="3">
-              <span class="chip-ico">💈</span><span>Con raya</span>
-            </button>
+        <!-- ---------- ASPECTO ---------- -->
+        <div class="seccion" id="sec-aspecto" role="tabpanel" aria-labelledby="tab-aspecto">
+          <div class="grupo">
+            <h3>Peinado</h3>
+            <div class="tarjetas cuatro" data-opcion="pelo">
+              <button type="button" class="tarjeta" data-valor="1"><span class="mini" data-mini="pelo" data-variante="1"></span><span class="tarjeta-nombre">Alborotado</span></button>
+              <button type="button" class="tarjeta" data-valor="2"><span class="mini" data-mini="pelo" data-variante="2"></span><span class="tarjeta-nombre">Melena</span></button>
+              <button type="button" class="tarjeta" data-valor="3"><span class="mini" data-mini="pelo" data-variante="3"></span><span class="tarjeta-nombre">Con raya</span></button>
+              <button type="button" class="tarjeta" data-valor="4"><span class="mini" data-mini="pelo" data-variante="4"></span><span class="tarjeta-nombre">Rizos</span></button>
+            </div>
+          </div>
+          <div class="grupo">
+            <h3>Color de pelo</h3>
+            <div class="muestras" data-opcion="colorPelo"></div>
+          </div>
+          <div class="grupo dos">
+            <div>
+              <h3>Tono de piel</h3>
+              <div class="muestras" data-opcion="piel"></div>
+            </div>
+            <div>
+              <h3>Ojos</h3>
+              <div class="muestras ojos" data-opcion="ojos"></div>
+            </div>
+          </div>
+          <div class="grupo linea">
+            <h3>Cicatriz de rayo</h3>
+            <button type="button" class="interruptor" id="interruptor-cicatriz" role="switch" aria-checked="true" aria-label="Cicatriz de rayo"><span></span></button>
           </div>
         </div>
 
-        <div class="grupo">
-          <h3><span class="num">2</span> Gafas</h3>
-          <div class="toggle" data-opcion="gafas" data-sel="si">
-            <button class="seg activo" data-valor="si">👓 Con gafas</button>
-            <button class="seg" data-valor="no">🚫 Sin gafas</button>
-            <span class="toggle-ind"></span>
+        <!-- ---------- EQUIPO ---------- -->
+        <div class="seccion" id="sec-equipo" role="tabpanel" aria-labelledby="tab-equipo" hidden>
+          <div class="grupo">
+            <h3>Gafas</h3>
+            <div class="tarjetas cuatro" data-opcion="gafas">
+              <button type="button" class="tarjeta" data-valor="redondas"><span class="mini" data-mini="gafas" data-variante="redondas"></span><span class="tarjeta-nombre">Redondas</span></button>
+              <button type="button" class="tarjeta" data-valor="cuadradas"><span class="mini" data-mini="gafas" data-variante="cuadradas"></span><span class="tarjeta-nombre">Cuadradas</span></button>
+              <button type="button" class="tarjeta" data-valor="media-luna"><span class="mini" data-mini="gafas" data-variante="media-luna"></span><span class="tarjeta-nombre">Media luna</span></button>
+              <button type="button" class="tarjeta" data-valor="ninguna"><span class="mini" data-mini="gafas" data-variante="ninguna"></span><span class="tarjeta-nombre">Sin gafas</span></button>
+            </div>
+          </div>
+          <div class="grupo">
+            <h3>Varita</h3>
+            <div class="tarjetas tres" data-opcion="varita">
+              <button type="button" class="tarjeta" data-valor="acebo"><span class="mini" data-mini="varita" data-variante="acebo"></span><span class="tarjeta-nombre">Acebo<small>y pluma de fénix</small></span></button>
+              <button type="button" class="tarjeta" data-valor="sauco"><span class="mini" data-mini="varita" data-variante="sauco"></span><span class="tarjeta-nombre">Saúco<small>y pelo de thestral</small></span></button>
+              <button type="button" class="tarjeta" data-valor="vid"><span class="mini" data-mini="varita" data-variante="vid"></span><span class="tarjeta-nombre">Vid<small>y fibra de dragón</small></span></button>
+            </div>
+          </div>
+          <div class="grupo">
+            <h3>Mascota</h3>
+            <div class="tarjetas cuatro" data-opcion="mascota">
+              <button type="button" class="tarjeta" data-valor="lechuza"><span class="mini" data-mini="mascota" data-variante="lechuza"></span><span class="tarjeta-nombre">Lechuza</span></button>
+              <button type="button" class="tarjeta" data-valor="gato"><span class="mini" data-mini="mascota" data-variante="gato"></span><span class="tarjeta-nombre">Gato</span></button>
+              <button type="button" class="tarjeta" data-valor="sapo"><span class="mini" data-mini="mascota" data-variante="sapo"></span><span class="tarjeta-nombre">Sapo</span></button>
+              <button type="button" class="tarjeta" data-valor="ninguna"><span class="mini" data-mini="mascota" data-variante="ninguna"></span><span class="tarjeta-nombre">Ninguna</span></button>
+            </div>
           </div>
         </div>
 
-        <div class="grupo">
-          <h3><span class="num">3</span> Bufanda de tu casa</h3>
-          <div class="casas" data-opcion="casa">
-            <button class="casa-btn activo" data-casa="Gryffindor" data-color="#7f0909">
-              <span class="swatch"></span>
-              <span class="casa-nom">Gryffindor</span>
-              <span class="casa-ico">🦁</span>
+        <!-- ---------- CASA ---------- -->
+        <div class="seccion" id="sec-casa" role="tabpanel" aria-labelledby="tab-casa" hidden>
+          <p class="sombrero">«¿Dónde te pondré? El Sombrero Seleccionador escucha tu elección…»</p>
+          <div class="estandartes" data-opcion="casa">
+            <button type="button" class="casa-btn" data-valor="Gryffindor" style="--a:#8b1a1a;--b:#e8b830">
+              <span class="estandarte"><span class="tela"><span class="emblema">🦁</span></span></span>
+              <span class="casa-nombre">Gryffindor</span><span class="casa-virtud">Valor</span>
             </button>
-            <button class="casa-btn" data-casa="Slytherin" data-color="#1a472a">
-              <span class="swatch"></span>
-              <span class="casa-nom">Slytherin</span>
-              <span class="casa-ico">🐍</span>
+            <button type="button" class="casa-btn" data-valor="Slytherin" style="--a:#1a5c34;--b:#c0c7cc">
+              <span class="estandarte"><span class="tela"><span class="emblema">🐍</span></span></span>
+              <span class="casa-nombre">Slytherin</span><span class="casa-virtud">Astucia</span>
             </button>
-            <button class="casa-btn" data-casa="Ravenclaw" data-color="#222f5b">
-              <span class="swatch"></span>
-              <span class="casa-nom">Ravenclaw</span>
-              <span class="casa-ico">🦅</span>
+            <button type="button" class="casa-btn" data-valor="Ravenclaw" style="--a:#233a7a;--b:#c69a4e">
+              <span class="estandarte"><span class="tela"><span class="emblema">🦅</span></span></span>
+              <span class="casa-nombre">Ravenclaw</span><span class="casa-virtud">Sabiduría</span>
             </button>
-            <button class="casa-btn" data-casa="Hufflepuff" data-color="#e8b72a">
-              <span class="swatch"></span>
-              <span class="casa-nom">Hufflepuff</span>
-              <span class="casa-ico">🦡</span>
+            <button type="button" class="casa-btn" data-valor="Hufflepuff" style="--a:#e8b72a;--b:#2b2520">
+              <span class="estandarte"><span class="tela"><span class="emblema">🦡</span></span></span>
+              <span class="casa-nombre">Hufflepuff</span><span class="casa-virtud">Lealtad</span>
             </button>
           </div>
+          <p class="casa-descripcion" id="casa-descripcion" aria-live="polite"></p>
         </div>
 
-        <button id="btn-comenzar" class="btn-entrar"><span>Comenzar Aventura ✦</span></button>
+        <button type="button" id="btn-comenzar" class="btn-entrar"><span>Comenzar Aventura ✦</span></button>
       </section>
     </div>
   </main>

@@ -28,19 +28,19 @@ hogwarts-ctf/
 │   └── hogwarts.db             # (se genera al ejecutar initdb)
 └── public/
     ├── index.html            # 1) Login  (pestaña: "Howgarts")
-    ├── personalizacion.html  # 2) Personalización del personaje
+    ├── personalizacion.html  # 2) Crea tu mago (personaje SVG + opciones)
     ├── juramento.html        # 3) El pergamino cerrado: carta + juramento (Reto 2)
     ├── mapa.html             # 4) Mapa del Merodeador (pestaña: "Mapa del Merodeador")
     ├── css/
     │   ├── global.css        # Tema compartido (fondo, botones, modales, transiciones)
     │   ├── login.css
-    │   ├── personalizacion.css
+    │   ├── personalizacion.css  # Medallón, pestañas, tarjetas y estandartes
     │   ├── juramento.css     # Pergamino en 3D, sobre lacrado, barra del conjuro
     │   └── mapa.css          # HUD, niebla de guerra, animaciones
     └── js/
         ├── flujo.js          # Orden de las pantallas y guardias de ruta
         ├── login.js
-        ├── personalizacion.js
+        ├── personalizacion.js   # Opciones, miniaturas, "Sorpréndeme", guardado
         ├── juramento.js      # Carta, validación del juramento, apertura del mapa
         ├── animaciones.js    # Placeholders: espada, horrocrux, cinemáticas
         ├── hud.js            # Temporizador, vidas (perderVida()), pistas
@@ -183,7 +183,11 @@ externas): portada en español, interior del castillo y sobre.
 
 **Completo y funcional:**
 - Login + backend con la SQLi intencional y BD SQLite sembrada.
-- Personalización (3 peinados, gafas sí/no, 4 casas) guardada en `localStorage`.
+- Creación del personaje: mago chibi en SVG sobre un medallón de pergamino,
+  con pestañas **Aspecto** (4 peinados, 6 colores de pelo, 6 tonos de piel,
+  5 colores de ojos, cicatriz), **Equipo** (gafas, varita y mascota) y
+  **Casa** (estandartes con descripción). Miniaturas en vivo, botón
+  "Sorpréndeme" y recuerdo de la última elección en `localStorage`.
 - Pergamino: carta de Hogwarts en sobre lacrado, reto de la frase oculta y
   animación del mapa que se abre (respeta `prefers-reduced-motion`).
 - Mapa: movimiento con flechas, niebla de guerra, 8 POIs (huellas→personaje),

@@ -18,7 +18,10 @@ const express = require('express');
 const Database = require('better-sqlite3');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+// Puerto 80 por defecto: para que el escaneo de Kali (nmap) detecte el servicio
+// web HTTP estandar. Enlazar al puerto 80 requiere privilegios (ver README).
+// Se puede sobreescribir:  PORT=3000 npm start
+const PORT = process.env.PORT || 80;
 const DB_PATH = path.join(__dirname, 'db', 'hogwarts.db');
 
 // Si no existe la BD todavia, avisamos con instrucciones claras.
@@ -119,11 +122,28 @@ app.get('/mision/:id', (req, res) => {
  * =========================================================================== */
 app.get('/api/health', (_req, res) => res.json({ ok: true, servicio: 'howgarts-ctf' }));
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log('===========================================================');
-  console.log('  HOWGARTS CTF  —  entorno educativo (NO usar en produccion)');
-  console.log(`  Servidor activo:  http://localhost:${PORT}`);
+  console.log('  HOWGARTS CTF  —  laboratorio educativo (NO usar en produccion)');
+  console.log(`  Servidor activo:  http://localhost:${PORT}  (puerto ${PORT})`);
   console.log('  Login vulnerable: POST /api/login');
-  console.log("  Reto SQLi:        usuario =  ' OR 1=1 --");
+  console.log('  Entrada legitima: usuario + contrasena validos');
+  console.log("  Entrada por SQLi: usuario =  ' OR 1=1 --");
   console.log('===========================================================');
+});
+
+// Mensajes de error claros para el operador del laboratorio.
+server.on('error', (err) => {
+  if (err.code === 'EACCES') {
+    console.error(`\n[!] Sin privilegios para enlazar el puerto ${PORT}.`);
+    console.error('    Opciones:');
+    console.error('      - Ejecutar con privilegios:   sudo npm start');
+    console.error('      - Permitir el puerto a node:  sudo setcap "cap_net_bind_service=+ep" "$(command -v node)"');
+    console.error('      - Usar otro puerto:           PORT=3000 npm start\n');
+  } else if (err.code === 'EADDRINUSE') {
+    console.error(`\n[!] El puerto ${PORT} ya esta en uso. Libera el puerto o usa:  PORT=3000 npm start\n`);
+  } else {
+    console.error('\n[!] Error al iniciar el servidor:', err.message, '\n');
+  }
+  process.exit(1);
 });

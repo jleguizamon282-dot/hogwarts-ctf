@@ -1,14 +1,18 @@
 # 🏰 Howgarts CTF — base del proyecto
 
-CTF **educativo** con temática Harry Potter para niños. Entorno de prácticas
-**local y controlado** para enseñar dos conceptos de seguridad:
+CTF **educativo** con temática Harry Potter. Pensado como **laboratorio de
+pentesting**: una máquina **Kali** escanea una **VM Ubuntu** que aloja esta app
+web en el **puerto 80**. Enseña dos conceptos de seguridad:
 
 1. **Inyección SQL** (en el login).
 2. **Inspección de código fuente** (frase oculta en el DOM).
 
+El login es **funcional**: los usuarios registrados entran con sus credenciales
+y, además, existe la **brecha SQLi intencional** para fines académicos.
+
 > ⚠️ Este proyecto contiene una vulnerabilidad **intencional**. Es una mecánica
-> del juego. **No lo despliegues en Internet** ni lo uses como base de un login
-> real. Úsalo solo en tu máquina.
+> del laboratorio. **No lo despliegues en Internet** ni lo uses como base de un
+> login real. Úsalo solo en una VM aislada y controlada.
 
 ---
 
@@ -19,8 +23,9 @@ hogwarts-ctf/
 ├── package.json
 ├── server.js              # Backend Express (login VULNERABLE a SQLi, a propósito)
 ├── db/
-│   ├── init.js            # Crea y siembra la BD SQLite
-│   └── hogwarts.db        # (se genera al ejecutar initdb)
+│   ├── init.js                 # Crea/siembra la BD (importa usuarios de /etc/passwd)
+│   ├── lab-users.example.json  # Plantilla de contraseñas de lab por usuario
+│   └── hogwarts.db             # (se genera al ejecutar initdb)
 └── public/
     ├── index.html         # 1) Login  (pestaña: "Howgarts")
     ├── personalizacion.html # 2) Personalización del personaje
@@ -38,16 +43,76 @@ hogwarts-ctf/
         └── mapa.js        # Movimiento, niebla, POIs, misiones, frase secreta
 ```
 
-## ▶️ Cómo ejecutar
+## ▶️ Cómo ejecutar (en la VM Ubuntu)
 
 ```bash
 cd hogwarts-ctf
 npm install
 npm run initdb
-npm start
+sudo npm start
 ```
 
-Abre <http://localhost:3000>.
+Abre <http://localhost:80> (o `http://IP-DE-LA-VM` desde Kali).
+
+El puerto 80 necesita privilegios. Tres opciones:
+
+```bash
+sudo npm start                                                   # opción simple
+```
+```bash
+sudo setcap 'cap_net_bind_service=+ep' "$(command -v node)"      # permitir el puerto a node y luego: npm start
+```
+```bash
+PORT=3000 npm start                                              # usar otro puerto (sin privilegios)
+```
+
+---
+
+## 🧪 Laboratorio Kali → Ubuntu
+
+**Topología:** Kali (atacante) y Ubuntu (víctima, aloja la web) en la misma red.
+
+1. **Escaneo / recon desde Kali:**
+   ```bash
+   nmap -sV -p- IP-DE-LA-VM          # detecta el puerto 80 (http) y el stack (Express)
+   whatweb http://IP-DE-LA-VM        # fingerprint del servicio web
+   ```
+2. Kali encuentra el **puerto 80** abierto → abre el navegador → aparece el **login**.
+3. Dos formas de entrar:
+   - **Legítima:** usuario + contraseña válidos (ver tabla que imprime `initdb`).
+   - **SQLi:** en el campo usuario, `' OR 1=1 --`.
+
+### Usuarios del login
+`npm run initdb` siembra la BD con:
+
+- **Cuentas demo de Hogwarts** (siempre presentes): `harry`, `hermione`, `ron`,
+  `luna`, `cedric`, `draco`, `dumbledore`.
+- **Usuarios de login reales de la VM**: los nombres con shell de login tomados
+  de `/etc/passwd` (p. ej. `root` y tus usuarios humanos). Así el recon que
+  enumera usuarios de la VM coincide con el login web.
+
+> **Contraseñas:** la app usa contraseñas de **laboratorio** guardadas en su BD
+> SQLite. **No** lee `/etc/shadow` ni usa PAM; del sistema solo toma los
+> **nombres** de usuario (de `/etc/passwd`, que es de lectura pública). Las
+> contraseñas del login son independientes de las reales del sistema.
+
+**Definir contraseñas por usuario** (opcional): copia la plantilla y edítala.
+
+```bash
+cp db/lab-users.example.json db/lab-users.json   # luego edita y vuelve a: npm run initdb
+```
+
+Variables de entorno útiles:
+
+```bash
+DEFAULT_LAB_PASSWORD='MiClaveLab'  IMPORT_SYSTEM_USERS=false  npm run initdb
+```
+
+- `DEFAULT_LAB_PASSWORD`: contraseña por defecto de los usuarios importados.
+- `IMPORT_SYSTEM_USERS=false`: no importar usuarios de `/etc/passwd` (solo demo).
+
+> `db/lab-users.json` está en `.gitignore` para que tus contraseñas de lab no se
+> publiquen en GitHub.
 
 ---
 

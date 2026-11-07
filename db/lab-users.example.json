@@ -1,0 +1,6 @@
+{
+  "_comentario": "Copia este archivo como db/lab-users.json y define la contrasena de LABORATORIO de cada usuario. Se aplica tanto a cuentas demo como a usuarios importados de /etc/passwd. Lo que no esté aquí usará DEFAULT_LAB_PASSWORD.",
+  "root": "toor",
+  "student": "Password123",
+  "ubuntu": "ubuntu"
+}

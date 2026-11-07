@@ -5,6 +5,9 @@ node_modules/
 db/hogwarts.db
 db/*.db
 
+# Contrasenas de laboratorio por usuario (no publicar). Usa el .example como plantilla.
+db/lab-users.json
+
 # Logs y temporales
 *.log
 npm-debug.log*

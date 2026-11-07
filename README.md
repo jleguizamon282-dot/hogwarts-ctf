@@ -27,21 +27,46 @@ hogwarts-ctf/
 │   ├── lab-users.example.json  # Plantilla de contraseñas de lab por usuario
 │   └── hogwarts.db             # (se genera al ejecutar initdb)
 └── public/
-    ├── index.html         # 1) Login  (pestaña: "Howgarts")
-    ├── personalizacion.html # 2) Personalización del personaje
-    ├── mapa.html          # 3) Mapa del Merodeador (pestaña: "Mapa del Merodeador")
+    ├── index.html            # 1) Login  (pestaña: "Howgarts")
+    ├── personalizacion.html  # 2) Personalización del personaje
+    ├── juramento.html        # 3) El pergamino cerrado: carta + juramento (Reto 2)
+    ├── mapa.html             # 4) Mapa del Merodeador (pestaña: "Mapa del Merodeador")
     ├── css/
-    │   ├── global.css     # Tema compartido (fondo, castillo, transiciones)
+    │   ├── global.css        # Tema compartido (fondo, botones, modales, transiciones)
     │   ├── login.css
     │   ├── personalizacion.css
-    │   └── mapa.css       # HUD, niebla de guerra, modales, animaciones
+    │   ├── juramento.css     # Pergamino en 3D, sobre lacrado, barra del conjuro
+    │   └── mapa.css          # HUD, niebla de guerra, animaciones
     └── js/
+        ├── flujo.js          # Orden de las pantallas y guardias de ruta
         ├── login.js
         ├── personalizacion.js
-        ├── animaciones.js # Placeholders: espada, horrocrux, cinemáticas
-        ├── hud.js         # Temporizador, vidas (perderVida()), pistas
-        └── mapa.js        # Movimiento, niebla, POIs, misiones, frase secreta
+        ├── juramento.js      # Carta, validación del juramento, apertura del mapa
+        ├── animaciones.js    # Placeholders: espada, horrocrux, cinemáticas
+        ├── hud.js            # Temporizador, vidas (perderVida()), pistas
+        └── mapa.js           # Movimiento, niebla, POIs, misiones
 ```
+
+## 🧭 Ruta del juego
+
+```
+index.html ──► personalizacion.html ──► juramento.html ──► mapa.html ──► /mision/1..8
+  Login           Crea tu mago            Pergamino +          Mapa del
+  (Reto 1)                                carta (Reto 2)       Merodeador
+```
+
+Cada pantalla deja una marca en `localStorage` al completarse, y la siguiente
+la exige al cargar (`js/flujo.js`). Si falta un paso, el navegador vuelve al
+primero pendiente antes de pintar la página.
+
+| Paso completado | Clave en `localStorage` | La exige |
+|---|---|---|
+| Login | `howgarts_sesion` | `personalizacion.html` |
+| Personaje creado | `howgarts_personaje` | `juramento.html` |
+| Juramento pronunciado | `howgarts_juramento` | `mapa.html` |
+
+> Es un control de navegación para ordenar el recorrido, no una medida de
+> seguridad: cualquiera puede editar `localStorage` desde la consola.
 
 ## ▶️ Cómo ejecutar (en la VM Ubuntu)
 
@@ -129,18 +154,28 @@ escribe en el campo **usuario**:
 
 (la contraseña puede quedar vacía o con cualquier texto).
 
-### Reto 2 — Inspección de código (Mapa)
-Al entrar al mapa, todo está a oscuras (niebla de guerra) y hay una **carta**
-(✉️ abajo a la derecha). Dice: *"en la fuente del castillo debes mirar"* → pista
-para abrir las **DevTools** e inspeccionar el código fuente. Escondido en el DOM
-(`mapa.html`) hay un `div` con `display:none` que contiene:
+### Reto 2 — Inspección de código (Pergamino)
+Tras crear el personaje aparece `juramento.html`: la portada del **Mapa del
+Merodeador**, todavía cerrado, y un **sobre lacrado** (con el escudo y el lacre
+rojo). Al hacer clic se rompe el lacre y se lee la carta de Hogwarts, que dice:
+*"en la fuente del castillo debes mirar"* → pista para abrir las **DevTools** e
+inspeccionar el código fuente. Escondido en el DOM (`juramento.html`) hay un
+`div` con `display:none` que contiene:
 
 ```
 Juro solemnemente que mis intenciones no son buenas
 ```
 
-Al escribir esa frase en la caja de texto del mapa: se disipa la niebla y se
-revela la **Espada de Gryffindor**.
+Al escribirlo en la barra del conjuro (no distingue mayúsculas, tildes ni
+puntuación), la tinta se extiende por el pergamino, **el mapa se despliega** y
+se entra en el Mapa del Merodeador. Con un juramento incorrecto responde uno de
+los merodeadores (Lunático, Colagusano, Canuto o Cornamenta).
+
+> La frase no está escrita en `juramento.js`: el script la lee del `div`
+> oculto, así que ese `div` es el único sitio donde encontrarla.
+
+El arte del pergamino es SVG dibujado para esta pantalla (sin imágenes
+externas): portada en español, interior del castillo y sobre.
 
 ---
 
@@ -149,11 +184,15 @@ revela la **Espada de Gryffindor**.
 **Completo y funcional:**
 - Login + backend con la SQLi intencional y BD SQLite sembrada.
 - Personalización (3 peinados, gafas sí/no, 4 casas) guardada en `localStorage`.
+- Pergamino: carta de Hogwarts en sobre lacrado, reto de la frase oculta y
+  animación del mapa que se abre (respeta `prefers-reduced-motion`).
 - Mapa: movimiento con flechas, niebla de guerra, 8 POIs (huellas→personaje),
   pop-up "Iniciar misión", HUD (temporizador 20:00, 3 vidas, pistas).
-- Reto de la frase oculta → disipa niebla + animación de espada.
+- Ruta ordenada entre pantallas (`js/flujo.js`).
 
 **Placeholders listos para ampliar** (funciones ya cableadas):
+- `Animaciones.revelarEspada()` — Espada de Gryffindor; ya no la dispara la
+  frase (ahora abre el mapa), queda lista para la misión que la entregue.
 - `Animaciones.destruirHorrocrux()` — al completar una misión (anillo azul→verde).
 - `Animaciones.gameOver()` — Voldemort vence (reloj a 00:00 o 0 corazones).
 - `Animaciones.victoria()` — Avada Kedavra del héroe (al completar las 8 misiones).
@@ -169,3 +208,8 @@ Animaciones.gameOver();
 
 Para simular el regreso de una misión completada, redirige a:
 `/mapa.html?completada=3`
+
+Para empezar el recorrido desde cero (consola del navegador):
+```js
+localStorage.clear(); location.href = '/';
+```

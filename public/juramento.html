@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>El Juramento · Howgarts</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%93%9C</text></svg>" />
+  <!-- Ruta del juego: exige haber iniciado sesion y creado el personaje -->
+  <script src="js/flujo.js" data-pagina="juramento.html"></script>
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/juramento.css" />
+</head>
+<body class="juramento-body">
+
+  <!-- Fondo (misma gama que la personalizacion) -->
+  <div class="escena" aria-hidden="true">
+    <img id="foto-fondo" src="assets/castle.jpg" alt="" onerror="this.remove()" />
+    <div class="scrim"></div>
+    <div class="particulas"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+
+  <main class="pantalla juramento-wrap">
+
+    <header class="juramento-intro">
+      <div class="crest">✦</div>
+      <h1>Un viejo pergamino</h1>
+      <p>Parece un simple trozo de pergamino… pero solo revela sus secretos a quien pronuncie el juramento correcto.</p>
+    </header>
+
+    <!-- ===================== EL MAPA CERRADO ===================== -->
+    <!-- Dos hojas con la portada por delante y el interior del mapa por detras.
+         Al pronunciar el juramento, las hojas se abren y el mapa se despliega. -->
+    <section class="pergamino-mapa" id="pergamino-mapa" role="img"
+             aria-label="Un viejo pergamino: El Mapa del Merodeador, todavía cerrado">
+      <div class="mapa-sombra" aria-hidden="true"></div>
+
+      <!-- Interior central (solo visible al desplegar) -->
+      <div class="mapa-interior" aria-hidden="true">
+        <svg viewBox="300 0 600 1000">
+          <use href="#interior-papel" width="1200" height="1000" />
+          <g clip-path="url(#c-revelar)"><use href="#interior-tinta" width="1200" height="1000" /></g>
+        </svg>
+      </div>
+
+      <!-- Hoja izquierda -->
+      <div class="hoja hoja-izq" aria-hidden="true">
+        <div class="cara frente">
+          <svg viewBox="0 0 300 1000">
+            <use href="#portada" width="600" height="1000" />
+            <g class="tinta" clip-path="url(#c-papel)"></g>
+          </svg>
+        </div>
+        <div class="cara dorso">
+          <svg viewBox="0 0 300 1000">
+            <use href="#interior-papel" width="1200" height="1000" />
+            <g clip-path="url(#c-revelar)"><use href="#interior-tinta" width="1200" height="1000" /></g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Hoja derecha -->
+      <div class="hoja hoja-der" aria-hidden="true">
+        <div class="cara frente">
+          <svg viewBox="300 0 300 1000">
+            <use href="#portada" width="600" height="1000" />
+            <g class="tinta" clip-path="url(#c-papel)"></g>
+          </svg>
+        </div>
+        <div class="cara dorso">
+          <svg viewBox="900 0 300 1000">
+            <use href="#interior-papel" width="1200" height="1000" />
+            <g clip-path="url(#c-revelar)"><use href="#interior-tinta" width="1200" height="1000" /></g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Destello donde la varita toca el pergamino -->
+      <div class="destello" aria-hidden="true"></div>
+    </section>
+
+    <!-- ===================== BARRA DEL CONJURO ===================== -->
+    <form class="conjuro" id="form-conjuro" autocomplete="off" novalidate>
+      <label class="conjuro-label" for="input-conjuro">Pronuncia el juramento para revelar el mapa</label>
+      <div class="conjuro-fila">
+        <span class="icono" aria-hidden="true">🪄</span>
+        <input type="text" id="input-conjuro" name="conjuro" spellcheck="false"
+               placeholder="¿Conoces el juramento del Mapa del Merodeador?" />
+        <button type="submit" class="btn-magico">Conjurar</button>
+      </div>
+      <p class="conjuro-msg" id="conjuro-msg" role="status" aria-live="polite"></p>
+    </form>
+
+    <!-- ===================== CARTA DE HOGWARTS (sobre lacrado) ===================== -->
+    <div class="sobre-wrap">
+      <button type="button" class="sobre" id="sobre" aria-haspopup="dialog" aria-controls="modal-carta"
+              aria-label="Abrir la carta de Hogwarts">
+        <span class="sobre-aviso" aria-hidden="true">1</span>
+        <svg class="sobre-svg" viewBox="0 0 220 150" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="g-sobre" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#e9dbb5" /><stop offset="1" stop-color="#c9b283" />
+            </linearGradient>
+            <linearGradient id="g-solapa" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#f0e4c4" /><stop offset="1" stop-color="#d6c294" />
+            </linearGradient>
+            <radialGradient id="g-lacre" cx=".38" cy=".34" r=".75">
+              <stop offset="0" stop-color="#e0473c" /><stop offset=".55" stop-color="#a5161a" /><stop offset="1" stop-color="#5e0a0b" />
+            </radialGradient>
+          </defs>
+          <!-- fondo interior del sobre -->
+          <rect x="8" y="12" width="204" height="130" rx="5" fill="#a68e64" stroke="#6b5532" stroke-width="2" />
+          <!-- solapa abierta (queda detras de la carta) -->
+          <path class="solapa-abierta" d="M8 13 L110 -50 L212 13 Z" fill="url(#g-solapa)" stroke="#6b5532" stroke-width="2" stroke-linejoin="round" />
+          <!-- la carta -->
+          <g class="carta-dentro">
+            <rect x="22" y="20" width="176" height="116" rx="3" fill="#f6edd4" stroke="#a48c5d" stroke-width="1.5" />
+            <path d="M40 42 H180 M40 56 H168 M40 70 H176 M40 84 H150" stroke="#8b6f43" stroke-width="2.2" stroke-linecap="round" opacity=".5" />
+          </g>
+          <!-- bolsillo delantero -->
+          <path d="M8 13 L110 88 L212 13 V137 Q212 142 207 142 H13 Q8 142 8 137 Z" fill="url(#g-sobre)" stroke="#6b5532" stroke-width="2" stroke-linejoin="round" />
+          <path d="M10 140 L98 84 M210 140 L122 84" stroke="#7d6640" stroke-opacity=".5" stroke-width="1.6" />
+          <!-- solapa cerrada con el escudo -->
+          <g class="solapa-cerrada">
+            <path d="M8 13 L110 94 L212 13 Z" fill="url(#g-solapa)" stroke="#6b5532" stroke-width="2" stroke-linejoin="round" />
+            <g transform="translate(110 42)" stroke="#4d3818" stroke-width="1.4" fill="none">
+              <path d="M-12 -14 H12 V-1 Q12 11 0 17 Q-12 11 -12 -1 Z" fill="#eadcb4" />
+              <path d="M0 -14 V17 M-12 0 H12" stroke-width="1" />
+              <circle cx="-6" cy="-7" r="2" /><circle cx="6" cy="-7" r="2" />
+              <circle cx="-6" cy="6" r="2" /><circle cx="6" cy="6" r="2" />
+              <circle r="5" fill="#eadcb4" />
+              <text y="3" text-anchor="middle" font-family="'Cinzel Decorative', Georgia, serif" font-weight="900" font-size="8" fill="#4d3818" stroke="none">H</text>
+            </g>
+          </g>
+          <!-- lacre rojo -->
+          <g class="lacre">
+            <path d="M125.7 94 C125.7 96.5 126.7 99.5 125.7 101.6 C124.7 103.6 121.9 104.8 119.9 106.4 C117.9 108 116.1 110.6 113.9 111 C111.7 111.5 109.1 109.6 106.6 109.1 C104.1 108.6 100.8 109.2 98.9 107.9 C97 106.6 96.3 103.5 95.1 101.2 C93.9 98.8 91.7 96.4 91.7 94 C91.8 91.6 94.1 89.2 95.3 86.9 C96.5 84.6 97.2 81.7 99 80.3 C100.9 78.8 104 78.9 106.4 78.4 C108.9 77.8 111.7 76.2 113.9 76.8 C116.1 77.4 117.8 80.2 119.7 81.8 C121.7 83.4 124.7 84.4 125.7 86.4 C126.7 88.5 125.7 91.5 125.7 94 Z"
+                  fill="url(#g-lacre)" stroke="#4a0808" stroke-width="1.2" />
+            <circle cx="110" cy="94" r="10.5" fill="none" stroke="#5e0a0b" stroke-width="1.6" opacity=".7" />
+            <text x="110" y="98.6" text-anchor="middle" font-family="'Cinzel Decorative', Georgia, serif" font-weight="900" font-size="13" fill="#5e0a0b">H</text>
+            <ellipse cx="104" cy="88" rx="4" ry="2.4" fill="#fff" opacity=".35" />
+          </g>
+        </svg>
+      </button>
+      <p class="sobre-leyenda">Tienes una carta sin leer</p>
+    </div>
+  </main>
+
+  <!-- ===================== MODAL: LA CARTA ===================== -->
+  <div id="modal-carta" class="overlay-modal oculto" role="dialog" aria-modal="true" aria-labelledby="carta-titulo">
+    <article class="pergamino carta">
+      <button type="button" class="cerrar" data-cerrar aria-label="Cerrar la carta">×</button>
+      <div class="carta-sello" aria-hidden="true">H</div>
+      <h2 id="carta-titulo">Colegio Hogwarts de Magia y Hechicería</h2>
+      <p class="saludo">Estimado(a) alumno(a):</p>
+      <p>
+        Tenemos el placer de informarle de que ha sido <strong>aceptado(a)</strong> en el Colegio
+        Hogwarts de Magia y Hechicería. Encontrará adjunta la lista de todos los libros y el equipo
+        necesarios. (…)
+      </p>
+      <div class="acertijo">
+        «Si a nuestra escuela quieres entrar,<br />
+        en la <strong>fuente</strong> del castillo debes mirar.»
+      </div>
+      <p class="nota">— La "fuente" es el origen. A veces lo que buscas no está en la pantalla… sino detrás de ella.</p>
+    </article>
+  </div>
+
+  <!-- Velo para la transicion final hacia el Mapa del Merodeador -->
+  <div class="velo" aria-hidden="true"></div>
+
+  <!-- =========================================================================
+       SECRETO DEL CTF — FRASE OCULTA EN EL DOM
+       El jugador, guiado por la carta ("en la fuente... debes mirar"), debe
+       inspeccionar el codigo fuente, encontrar este juramento y escribirlo en
+       la barra del conjuro. juramento.js compara lo escrito con este div.
+       (Esto es parte de la mecanica del CTF: no eliminar.)
+       ========================================================================= -->
+  <div id="secreto-merodeador" style="display:none" aria-hidden="true" data-flag="map">Juro solemnemente que mis intenciones no son buenas</div>
+
+  <!-- =========================================================================
+       ARTE (SVG) — generado a mano para esta pantalla
+         #portada         Portada del mapa cerrado (600x1000). La usan las dos hojas.
+         #interior-papel  Cara interior del pergamino desplegado (1200x1000).
+         #interior-tinta  Dibujo del castillo que aparece al desplegarlo.
+       ========================================================================= -->
+  <svg class="arte" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+    <!-- Pergamino -->
+    <radialGradient id="g-papel" cx=".5" cy=".4" r=".8">
+      <stop offset="0" stop-color="#c3ae88"/>
+      <stop offset=".55" stop-color="#9c8767"/>
+      <stop offset="1" stop-color="#5d4c37"/>
+    </radialGradient>
+    <radialGradient id="g-papel-int" cx=".5" cy=".5" r=".75">
+      <stop offset="0" stop-color="#ecdcb4"/>
+      <stop offset=".6" stop-color="#d6c296"/>
+      <stop offset="1" stop-color="#9c8459"/>
+    </radialGradient>
+    <linearGradient id="g-bruma" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a2620" stop-opacity="0"/>
+      <stop offset=".45" stop-color="#2a2620" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#1b1814" stop-opacity=".85"/>
+    </linearGradient>
+    <filter id="f-manchas" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".006 .009" numOctaves="4" seed="8"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 .18  0 0 0 0 .12  0 0 0 0 .07  2 0 0 0 -.84"/>
+    </filter>
+    <filter id="f-grano" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="2"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 .16  0 0 0 0 .11  0 0 0 0 .06  0 0 0 -2.4 1.3"/>
+    </filter>
+    <filter id="f-quemado" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="9"/></filter>
+    <filter id="f-sombra-ancha" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="24"/></filter>
+    <filter id="f-difuso" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="10"/></filter>
+    <filter id="f-titulo" x="-8%" y="-40%" width="116%" height="180%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="1.3" numOctaves="2" seed="11" result="ruido"/>
+      <feColorMatrix in="ruido" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -9 6.3" result="desgaste"/>
+      <feComposite in="SourceGraphic" in2="desgaste" operator="in" result="gastado"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="halo"/>
+      <feFlood flood-color="#e9c46a" flood-opacity=".28"/>
+      <feComposite in2="halo" operator="in" result="brillo"/>
+      <feMerge><feMergeNode in="brillo"/><feMergeNode in="gastado"/></feMerge>
+    </filter>
+    <path id="borde-portada" d="M28 14.7 L57.2 16 L90.8 15.6 L123.9 10.3 L147.2 17.1 L174.4 16.8 L190 13.6 L208.5 14.1 L234.1 10.2 L252 12.2 L285 15.8 L301.7 16 L317.9 14.7 L333.8 10.1 L365.8 11.6 L383.7 17.4 L415.7 17.2 L449.7 14.1 L477.5 11.6 L511.1 15.2 L545.1 16.7 L564.8 12.8 L582 17 L588.8 28 L587.7 42.6 L589.9 68.8 L587.4 96.7 L583.8 116.6 L587.6 140.2 L584.7 163.8 L582.7 178.2 L584.4 191.9 L589.8 223.3 L587.2 253.5 L589.9 279.2 L588.6 293.4 L588.5 327.3 L583 356.8 L587.4 390.4 L586 411.2 L589.1 441.2 L584 470.5 L589.7 502.3 L589.2 535.9 L585 556.5 L587.4 589.5 L585.9 622.7 L587.6 642.6 L589.3 659.7 L584.8 676.1 L588.7 710.8 L582.6 725.1 L586.9 749.8 L585.5 768.1 L586.5 799.2 L589.5 821.5 L589.7 854.5 L583.7 878.3 L584.5 894.3 L585.2 928.1 L589.1 958.3 L583 982 L572 988.8 L540.6 987.7 L517.6 982.5 L486 982.7 L463 986.3 L434 986.4 L414.5 986.9 L398.2 987.1 L363.6 982.8 L336.9 986.2 L316.3 989.3 L297.3 984.1 L265.3 987.2 L235.2 976.5 L207 985 L177.3 987.2 L148.9 987.8 L125.2 984.2 L97.1 987.7 L63.5 985.1 L37.7 989.8 L18 983 L11.9 972 L13.5 944.3 L14.9 913.5 L12.7 883 L15.6 855.9 L12.7 824.8 L16.5 793.4 L17.3 765.3 L13.9 731.5 L11.3 706.9 L17 675.6 L15.2 652.1 L15.5 623.3 L15.9 606.4 L15 580.7 L14.7 558.4 L14.8 528.4 L10.3 499.7 L13.3 483 L17.9 455.8 L14.8 427.8 L13.6 413.7 L10.5 395.6 L12.4 379.5 L11.5 362.4 L13.5 348.4 L14.6 327 L11.8 301 L10.1 268.3 L12.1 246.4 L10.9 224.3 L12.9 193.2 L14.6 179.2 L14.1 163.9 L14.4 143.4 L16.2 109.5 L16.1 87.3 L12.8 60.2 L14.5 43.9 L17 18 Z"/>
+    <path id="borde-interior" d="M26 13.3 L61.1 16.8 L90.6 13.7 L128.5 18.1 L158.8 15.8 L181.7 12.1 L208.2 16.4 L226.6 18 L249.3 13.8 L267 19.5 L303.4 18.6 L336.5 12.3 L361.9 15.8 L381.6 19.1 L408 13.2 L446.6 13 L488.1 15.4 L519.5 14.6 L549.1 13.5 L566.6 18.5 L589.5 17.9 L611.6 19.3 L652.2 17.7 L689.3 16.4 L725.5 13 L754.9 23.7 L776.8 18.9 L817.3 15.1 L843.6 15.4 L870.6 19.5 L897.5 12.3 L916.5 17.4 L959.8 15.8 L989.6 16.2 L1026.3 13.7 L1059.2 16.2 L1092.5 13.4 L1113.6 14.7 L1155.2 14.6 L1184 19 L1189.6 30 L1191.4 49.3 L1186.2 87.8 L1186.9 114.4 L1185.3 149.1 L1188.9 191.5 L1184.8 234.7 L1185.4 267.2 L1181.3 296.9 L1185.4 320.1 L1191.4 341 L1186.2 379.2 L1185.7 408.8 L1190 426.7 L1188.8 451 L1191.4 472.1 L1185.2 497.7 L1186.4 540.8 L1190.1 570.2 L1188 612.6 L1191.7 648.8 L1185.7 671 L1185.4 709 L1188.8 741.7 L1185.6 773.9 L1188 798.7 L1186.2 822.7 L1186.8 839.4 L1191.8 881.7 L1187.1 914.2 L1187.6 953.7 L1185 980 L1174 984.9 L1131.6 981.2 L1111.5 987.2 L1092.5 987.7 L1063.9 986.9 L1024 983.1 L1004.1 983.9 L978.8 984.3 L956.4 986.7 L934.9 985.1 L899.3 983.8 L881.5 982.6 L841.4 982.2 L803.6 987.9 L774.5 987.5 L737.4 986.6 L701.7 986 L666.4 985.6 L648.8 985 L623.9 981.2 L599.4 984.2 L568.1 980.9 L548.9 983.5 L518.7 982.5 L476.1 985.6 L440.7 984 L409.1 983.4 L370.6 980.7 L344.5 985.6 L301.2 987.1 L282.6 987.4 L244.1 982.3 L215.5 983.3 L198.5 983.1 L170.1 984.1 L143 984.9 L120.5 987.6 L92.2 986.1 L56.7 981.9 L16 981 L11.5 970 L10.9 947.1 L12.8 917.5 L8.7 875 L11.7 845.5 L14.7 809.7 L12.7 772.1 L13 735.1 L13.3 695.4 L9.9 660.5 L10.9 619.2 L14.2 586.1 L15.4 543.6 L10.4 527 L11 502 L12.2 481.6 L10.3 463 L13.6 421 L8.9 392 L13.3 349.7 L10.6 327.6 L13.1 293.8 L15.1 270.3 L10 245.1 L9.2 205.7 L9.6 170.9 L10.1 138.2 L15.1 111.5 L11.3 82.4 L10.2 49.2 L15 20 Z"/>
+    <clipPath id="c-papel"><use href="#borde-portada"/></clipPath>
+    <clipPath id="c-papel-int"><use href="#borde-interior"/></clipPath>
+    <!-- Revelado del interior: el circulo crece por JS al desplegar el mapa -->
+    <clipPath id="c-revelar" clipPathUnits="userSpaceOnUse"><circle id="revelar-circulo" cx="600" cy="560" r="0"/></clipPath>
+
+    <!-- Piedra del castillo -->
+    <radialGradient id="g-patio" cx=".5" cy=".42" r=".62">
+      <stop offset="0" stop-color="#4b121a"/>
+      <stop offset=".7" stop-color="#2d0a0f"/>
+      <stop offset="1" stop-color="#1b0609"/>
+    </radialGradient>
+    <linearGradient id="g-torre" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c9b590"/>
+      <stop offset=".45" stop-color="#a48e6b"/>
+      <stop offset="1" stop-color="#65533f"/>
+    </linearGradient>
+    <linearGradient id="g-muro-luz" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9c8667"/>
+      <stop offset="1" stop-color="#7a6750"/>
+    </linearGradient>
+    <linearGradient id="g-muro-sombra" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6f5d48"/>
+      <stop offset="1" stop-color="#54463a"/>
+    </linearGradient>
+    <pattern id="p-ladrillo-baja" width="26" height="24" patternUnits="userSpaceOnUse" patternTransform="skewY(42.5)">
+      <path d="M0 .6H26 M0 12.6H26 M.6 0V12 M13.6 12V24" fill="none" stroke="#231811" stroke-opacity=".42" stroke-width="1.3"/>
+    </pattern>
+    <pattern id="p-ladrillo-sube" width="26" height="24" patternUnits="userSpaceOnUse" patternTransform="skewY(-42.5)">
+      <path d="M0 .6H26 M0 12.6H26 M.6 0V12 M13.6 12V24" fill="none" stroke="#231811" stroke-opacity=".42" stroke-width="1.3"/>
+    </pattern>
+    <!-- Cintas -->
+    <linearGradient id="g-cinta" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cbb691"/>
+      <stop offset="1" stop-color="#a38c68"/>
+    </linearGradient>
+
+    <!-- Piezas pequenas reutilizables -->
+    <symbol id="chispa" viewBox="-10 -10 20 20"><path d="M0-10C1-2 2-1 10 0 2 1 1 2 0 10-1 2-2 1-10 0-2-1-1-2 0-10Z"/></symbol>
+    <g id="pie"><ellipse cy="-2.2" rx="2.4" ry="3.7"/><ellipse cy="4.3" rx="1.9" ry="1.8"/></g>
+
+    </defs>
+
+    <symbol id="portada" viewBox="0 0 600 1000">
+    <!-- Pergamino envejecido -->
+    <use href="#borde-portada" fill="url(#g-papel)"/>
+    <g clip-path="url(#c-papel)">
+      <rect x="0" y="0" width="600" height="1000" filter="url(#f-manchas)"/>
+      <rect x="0" y="0" width="600" height="1000" filter="url(#f-grano)" opacity=".5"/>
+      <ellipse cx="300" cy="300" rx="230" ry="150" fill="#e9dcb9" opacity=".22" filter="url(#f-difuso)"/>
+      <rect x="0" y="760" width="600" height="240" fill="url(#g-bruma)"/>
+    </g>
+    <!-- Filigranas -->
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <g stroke="#231811" stroke-width="11"><path d="M97.5 74.3 C97.8 74.1 98.7 73.5 99.2 72.9 C99.7 72.2 100.1 71.4 100.4 70.6 C100.7 69.7 100.9 68.8 100.8 67.8 C100.8 66.8 100.6 65.6 100.2 64.6 C99.9 63.6 99.3 62.5 98.5 61.5 C97.8 60.6 96.8 59.6 95.7 58.9 C94.6 58.2 93.3 57.5 91.9 57.1 C90.5 56.7 88.9 56.5 87.4 56.5 C85.8 56.6 84.1 56.8 82.6 57.4 C81 57.9 79.3 58.7 77.9 59.8 C76.5 60.8 75 62.2 73.9 63.7 C72.7 65.2 71.7 67 71 68.9 C70.3 70.7 69.9 72.9 69.7 75 C69.6 77.1 69.8 79.4 70.3 81.6 C70.8 83.8 71.7 86.1 72.9 88.1 C74.1 90.1 75.6 92.2 77.4 93.8 C79.2 95.5 81.4 97.1 83.7 98.3 C86 99.4 88.7 100.3 91.3 100.8 C94 101.3 96.9 101.4 99.7 101.1 C102.5 100.7 105.5 100 108.2 98.8 C110.9 97.7 113.6 96.1 116 94.1 C118.3 92.2 120.5 89.8 122.3 87.1 C124.1 84.5 125.6 81.4 126.6 78.3 C127.5 75.2 128.2 71.7 128.2 68.3 C128.3 64.9 127.8 61.2 126.9 57.8 C126 54.4 124.5 51 122.6 47.9 C120.6 44.8 118.2 41.8 115.4 39.3 C112.5 36.8 109.2 34.5 105.7 32.9 C102.2 31.2 98.3 30 94.3 29.3 C90.4 28.7 84.1 29.2 82 29.1"/><path d="M515.7 66.6 C515.4 66.4 514.6 66.1 514.1 65.6 C513.6 65.2 513.2 64.6 512.8 64 C512.4 63.3 512.2 62.6 512 61.7 C511.9 60.9 511.8 60 512 59.1 C512.1 58.2 512.4 57.2 512.8 56.3 C513.3 55.4 513.9 54.5 514.7 53.7 C515.4 52.9 516.4 52.1 517.4 51.6 C518.4 51 519.6 50.5 520.9 50.2 C522.2 50 523.6 49.8 524.9 49.9 C526.3 50.1 527.8 50.4 529.2 50.9 C530.5 51.4 532 52.2 533.2 53.1 C534.5 54.1 535.7 55.3 536.6 56.6 C537.6 58 538.5 59.6 539.1 61.2 C539.7 62.9 540.1 64.8 540.2 66.6 C540.3 68.5 540.2 70.5 539.8 72.4 C539.4 74.3 538.7 76.3 537.7 78.1 C536.7 79.9 535.4 81.7 533.9 83.2 C532.4 84.7 530.5 86.2 528.6 87.3 C526.6 88.4 524.4 89.3 522.1 89.8 C519.8 90.4 517.3 90.6 514.9 90.5 C512.4 90.4 509.8 89.9 507.4 89.1 C505 88.3 502.6 87.1 500.4 85.6 C498.2 84.1 496.1 82.3 494.4 80.2 C492.6 78.1 491.1 75.6 489.9 73 C488.8 70.4 487.9 67.5 487.5 64.6 C487.1 61.7 487.1 58.6 487.5 55.5 C487.9 52.5 488.7 49.4 490 46.6 C491.3 43.7 493 40.8 495 38.3 C497.1 35.9 499.6 33.5 502.3 31.6 C505.1 29.7 509.9 27.8 511.4 27"/><path d="M559.4 208.2 C559.2 208.4 558.7 208.7 558.4 209 C558.1 209.4 557.9 209.8 557.7 210.2 C557.5 210.7 557.3 211.2 557.3 211.7 C557.2 212.3 557.2 212.9 557.3 213.5 C557.4 214.1 557.6 214.7 557.9 215.3 C558.2 215.8 558.5 216.4 559 216.9 C559.5 217.5 560.1 218 560.7 218.4 C561.3 218.8 562.1 219.1 562.8 219.3 C563.6 219.6 564.5 219.7 565.3 219.7 C566.2 219.7 567.1 219.7 568 219.4 C568.8 219.2 569.8 218.9 570.6 218.4 C571.4 217.9 572.3 217.3 573 216.6 C573.7 215.9 574.4 215.1 575 214.1 C575.5 213.2 576 212.2 576.3 211.1 C576.6 210 576.8 208.8 576.8 207.6 C576.8 206.5 576.7 205.2 576.4 204 C576.1 202.8 575.6 201.6 575 200.4 C574.4 199.3 573.6 198.2 572.6 197.2 C571.7 196.3 570.6 195.4 569.4 194.6 C568.2 193.9 566.9 193.3 565.5 192.8 C564.1 192.4 562.6 192.2 561.1 192.1 C559.6 192 558 192.2 556.5 192.5 C554.9 192.9 553.4 193.4 551.9 194.2 C550.5 194.9 549.1 195.9 547.8 197 C546.6 198.1 545.4 199.4 544.5 200.9 C543.5 202.3 542.7 203.9 542.1 205.6 C541.5 207.3 541.2 209.1 541 211 C540.9 212.8 541 214.7 541.3 216.6 C541.7 218.5 542.2 220.4 543.1 222.1 C543.9 223.9 545.7 226.3 546.2 227.2"/><path d="M41.4 193.3 C41.6 193.3 42 193.3 42.3 193.3 C42.7 193.4 43 193.4 43.4 193.6 C43.7 193.7 44 193.9 44.3 194.2 C44.7 194.5 45 194.8 45.2 195.2 C45.4 195.5 45.7 195.9 45.8 196.4 C46 196.9 46.1 197.4 46.1 197.9 C46.1 198.4 46.1 199 46 199.5 C45.9 200.1 45.7 200.6 45.5 201.2 C45.2 201.7 44.9 202.3 44.4 202.8 C44 203.3 43.5 203.7 43 204.1 C42.4 204.5 41.8 204.9 41.1 205.2 C40.4 205.4 39.7 205.6 38.9 205.7 C38.2 205.8 37.3 205.9 36.5 205.8 C35.7 205.7 34.9 205.5 34.1 205.2 C33.3 204.9 32.5 204.5 31.7 204 C31 203.5 30.3 202.9 29.6 202.2 C29 201.5 28.4 200.7 28 199.8 C27.5 199 27.1 198 26.8 197 C26.6 196 26.4 195 26.4 193.9 C26.4 192.8 26.5 191.7 26.7 190.6 C26.9 189.6 27.3 188.5 27.8 187.4 C28.3 186.4 29 185.4 29.7 184.4 C30.5 183.5 31.4 182.6 32.4 181.9 C33.3 181.2 34.5 180.5 35.6 180 C36.8 179.5 38.1 179.1 39.4 178.8 C40.7 178.6 42.1 178.5 43.4 178.6 C44.8 178.7 46.2 178.9 47.5 179.3 C48.9 179.7 50.2 180.3 51.5 181 C52.7 181.8 54 182.7 55 183.7 C56.1 184.7 57.5 186.6 58 187.2"/><path d="M329.4 55.7 C329.7 55.7 330.3 55.9 330.8 55.8 C331.2 55.8 331.7 55.7 332.2 55.5 C332.7 55.3 333.2 55 333.6 54.7 C334 54.3 334.5 53.9 334.8 53.3 C335.1 52.8 335.5 52.2 335.7 51.6 C335.9 50.9 336 50.2 336 49.5 C336 48.7 335.9 47.9 335.7 47.2 C335.5 46.4 335.2 45.6 334.8 44.8 C334.4 44.1 333.8 43.4 333.2 42.7 C332.5 42.1 331.7 41.5 330.9 41 C330 40.6 329.1 40.2 328.1 39.9 C327.1 39.7 326 39.6 324.9 39.6 C323.8 39.6 322.7 39.8 321.6 40.1 C320.5 40.4 319.3 40.9 318.3 41.5 C317.3 42.2 316.3 43 315.4 43.9 C314.5 44.8 313.7 45.9 313.1 47 C312.4 48.2 311.9 49.5 311.6 50.9 C311.2 52.2 311.1 53.7 311.1 55.1 C311.1 56.6 311.3 58.1 311.7 59.5 C312.1 61 312.7 62.5 313.5 63.8 C314.3 65.2 315.3 66.5 316.5 67.6 C317.7 68.8 319 69.8 320.5 70.7 C321.9 71.5 323.6 72.2 325.3 72.7 C326.9 73.1 328.8 73.4 330.6 73.4 C332.4 73.5 334.3 73.3 336.1 72.8 C337.9 72.4 339.8 71.7 341.4 70.7 C343.1 69.8 344.8 68.6 346.2 67.3 C347.7 65.9 349 64.3 350.1 62.6 C351.2 60.9 352.2 58.9 352.8 56.9 C353.4 54.9 353.8 51.6 354 50.5"/><path d="M128 70 C170 20 230 30 252 64 C270 92 300 92 304 70"/><path d="M352 50 C380 18 440 16 470 40 C488 54 500 70 490 88"/><path d="M545 100 C578 128 582 160 566 186"/><path d="M60 112 C36 140 30 168 40 176"/><path d="M232 162 C250 186 286 196 300 176"/></g>
+      <g stroke="#8a7254" stroke-width="6"><path d="M97.5 74.3 C97.8 74.1 98.7 73.5 99.2 72.9 C99.7 72.2 100.1 71.4 100.4 70.6 C100.7 69.7 100.9 68.8 100.8 67.8 C100.8 66.8 100.6 65.6 100.2 64.6 C99.9 63.6 99.3 62.5 98.5 61.5 C97.8 60.6 96.8 59.6 95.7 58.9 C94.6 58.2 93.3 57.5 91.9 57.1 C90.5 56.7 88.9 56.5 87.4 56.5 C85.8 56.6 84.1 56.8 82.6 57.4 C81 57.9 79.3 58.7 77.9 59.8 C76.5 60.8 75 62.2 73.9 63.7 C72.7 65.2 71.7 67 71 68.9 C70.3 70.7 69.9 72.9 69.7 75 C69.6 77.1 69.8 79.4 70.3 81.6 C70.8 83.8 71.7 86.1 72.9 88.1 C74.1 90.1 75.6 92.2 77.4 93.8 C79.2 95.5 81.4 97.1 83.7 98.3 C86 99.4 88.7 100.3 91.3 100.8 C94 101.3 96.9 101.4 99.7 101.1 C102.5 100.7 105.5 100 108.2 98.8 C110.9 97.7 113.6 96.1 116 94.1 C118.3 92.2 120.5 89.8 122.3 87.1 C124.1 84.5 125.6 81.4 126.6 78.3 C127.5 75.2 128.2 71.7 128.2 68.3 C128.3 64.9 127.8 61.2 126.9 57.8 C126 54.4 124.5 51 122.6 47.9 C120.6 44.8 118.2 41.8 115.4 39.3 C112.5 36.8 109.2 34.5 105.7 32.9 C102.2 31.2 98.3 30 94.3 29.3 C90.4 28.7 84.1 29.2 82 29.1"/><path d="M515.7 66.6 C515.4 66.4 514.6 66.1 514.1 65.6 C513.6 65.2 513.2 64.6 512.8 64 C512.4 63.3 512.2 62.6 512 61.7 C511.9 60.9 511.8 60 512 59.1 C512.1 58.2 512.4 57.2 512.8 56.3 C513.3 55.4 513.9 54.5 514.7 53.7 C515.4 52.9 516.4 52.1 517.4 51.6 C518.4 51 519.6 50.5 520.9 50.2 C522.2 50 523.6 49.8 524.9 49.9 C526.3 50.1 527.8 50.4 529.2 50.9 C530.5 51.4 532 52.2 533.2 53.1 C534.5 54.1 535.7 55.3 536.6 56.6 C537.6 58 538.5 59.6 539.1 61.2 C539.7 62.9 540.1 64.8 540.2 66.6 C540.3 68.5 540.2 70.5 539.8 72.4 C539.4 74.3 538.7 76.3 537.7 78.1 C536.7 79.9 535.4 81.7 533.9 83.2 C532.4 84.7 530.5 86.2 528.6 87.3 C526.6 88.4 524.4 89.3 522.1 89.8 C519.8 90.4 517.3 90.6 514.9 90.5 C512.4 90.4 509.8 89.9 507.4 89.1 C505 88.3 502.6 87.1 500.4 85.6 C498.2 84.1 496.1 82.3 494.4 80.2 C492.6 78.1 491.1 75.6 489.9 73 C488.8 70.4 487.9 67.5 487.5 64.6 C487.1 61.7 487.1 58.6 487.5 55.5 C487.9 52.5 488.7 49.4 490 46.6 C491.3 43.7 493 40.8 495 38.3 C497.1 35.9 499.6 33.5 502.3 31.6 C505.1 29.7 509.9 27.8 511.4 27"/><path d="M559.4 208.2 C559.2 208.4 558.7 208.7 558.4 209 C558.1 209.4 557.9 209.8 557.7 210.2 C557.5 210.7 557.3 211.2 557.3 211.7 C557.2 212.3 557.2 212.9 557.3 213.5 C557.4 214.1 557.6 214.7 557.9 215.3 C558.2 215.8 558.5 216.4 559 216.9 C559.5 217.5 560.1 218 560.7 218.4 C561.3 218.8 562.1 219.1 562.8 219.3 C563.6 219.6 564.5 219.7 565.3 219.7 C566.2 219.7 567.1 219.7 568 219.4 C568.8 219.2 569.8 218.9 570.6 218.4 C571.4 217.9 572.3 217.3 573 216.6 C573.7 215.9 574.4 215.1 575 214.1 C575.5 213.2 576 212.2 576.3 211.1 C576.6 210 576.8 208.8 576.8 207.6 C576.8 206.5 576.7 205.2 576.4 204 C576.1 202.8 575.6 201.6 575 200.4 C574.4 199.3 573.6 198.2 572.6 197.2 C571.7 196.3 570.6 195.4 569.4 194.6 C568.2 193.9 566.9 193.3 565.5 192.8 C564.1 192.4 562.6 192.2 561.1 192.1 C559.6 192 558 192.2 556.5 192.5 C554.9 192.9 553.4 193.4 551.9 194.2 C550.5 194.9 549.1 195.9 547.8 197 C546.6 198.1 545.4 199.4 544.5 200.9 C543.5 202.3 542.7 203.9 542.1 205.6 C541.5 207.3 541.2 209.1 541 211 C540.9 212.8 541 214.7 541.3 216.6 C541.7 218.5 542.2 220.4 543.1 222.1 C543.9 223.9 545.7 226.3 546.2 227.2"/><path d="M41.4 193.3 C41.6 193.3 42 193.3 42.3 193.3 C42.7 193.4 43 193.4 43.4 193.6 C43.7 193.7 44 193.9 44.3 194.2 C44.7 194.5 45 194.8 45.2 195.2 C45.4 195.5 45.7 195.9 45.8 196.4 C46 196.9 46.1 197.4 46.1 197.9 C46.1 198.4 46.1 199 46 199.5 C45.9 200.1 45.7 200.6 45.5 201.2 C45.2 201.7 44.9 202.3 44.4 202.8 C44 203.3 43.5 203.7 43 204.1 C42.4 204.5 41.8 204.9 41.1 205.2 C40.4 205.4 39.7 205.6 38.9 205.7 C38.2 205.8 37.3 205.9 36.5 205.8 C35.7 205.7 34.9 205.5 34.1 205.2 C33.3 204.9 32.5 204.5 31.7 204 C31 203.5 30.3 202.9 29.6 202.2 C29 201.5 28.4 200.7 28 199.8 C27.5 199 27.1 198 26.8 197 C26.6 196 26.4 195 26.4 193.9 C26.4 192.8 26.5 191.7 26.7 190.6 C26.9 189.6 27.3 188.5 27.8 187.4 C28.3 186.4 29 185.4 29.7 184.4 C30.5 183.5 31.4 182.6 32.4 181.9 C33.3 181.2 34.5 180.5 35.6 180 C36.8 179.5 38.1 179.1 39.4 178.8 C40.7 178.6 42.1 178.5 43.4 178.6 C44.8 178.7 46.2 178.9 47.5 179.3 C48.9 179.7 50.2 180.3 51.5 181 C52.7 181.8 54 182.7 55 183.7 C56.1 184.7 57.5 186.6 58 187.2"/><path d="M329.4 55.7 C329.7 55.7 330.3 55.9 330.8 55.8 C331.2 55.8 331.7 55.7 332.2 55.5 C332.7 55.3 333.2 55 333.6 54.7 C334 54.3 334.5 53.9 334.8 53.3 C335.1 52.8 335.5 52.2 335.7 51.6 C335.9 50.9 336 50.2 336 49.5 C336 48.7 335.9 47.9 335.7 47.2 C335.5 46.4 335.2 45.6 334.8 44.8 C334.4 44.1 333.8 43.4 333.2 42.7 C332.5 42.1 331.7 41.5 330.9 41 C330 40.6 329.1 40.2 328.1 39.9 C327.1 39.7 326 39.6 324.9 39.6 C323.8 39.6 322.7 39.8 321.6 40.1 C320.5 40.4 319.3 40.9 318.3 41.5 C317.3 42.2 316.3 43 315.4 43.9 C314.5 44.8 313.7 45.9 313.1 47 C312.4 48.2 311.9 49.5 311.6 50.9 C311.2 52.2 311.1 53.7 311.1 55.1 C311.1 56.6 311.3 58.1 311.7 59.5 C312.1 61 312.7 62.5 313.5 63.8 C314.3 65.2 315.3 66.5 316.5 67.6 C317.7 68.8 319 69.8 320.5 70.7 C321.9 71.5 323.6 72.2 325.3 72.7 C326.9 73.1 328.8 73.4 330.6 73.4 C332.4 73.5 334.3 73.3 336.1 72.8 C337.9 72.4 339.8 71.7 341.4 70.7 C343.1 69.8 344.8 68.6 346.2 67.3 C347.7 65.9 349 64.3 350.1 62.6 C351.2 60.9 352.2 58.9 352.8 56.9 C353.4 54.9 353.8 51.6 354 50.5"/><path d="M128 70 C170 20 230 30 252 64 C270 92 300 92 304 70"/><path d="M352 50 C380 18 440 16 470 40 C488 54 500 70 490 88"/><path d="M545 100 C578 128 582 160 566 186"/><path d="M60 112 C36 140 30 168 40 176"/><path d="M232 162 C250 186 286 196 300 176"/></g>
+    </g>
+    <!-- Cinta: pliegue que une las dos cintas -->
+    <path d="M286 106 L316 134 L276 198 L236 160 Z" fill="#7d684e" stroke="#231811" stroke-width="2.4" stroke-linejoin="round"/>
+    <path d="M38.6 102.3 L12.6 129.2 L30.7 138.2 L29.8 158.5 L55.8 131.6 Z" fill="#8b7558" stroke="#231811" stroke-width="2.4" stroke-linejoin="round"/>
+      <path d="M42 120 Q168 46 300 122" fill="none" stroke="#231811" stroke-width="45"/>
+      <path d="M42 120 Q168 46 300 122" fill="none" stroke="url(#g-cinta)" stroke-width="40"/>
+      <path d="M42 120 Q168 46 300 122" fill="none" stroke="#fff3d6" stroke-opacity=".16" stroke-width="24"/>
+      <path id="curva-itinerarium" d="M42 120 Q168 46 300 122" fill="none"/>
+      <text font-family="'Cinzel Decorative', Georgia, serif" font-weight="900" font-size="25" letter-spacing="1.5" fill="#22160e" dy="8.5"><textPath href="#curva-itinerarium" startOffset="50%" text-anchor="middle">ITINERARIUM</textPath></text>
+    <path d="M538 121 L571.2 121.8 L564.8 141 L579.6 154.7 L546.4 154 Z" fill="#8b7558" stroke="#231811" stroke-width="2.4" stroke-linejoin="round"/>
+      <path d="M246 180 Q400 174 548 136" fill="none" stroke="#231811" stroke-width="45"/>
+      <path d="M246 180 Q400 174 548 136" fill="none" stroke="url(#g-cinta)" stroke-width="40"/>
+      <path d="M246 180 Q400 174 548 136" fill="none" stroke="#fff3d6" stroke-opacity=".16" stroke-width="24"/>
+      <path id="curva-maraudentium" d="M246 180 Q400 174 548 136" fill="none"/>
+      <text font-family="'Cinzel Decorative', Georgia, serif" font-weight="900" font-size="25" letter-spacing="1.5" fill="#22160e" dy="8.5"><textPath href="#curva-maraudentium" startOffset="50%" text-anchor="middle">MARAUDENTIUM</textPath></text>
+    <!-- Destellos -->
+    <g fill="#f3dc94" opacity=".75"><circle cx="112" cy="373.3" r="0.9"/><circle cx="301.4" cy="379.7" r="1"/><circle cx="303.3" cy="384.8" r="1.7"/><circle cx="500.9" cy="375.9" r="1"/><circle cx="52.2" cy="284.9" r="2.1"/><circle cx="44.3" cy="216.7" r="1.6"/><circle cx="49.1" cy="217" r="1.5"/><circle cx="557.3" cy="399.6" r="1.1"/><circle cx="406.8" cy="390.2" r="1.2"/><circle cx="346.9" cy="354.9" r="1"/><circle cx="220.5" cy="372.8" r="1.7"/><circle cx="552.8" cy="314.9" r="0.9"/><circle cx="93.6" cy="356.8" r="0.9"/><circle cx="446" cy="361.5" r="1.5"/><circle cx="428.3" cy="595.5" r="1"/><circle cx="550.6" cy="584.4" r="1.2"/><circle cx="494.3" cy="569.9" r="1.5"/><circle cx="122.4" cy="787.9" r="1.1"/><circle cx="57.3" cy="848.6" r="1"/><circle cx="541.1" cy="853.6" r="1.4"/><circle cx="36.4" cy="428" r="1"/><circle cx="240" cy="681.3" r="1.8"/><circle cx="221.4" cy="464.7" r="1.4"/><circle cx="104.1" cy="439.8" r="1.4"/><circle cx="405.8" cy="430.2" r="1.3"/><circle cx="410.1" cy="751.5" r="1.2"/><circle cx="509.1" cy="477.8" r="1.5"/><circle cx="446.7" cy="804.9" r="1.3"/><circle cx="83.6" cy="422.3" r="1.3"/><circle cx="123.6" cy="689.7" r="0.9"/></g>
+    <use href="#chispa" x="188" y="242" width="20" height="20" fill="#3b2d40"></use>
+    <use href="#chispa" x="343" y="227" width="18" height="18" fill="#f0cf7a"><animate attributeName="opacity" values="1;.25;1" dur="2.6s" begin="0s" repeatCount="indefinite"/></use>
+    <use href="#chispa" x="506" y="256" width="12" height="12" fill="#f0cf7a"><animate attributeName="opacity" values="1;.25;1" dur="3.1s" begin="0.6s" repeatCount="indefinite"/></use>
+    <use href="#chispa" x="79" y="283" width="14" height="14" fill="#f0cf7a"><animate attributeName="opacity" values="1;.25;1" dur="2.2s" begin="1.1s" repeatCount="indefinite"/></use>
+    <use href="#chispa" x="540.5" y="310.5" width="15" height="15" fill="#3b2d40"></use>
+    <use href="#chispa" x="465.5" y="367.5" width="9" height="9" fill="#f6dc8e"><animate attributeName="opacity" values="1;.25;1" dur="2.8s" begin="0.3s" repeatCount="indefinite"/></use>
+    <use href="#chispa" x="113" y="367" width="10" height="10" fill="#3b2d40"></use>
+    <use href="#chispa" x="34" y="644" width="12" height="12" fill="#f0cf7a"><animate attributeName="opacity" values="1;.25;1" dur="3.4s" begin="0.9s" repeatCount="indefinite"/></use>
+    <use href="#chispa" x="567.5" y="735.5" width="13" height="13" fill="#f0cf7a"><animate attributeName="opacity" values="1;.25;1" dur="2.4s" begin="1.5s" repeatCount="indefinite"/></use>
+    <use href="#chispa" x="511.5" y="831.5" width="9" height="9" fill="#f6dc8e"><animate attributeName="opacity" values="1;.25;1" dur="2.9s" begin="0.2s" repeatCount="indefinite"/></use>
+    <use href="#chispa" x="59" y="765" width="10" height="10" fill="#3b2d40"></use>
+    <use href="#chispa" x="416" y="358" width="8" height="8" fill="#f0cf7a"><animate attributeName="opacity" values="1;.25;1" dur="2.1s" begin="1.8s" repeatCount="indefinite"/></use>
+    <!-- Titulo: "Los senores Lunatico, Colagusano, Canuto y Cornamenta" -->
+    <text x="300" y="242" text-anchor="middle" font-family="MedievalSharp, Georgia, serif" font-size="38" fill="#22160e" stroke="#22160e" stroke-width="1.1">Los señores</text>
+    <g font-family="'Cinzel Decorative', Georgia, serif" font-weight="900" font-size="34" fill="#22160e" text-anchor="middle">
+      <text x="300" y="286" textLength="492" lengthAdjust="spacingAndGlyphs">LUNÁTICO, COLAGUSANO,</text>
+      <text x="300" y="333" textLength="452" lengthAdjust="spacingAndGlyphs">CANUTO Y CORNAMENTA</text>
+    </g>
+    <!-- ===== Castillo ===== -->
+    <!-- Patio interior (oscuro) -->
+    <polygon points="300,438 516,636 300,834 84,636" fill="url(#g-patio)"/>
+    <!-- Caras interiores de los muros traseros -->
+    <polygon points="84,592 300,394 300,438 84,636" fill="#57473a"/>
+    <polygon points="84,592 300,394 300,438 84,636" fill="url(#p-ladrillo-sube)"/>
+    <polygon points="300,394 516,592 516,636 300,438" fill="#6f5c47"/>
+    <polygon points="300,394 516,592 516,636 300,438" fill="url(#p-ladrillo-baja)"/>
+    <path d="M84 592 L300 394 L516 592 L516 636 L300 438 L84 636 Z" fill="none" stroke="#231811" stroke-width="2"/>
+    <!-- Adarve trasero -->
+    <path d="M60 592 L300 372 L540 592 L516 592 L300 394 L84 592 Z" fill="#a48e6b" stroke="#231811" stroke-width="2.2" stroke-linejoin="round"/>
+    <g fill="#8c7759" stroke="#231811" stroke-width="1.4" stroke-linejoin="round"><polygon points="65.2,587.3 71.8,581.2 71.8,573.2 65.2,579.3"/><polygon points="77.7,575.8 84.3,569.7 84.3,561.7 77.7,567.8"/><polygon points="90.2,564.3 96.9,558.2 96.9,550.2 90.2,556.3"/><polygon points="102.8,552.8 109.4,546.7 109.4,538.7 102.8,544.8"/><polygon points="115.3,541.3 121.9,535.2 121.9,527.2 115.3,533.3"/><polygon points="127.8,529.8 134.5,523.8 134.5,515.8 127.8,521.8"/><polygon points="177.9,483.9 184.6,477.8 184.6,469.8 177.9,475.9"/><polygon points="190.5,472.4 197.1,466.3 197.1,458.3 190.5,464.4"/><polygon points="203,460.9 209.6,454.8 209.6,446.8 203,452.9"/><polygon points="265.7,403.5 272.3,397.4 272.3,389.4 265.7,395.5"/><polygon points="278.2,392 284.8,385.9 284.8,377.9 278.2,384"/></g>
+    <g fill="#8c7759" stroke="#231811" stroke-width="1.4" stroke-linejoin="round"><polygon points="305.2,376.7 311.8,382.8 311.8,374.8 305.2,368.7"/><polygon points="317.7,388.2 324.3,394.3 324.3,386.3 317.7,380.2"/><polygon points="330.2,399.7 336.9,405.8 336.9,397.8 330.2,391.7"/><polygon points="380.3,445.7 387,451.7 387,443.7 380.3,437.7"/><polygon points="392.9,457.1 399.5,463.2 399.5,455.2 392.9,449.1"/><polygon points="405.4,468.6 412,474.7 412,466.7 405.4,460.6"/><polygon points="417.9,480.1 424.6,486.2 424.6,478.2 417.9,472.1"/><polygon points="468.1,526.1 474.7,532.1 474.7,524.1 468.1,518.1"/><polygon points="480.6,537.6 487.2,543.6 487.2,535.6 480.6,529.6"/><polygon points="493.1,549 499.8,555.1 499.8,547.1 493.1,541"/><polygon points="505.7,560.5 512.3,566.6 512.3,558.6 505.7,552.5"/><polygon points="518.2,572 524.8,578.1 524.8,570.1 518.2,564"/></g>
+    <!-- Torres traseras -->
+    <g><path d="M338 380 V432 Q353 438.6 368 432 V380 Z" fill="url(#g-torre)" stroke="#231811" stroke-width="2.2"/><path d="M338 397 Q353 402.6 368 397 M338 416 Q353 421.6 368 416" fill="none" stroke="#231811" stroke-opacity=".32" stroke-width="1.2"/><rect x="349.5" y="396" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><ellipse cx="353" cy="380" rx="19" ry="4.3" fill="#3f7a75" stroke="#231811" stroke-width="2"/><path d="M334 380 Q346.9 363.2 353 340 Q359.1 363.2 372 380 Q353 385.6 334 380 Z" fill="#3f7a75" stroke="#231811" stroke-width="2.2" stroke-linejoin="round"/><path d="M353 340 Q359.1 363.2 372 380 Q363.4 384.3 356 385.3 Q356 364.8 353 340 Z" fill="#000" opacity=".26"/><path d="M342.6 378 Q348.1 363.2 351.5 347" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="2.4" stroke-linecap="round"/><path d="M339.3 368.8 Q353 372 366.7 368.8 M345 356.8 Q353 359.2 361 356.8" fill="none" stroke="#231811" stroke-opacity=".35" stroke-width="1.2"/></g>
+    <g><rect x="216" y="382" width="23.8" height="68" fill="#b39d78" stroke="#231811" stroke-width="2.2"/><rect x="239.8" y="382" width="10.2" height="68" fill="#76634d" stroke="#231811" stroke-width="2.2"/><path d="M216 398 H250 M216 413 H250 M216 428 H250 M216 443 H250" fill="none" stroke="#231811" stroke-opacity=".3" stroke-width="1.1"/><rect x="224.4" y="398" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><g fill="#b39d78" stroke="#231811" stroke-width="1.6"><rect x="214" y="372" width="5.4" height="12"/><rect x="224.9" y="372" width="5.4" height="12"/><rect x="235.7" y="372" width="5.4" height="12"/><rect x="246.6" y="372" width="5.4" height="12"/></g><path d="M214 384 H252" stroke="#231811" stroke-width="2"/></g>
+    <g><path d="M140 458 V520 Q156 527 172 520 V458 Z" fill="url(#g-torre)" stroke="#231811" stroke-width="2.2"/><path d="M140 475 Q156 481 172 475 M140 494 Q156 500 172 494 M140 513 Q156 519 172 513" fill="none" stroke="#231811" stroke-opacity=".32" stroke-width="1.2"/><rect x="152.5" y="474" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><ellipse cx="156" cy="458" rx="20" ry="4.5" fill="#3f5f86" stroke="#231811" stroke-width="2"/><path d="M136 458 Q149.6 442.9 156 422 Q162.4 442.9 176 458 Q156 464 136 458 Z" fill="#3f5f86" stroke="#231811" stroke-width="2.2" stroke-linejoin="round"/><path d="M156 422 Q162.4 442.9 176 458 Q167 462.6 159 463.6 Q159.2 444.3 156 422 Z" fill="#000" opacity=".26"/><path d="M145 456 Q150.8 442.9 154.5 429" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="2.4" stroke-linecap="round"/><path d="M141.6 447.9 Q156 450.8 170.4 447.9 M147.6 437.1 Q156 439.3 164.4 437.1" fill="none" stroke="#231811" stroke-opacity=".35" stroke-width="1.2"/></g>
+    <g><path d="M424 420 V518 Q444 526.8 464 518 V420 Z" fill="url(#g-torre)" stroke="#231811" stroke-width="2.2"/><path d="M424 437 Q444 444.5 464 437 M424 456 Q444 463.5 464 456 M424 475 Q444 482.5 464 475 M424 494 Q444 501.5 464 494" fill="none" stroke="#231811" stroke-opacity=".32" stroke-width="1.2"/><rect x="440.5" y="436" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><ellipse cx="444" cy="420" rx="24" ry="5.4" fill="#a2463a" stroke="#231811" stroke-width="2"/><path d="M420 420 Q436.3 399 444 370 Q451.7 399 468 420 Q444 427.5 420 420 Z" fill="#a2463a" stroke="#231811" stroke-width="2.2" stroke-linejoin="round"/><path d="M444 370 Q451.7 399 468 420 Q457.2 425.7 447 427 Q447.8 401 444 370 Z" fill="#000" opacity=".26"/><path d="M430.8 418 Q437.8 399 442.5 377" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="2.4" stroke-linecap="round"/><path d="M426.7 406 Q444 410 461.3 406 M433.9 391 Q444 394 454.1 391" fill="none" stroke="#231811" stroke-opacity=".35" stroke-width="1.2"/></g>
+    <!-- Rotulo: "El Mapa del Merodeador" -->
+    <g font-family="Fredoka, 'Trebuchet MS', sans-serif" fill="#efdcae" stroke="#1c080b" stroke-width="3.5"
+       paint-order="stroke" stroke-linejoin="round" text-anchor="middle" filter="url(#f-titulo)">
+      <text x="300" y="548" font-size="40" font-weight="600">El</text>
+      <text x="300" y="604" font-size="48" font-weight="700" textLength="236" lengthAdjust="spacingAndGlyphs">MAPA DEL</text>
+      <text x="300" y="664" font-size="54" font-weight="700" textLength="262" lengthAdjust="spacingAndGlyphs">MERODEADOR</text>
+    </g>
+    <!-- Huellas dentro del patio -->
+    <g fill="#e6d2a0" opacity=".9">
+        <use href="#pie" transform="translate(252.4 507.4) rotate(45.6)"/>
+        <use href="#pie" transform="translate(256.1 493.6) rotate(43.9)"/>
+        <use href="#pie" transform="translate(269.8 489.9) rotate(49.5)"/>
+        <use href="#pie" transform="translate(276.3 477.4) rotate(60.1)"/>
+        <use href="#pie" transform="translate(290.4 478.1) rotate(69.5)"/>
+        <use href="#pie" transform="translate(301 468.5) rotate(84.4)"/>
+        <use href="#pie" transform="translate(313.4 475.3) rotate(96)"/>
+        <use href="#pie" transform="translate(327 471.3) rotate(108)"/>
+        <use href="#pie" transform="translate(335.1 482.8) rotate(127)"/>
+        <use href="#pie" transform="translate(348.8 486.1) rotate(134.9)"/>
+        <use href="#pie" transform="translate(353 499.6) rotate(134.3)"/>
+        <use href="#pie" transform="translate(366.6 503.8) rotate(137)"/>
+        <use href="#pie" transform="translate(369.5 517.7) rotate(142)"/>
+        <use href="#pie" transform="translate(382.1 524.3) rotate(149.5)"/>
+        <use href="#pie" transform="translate(382.2 538.5) rotate(152.2)"/>
+        <use href="#pie" transform="translate(233.7 708.5) rotate(132.6)"/>
+        <use href="#pie" transform="translate(247.3 712.3) rotate(133.6)"/>
+        <use href="#pie" transform="translate(252.4 725.6) rotate(126.2)"/>
+        <use href="#pie" transform="translate(266.7 726.5) rotate(119.2)"/>
+        <use href="#pie" transform="translate(275 738.1) rotate(112.4)"/>
+        <use href="#pie" transform="translate(289 735.4) rotate(103.6)"/>
+        <use href="#pie" transform="translate(300.1 744.2) rotate(95.5)"/>
+        <use href="#pie" transform="translate(312.6 737.4) rotate(84)"/>
+        <use href="#pie" transform="translate(326.1 741.7) rotate(75)"/>
+        <use href="#pie" transform="translate(335.7 731.3) rotate(67.5)"/>
+        <use href="#pie" transform="translate(349.9 731.5) rotate(57.2)"/>
+        <use href="#pie" transform="translate(356.2 718.6) rotate(52.7)"/>
+        <use href="#pie" transform="translate(370.2 716) rotate(48.4)"/>
+        <use href="#pie" transform="translate(374.7 702.5) rotate(45.5)"/>
+        <use href="#pie" transform="translate(388.3 698.1) rotate(41.8)"/>
+        <use href="#pie" transform="translate(391.3 684.2) rotate(40.4)"/>
+    </g>
+    <!-- Muros delanteros (caras exteriores) -->
+    <polygon points="60,592 300,812 300,874 60,654" fill="url(#g-muro-luz)"/>
+    <polygon points="60,592 300,812 300,874 60,654" fill="url(#p-ladrillo-baja)"/>
+    <polygon points="300,812 540,592 540,654 300,874" fill="url(#g-muro-sombra)"/>
+    <polygon points="300,812 540,592 540,654 300,874" fill="url(#p-ladrillo-sube)"/>
+    <path d="M60 592 L300 812 L540 592 L540 654 L300 874 L60 654 Z" fill="none" stroke="#231811" stroke-width="2.4" stroke-linejoin="round"/>
+    <path d="M300 812 V874" stroke="#231811" stroke-width="2"/>
+    <!-- Adarve delantero -->
+    <path d="M60 592 L300 812 L540 592 L516 592 L300 790 L84 592 Z" fill="#b29c78" stroke="#231811" stroke-width="2.2" stroke-linejoin="round"/>
+    <g fill="#a58f6c" stroke="#231811" stroke-width="1.4" stroke-linejoin="round"><polygon points="65.2,596.7 71.8,602.8 71.8,594.8 65.2,588.7"/><polygon points="77.7,608.2 84.3,614.3 84.3,606.3 77.7,600.2"/><polygon points="127.8,654.2 134.5,660.2 134.5,652.2 127.8,646.2"/><polygon points="140.3,665.7 147,671.7 147,663.7 140.3,657.7"/><polygon points="203,723.1 209.6,729.2 209.6,721.2 203,715.1"/><polygon points="253.1,769 259.8,775.1 259.8,767.1 253.1,761"/><polygon points="265.7,780.5 272.3,786.6 272.3,778.6 265.7,772.5"/><polygon points="278.2,792 284.8,798.1 284.8,790.1 278.2,784"/></g>
+    <g fill="#a58f6c" stroke="#231811" stroke-width="1.4" stroke-linejoin="round"><polygon points="330.2,784.3 336.9,778.2 336.9,770.2 330.2,776.3"/><polygon points="342.8,772.8 349.4,766.7 349.4,758.7 342.8,764.8"/><polygon points="392.9,726.9 399.5,720.8 399.5,712.8 392.9,718.9"/><polygon points="405.4,715.4 412,709.3 412,701.3 405.4,707.4"/><polygon points="417.9,703.9 424.6,697.8 424.6,689.8 417.9,695.9"/><polygon points="430.5,692.4 437.1,686.3 437.1,678.3 430.5,684.4"/><polygon points="480.6,646.4 487.2,640.4 487.2,632.4 480.6,638.4"/><polygon points="493.1,635 499.8,628.9 499.8,620.9 493.1,627"/><polygon points="505.7,623.5 512.3,617.4 512.3,609.4 505.7,615.5"/><polygon points="518.2,612 524.8,605.9 524.8,597.9 518.2,604"/></g>
+    <g fill="#1a110b" stroke="#231811" stroke-width="1.6"><path d="M132 725.3 V707.3 A8 8 0 0 1 148 707.3 V725.3 Z"/><path d="M412 762 V744 A8 8 0 0 1 428 744 V762 Z"/></g>
+    <!-- Arbol -->
+    <path d="M560 604 C556 570 563 542 553 508 C549 492 556 480 560 470" fill="none" stroke="#3a2a1c" stroke-width="9" stroke-linecap="round"/>
+    <path d="M557 532 C568 522 574 512 580 500" fill="none" stroke="#3a2a1c" stroke-width="5" stroke-linecap="round"/>
+    <g fill="#465030" stroke="#20251a" stroke-width="5"><circle cx="546" cy="452" r="30"/><circle cx="572" cy="474" r="22"/><circle cx="522" cy="476" r="20"/><circle cx="554" cy="420" r="22"/><circle cx="578" cy="440" r="16"/></g><g fill="#465030"><circle cx="546" cy="452" r="30"/><circle cx="572" cy="474" r="22"/><circle cx="522" cy="476" r="20"/><circle cx="554" cy="420" r="22"/><circle cx="578" cy="440" r="16"/></g><g fill="#5d6a3d" opacity=".55"><circle cx="540.6" cy="445.4" r="18.6"/><circle cx="568" cy="469.2" r="13.6"/><circle cx="518.4" cy="471.6" r="12.4"/><circle cx="550" cy="415.2" r="13.6"/><circle cx="575.1" cy="436.5" r="9.9"/></g>
+    <!-- Torres de las esquinas y del frente -->
+    <g><path d="M42 510 V662 Q60 669.9 78 662 V510 Z" fill="url(#g-torre)" stroke="#231811" stroke-width="2.2"/><path d="M42 527 Q60 533.7 78 527 M42 546 Q60 552.7 78 546 M42 565 Q60 571.7 78 565 M42 584 Q60 590.7 78 584 M42 603 Q60 609.7 78 603 M42 622 Q60 628.7 78 622 M42 641 Q60 647.7 78 641" fill="none" stroke="#231811" stroke-opacity=".32" stroke-width="1.2"/><rect x="56.5" y="526" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><rect x="56.5" y="557" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><rect x="56.5" y="588" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><ellipse cx="60" cy="510" rx="22" ry="5" fill="#a2463a" stroke="#231811" stroke-width="2"/><path d="M38 510 Q53 492.4 60 468 Q67 492.4 82 510 Q60 516.7 38 510 Z" fill="#a2463a" stroke="#231811" stroke-width="2.2" stroke-linejoin="round"/><path d="M60 468 Q67 492.4 82 510 Q72.1 515.1 63 516.3 Q63.5 494 60 468 Z" fill="#000" opacity=".26"/><path d="M47.9 508 Q54.3 492.4 58.5 475" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="2.4" stroke-linecap="round"/><path d="M44.2 498.2 Q60 501.6 75.8 498.2 M50.8 485.6 Q60 488.2 69.2 485.6" fill="none" stroke="#231811" stroke-opacity=".35" stroke-width="1.2"/></g>
+    <g><path d="M522 522 V662 Q540 669.9 558 662 V522 Z" fill="url(#g-torre)" stroke="#231811" stroke-width="2.2"/><path d="M522 539 Q540 545.7 558 539 M522 558 Q540 564.7 558 558 M522 577 Q540 583.7 558 577 M522 596 Q540 602.7 558 596 M522 615 Q540 621.7 558 615 M522 634 Q540 640.7 558 634 M522 653 Q540 659.7 558 653" fill="none" stroke="#231811" stroke-opacity=".32" stroke-width="1.2"/><rect x="536.5" y="538" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><rect x="536.5" y="569" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><rect x="536.5" y="600" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><ellipse cx="540" cy="522" rx="22" ry="5" fill="#3f5f86" stroke="#231811" stroke-width="2"/><path d="M518 522 Q533 505.2 540 482 Q547 505.2 562 522 Q540 528.7 518 522 Z" fill="#3f5f86" stroke="#231811" stroke-width="2.2" stroke-linejoin="round"/><path d="M540 482 Q547 505.2 562 522 Q552.1 527.1 543 528.3 Q543.5 506.8 540 482 Z" fill="#000" opacity=".26"/><path d="M527.9 520 Q534.3 505.2 538.5 489" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="2.4" stroke-linecap="round"/><path d="M524.2 510.8 Q540 514 555.8 510.8 M530.8 498.8 Q540 501.2 549.2 498.8" fill="none" stroke="#231811" stroke-opacity=".35" stroke-width="1.2"/></g>
+    <g><path d="M87 584 V700 Q104 707.5 121 700 V584 Z" fill="url(#g-torre)" stroke="#231811" stroke-width="2.2"/><path d="M87 601 Q104 607.4 121 601 M87 620 Q104 626.4 121 620 M87 639 Q104 645.4 121 639 M87 658 Q104 664.4 121 658 M87 677 Q104 683.4 121 677" fill="none" stroke="#231811" stroke-opacity=".32" stroke-width="1.2"/><rect x="100.5" y="600" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><rect x="100.5" y="631" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><ellipse cx="104" cy="584" rx="21" ry="4.7" fill="#6e4c70" stroke="#231811" stroke-width="2"/><path d="M83 584 Q97.3 568.9 104 548 Q110.7 568.9 125 584 Q104 590.4 83 584 Z" fill="#6e4c70" stroke="#231811" stroke-width="2.2" stroke-linejoin="round"/><path d="M104 548 Q110.7 568.9 125 584 Q115.5 588.9 107 590 Q107.4 570.3 104 548 Z" fill="#000" opacity=".26"/><path d="M92.5 582 Q98.5 568.9 102.5 555" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="2.4" stroke-linecap="round"/><path d="M88.9 573.9 Q104 576.8 119.1 573.9 M95.2 563.1 Q104 565.3 112.8 563.1" fill="none" stroke="#231811" stroke-opacity=".35" stroke-width="1.2"/></g>
+    <g><path d="M436 622 V737 Q456 745.8 476 737 V622 Z" fill="url(#g-torre)" stroke="#231811" stroke-width="2.2"/><path d="M436 639 Q456 646.5 476 639 M436 658 Q456 665.5 476 658 M436 677 Q456 684.5 476 677 M436 696 Q456 703.5 476 696 M436 715 Q456 722.5 476 715" fill="none" stroke="#231811" stroke-opacity=".32" stroke-width="1.2"/><rect x="452.5" y="638" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><rect x="452.5" y="669" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><ellipse cx="456" cy="622" rx="24" ry="5.4" fill="#6e4c70" stroke="#231811" stroke-width="2"/><path d="M432 622 Q448.3 605.2 456 582 Q463.7 605.2 480 622 Q456 629.5 432 622 Z" fill="#6e4c70" stroke="#231811" stroke-width="2.2" stroke-linejoin="round"/><path d="M456 582 Q463.7 605.2 480 622 Q469.2 627.7 459 629 Q459.8 606.8 456 582 Z" fill="#000" opacity=".26"/><path d="M442.8 620 Q449.8 605.2 454.5 589" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="2.4" stroke-linecap="round"/><path d="M438.7 610.8 Q456 614 473.3 610.8 M445.9 598.8 Q456 601.2 466.1 598.8" fill="none" stroke="#231811" stroke-opacity=".35" stroke-width="1.2"/></g>
+    <g><path d="M151 670 V766 Q175 776.6 199 766 V670 Z" fill="url(#g-torre)" stroke="#231811" stroke-width="2.2"/><path d="M151 687 Q175 696 199 687 M151 706 Q175 715 199 706 M151 725 Q175 734 199 725 M151 744 Q175 753 199 744" fill="none" stroke="#231811" stroke-opacity=".32" stroke-width="1.2"/><rect x="171.5" y="686" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><ellipse cx="175" cy="670" rx="26" ry="6.3" fill="#3a2c20" stroke="#231811" stroke-width="2"/><g fill="#b39d78" stroke="#231811" stroke-width="1.6"><rect x="149" y="660" width="5.8" height="12"/><rect x="160.6" y="660" width="5.8" height="12"/><rect x="172.1" y="660" width="5.8" height="12"/><rect x="183.7" y="660" width="5.8" height="12"/><rect x="195.2" y="660" width="5.8" height="12"/></g><path d="M149 672 H201" stroke="#231811" stroke-width="2"/></g>
+    <g><path d="M355 712 V814 Q372 821.5 389 814 V712 Z" fill="url(#g-torre)" stroke="#231811" stroke-width="2.2"/><path d="M355 729 Q372 735.4 389 729 M355 748 Q372 754.4 389 748 M355 767 Q372 773.4 389 767 M355 786 Q372 792.4 389 786 M355 805 Q372 811.4 389 805" fill="none" stroke="#231811" stroke-opacity=".32" stroke-width="1.2"/><rect x="368.5" y="728" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><rect x="368.5" y="759" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><ellipse cx="372" cy="712" rx="21" ry="4.7" fill="#557a45" stroke="#231811" stroke-width="2"/><path d="M351 712 Q365.3 697.7 372 678 Q378.7 697.7 393 712 Q372 718.4 351 712 Z" fill="#557a45" stroke="#231811" stroke-width="2.2" stroke-linejoin="round"/><path d="M372 678 Q378.7 697.7 393 712 Q383.6 716.9 375 718 Q375.4 699.1 372 678 Z" fill="#000" opacity=".26"/><path d="M360.4 710 Q366.5 697.7 370.5 685" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="2.4" stroke-linecap="round"/><path d="M356.9 702.5 Q372 705.2 387.1 702.5 M363.2 692.3 Q372 694.3 380.8 692.3" fill="none" stroke="#231811" stroke-opacity=".35" stroke-width="1.2"/></g>
+    <g><path d="M214 724 V814 Q228 820.2 242 814 V724 Z" fill="url(#g-torre)" stroke="#231811" stroke-width="2.2"/><path d="M214 741 Q228 746.2 242 741 M214 760 Q228 765.2 242 760 M214 779 Q228 784.2 242 779 M214 798 Q228 803.2 242 798" fill="none" stroke="#231811" stroke-opacity=".32" stroke-width="1.2"/><rect x="224.5" y="740" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><ellipse cx="228" cy="724" rx="18" ry="4.1" fill="#8e3a2c" stroke="#231811" stroke-width="2"/><path d="M210 724 Q222.2 712.2 228 696 Q233.8 712.2 246 724 Q228 729.2 210 724 Z" fill="#8e3a2c" stroke="#231811" stroke-width="2.2" stroke-linejoin="round"/><path d="M228 696 Q233.8 712.2 246 724 Q237.9 728 231 728.9 Q230.9 713.4 228 696 Z" fill="#000" opacity=".26"/><path d="M218.1 722 Q223.3 712.2 226.5 703" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="2.4" stroke-linecap="round"/><path d="M215 716.2 Q228 718.4 241 716.2 M220.4 707.8 Q228 709.4 235.6 707.8" fill="none" stroke="#231811" stroke-opacity=".35" stroke-width="1.2"/></g>
+    <g><rect x="276" y="772" width="36.4" height="110" fill="#b39d78" stroke="#231811" stroke-width="2.2"/><rect x="312.4" y="772" width="15.6" height="110" fill="#76634d" stroke="#231811" stroke-width="2.2"/><path d="M276 788 H328 M276 803 H328 M276 818 H328 M276 833 H328 M276 848 H328 M276 863 H328" fill="none" stroke="#231811" stroke-opacity=".3" stroke-width="1.1"/><rect x="290.7" y="788" width="7" height="13" rx="3.5" fill="#f2cd70" stroke="#231811" stroke-width="1.3"/><path d="M282.2 882 V856 A12 12 0 0 1 306.2 856 V882 Z" fill="#1a110b" stroke="#231811" stroke-width="1.8"/><path d="M288.2 882 V850 M300.2 882 V850 M282.2 866.2 H306.2" stroke="#6b5a45" stroke-width="1.2"/><g fill="#b39d78" stroke="#231811" stroke-width="1.6"><rect x="274" y="762" width="6.2" height="12"/><rect x="286.4" y="762" width="6.2" height="12"/><rect x="298.9" y="762" width="6.2" height="12"/><rect x="311.3" y="762" width="6.2" height="12"/><rect x="323.8" y="762" width="6.2" height="12"/></g><path d="M274 774 H330" stroke="#231811" stroke-width="2"/></g>
+    <!-- Estandarte "HOGWARTS" -->
+    <path d="M128 531 V420" stroke="#231811" stroke-width="3.2" stroke-linecap="round"/>
+    <circle cx="128" cy="417" r="4" fill="#e1bd62" stroke="#231811" stroke-width="1.6"/>
+    <path d="M32 446 C22 466 40 482 26 508 C38 498 46 488 44 470 C43 460 40 452 44 446 Z" fill="#a8873f" stroke="#231811" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M126 424 C100 416 64 436 26 430 L36 443 L24 456 C60 463 98 446 126 452 Z" fill="#cba85a" stroke="#231811" stroke-width="2.2" stroke-linejoin="round"/>
+    <text x="78" y="447" text-anchor="middle" font-family="'Cinzel Decorative', Georgia, serif" font-weight="900" font-size="13" textLength="78" lengthAdjust="spacingAndGlyphs" fill="#22160e" transform="rotate(-3 78 447)">HOGWARTS</text>
+    <!-- Camino y huellas exteriores -->
+    <path d="M14 690 C18.3 695.3 36.7 710.3 40 722 C43.3 733.7 29 748.3 34 760 C39 771.7 60 780 70 792 C80 804 91.3 818.7 94 832 C96.7 845.3 82 860.3 86 872 C90 883.7 105.7 893.3 118 902 C130.3 910.7 148 914.3 160 924 C172 933.7 185 954 190 960" fill="none" stroke="#2c2016" stroke-width="1.6" stroke-dasharray="1 0"/>
+    <g fill="#2c2016" opacity=".85">
+        <use href="#pie" transform="translate(23.2 705.9) rotate(146.3) scale(0.95)"/>
+        <use href="#pie" transform="translate(36.4 712.5) rotate(143.7) scale(0.95)"/>
+        <use href="#pie" transform="translate(38.3 727) rotate(146.7) scale(0.95)"/>
+        <use href="#pie" transform="translate(50.5 735.1) rotate(155.9) scale(0.95)"/>
+        <use href="#pie" transform="translate(46.4 749.2) rotate(179.4) scale(0.95)"/>
+        <use href="#pie" transform="translate(53 762.1) rotate(179.2) scale(0.95)"/>
+        <use href="#pie" transform="translate(49.4 776.4) rotate(151.6) scale(0.95)"/>
+        <use href="#pie" transform="translate(63.1 782.1) rotate(132.3) scale(0.95)"/>
+        <use href="#pie" transform="translate(68.6 795.5) rotate(130.1) scale(0.95)"/>
+        <use href="#pie" transform="translate(82.7 799.9) rotate(141.5) scale(0.95)"/>
+        <use href="#pie" transform="translate(84.9 814.4) rotate(145.7) scale(0.95)"/>
+        <use href="#pie" transform="translate(97.7 821.6) rotate(147.5) scale(0.95)"/>
+        <use href="#pie" transform="translate(98.8 836.2) rotate(147.8) scale(0.95)"/>
+        <use href="#pie" transform="translate(126.6 903.1) rotate(114.7) scale(0.95)"/>
+        <use href="#pie" transform="translate(141.3 901.9) rotate(112.8) scale(0.95)"/>
+        <use href="#pie" transform="translate(150.4 913.4) rotate(115.1) scale(0.95)"/>
+        <use href="#pie" transform="translate(165.2 913.4) rotate(121.6) scale(0.95)"/>
+        <use href="#pie" transform="translate(171.9 926.5) rotate(127.8) scale(0.95)"/>
+        <use href="#pie" transform="translate(186.2 929.8) rotate(133.8) scale(0.95)"/>
+        <use href="#pie" transform="translate(190.1 943.9) rotate(140.5) scale(0.95)"/>
+        <use href="#pie" transform="translate(202.9 951.1) rotate(153.5) scale(0.95)"/>
+        <use href="#pie" transform="translate(201.6 965.7) rotate(160.3) scale(0.95)"/>
+        <use href="#pie" transform="translate(212.1 975.9) rotate(161.6) scale(0.95)"/>
+    </g>
+    <!-- Bruma, nubes y arbustos -->
+    <g clip-path="url(#c-papel)">
+      <ellipse cx="300" cy="900" rx="250" ry="40" fill="#8a8373" opacity=".55" filter="url(#f-difuso)"/>
+      <g opacity=".92"><g fill="#6f6a5d" stroke="#25221d" stroke-width="5"><circle cx="196" cy="892" r="22"/><circle cx="232" cy="884" r="26"/><circle cx="268" cy="896" r="22"/><circle cx="226" cy="906" r="24"/></g><g fill="#6f6a5d"><circle cx="196" cy="892" r="22"/><circle cx="232" cy="884" r="26"/><circle cx="268" cy="896" r="22"/><circle cx="226" cy="906" r="24"/></g><g fill="#8a8576" opacity=".55"><circle cx="192" cy="887.2" r="13.6"/><circle cx="227.3" cy="878.3" r="16.1"/><circle cx="264" cy="891.2" r="13.6"/><circle cx="221.7" cy="900.7" r="14.9"/></g></g>
+      <g opacity=".92"><g fill="#6f6a5d" stroke="#25221d" stroke-width="5"><circle cx="344" cy="898" r="24"/><circle cx="382" cy="886" r="22"/><circle cx="414" cy="898" r="20"/><circle cx="372" cy="910" r="24"/></g><g fill="#6f6a5d"><circle cx="344" cy="898" r="24"/><circle cx="382" cy="886" r="22"/><circle cx="414" cy="898" r="20"/><circle cx="372" cy="910" r="24"/></g><g fill="#8a8576" opacity=".55"><circle cx="339.7" cy="892.7" r="14.9"/><circle cx="378" cy="881.2" r="13.6"/><circle cx="410.4" cy="893.6" r="12.4"/><circle cx="367.7" cy="904.7" r="14.9"/></g></g>
+      <ellipse cx="120" cy="960" rx="160" ry="40" fill="#3b3830" opacity=".5" filter="url(#f-difuso)"/>
+      <g fill="#465030" stroke="#20251a" stroke-width="5"><circle cx="26" cy="858" r="20"/><circle cx="48" cy="846" r="18"/><circle cx="64" cy="862" r="15"/></g><g fill="#465030"><circle cx="26" cy="858" r="20"/><circle cx="48" cy="846" r="18"/><circle cx="64" cy="862" r="15"/></g><g fill="#5d6a3d" opacity=".55"><circle cx="22.4" cy="853.6" r="12.4"/><circle cx="44.8" cy="842" r="11.2"/><circle cx="61.3" cy="858.7" r="9.3"/></g>
+      <g fill="#465030" stroke="#20251a" stroke-width="5"><circle cx="548" cy="870" r="20"/><circle cx="572" cy="858" r="18"/><circle cx="588" cy="876" r="14"/></g><g fill="#465030"><circle cx="548" cy="870" r="20"/><circle cx="572" cy="858" r="18"/><circle cx="588" cy="876" r="14"/></g><g fill="#5d6a3d" opacity=".55"><circle cx="544.4" cy="865.6" r="12.4"/><circle cx="568.8" cy="854" r="11.2"/><circle cx="585.5" cy="872.9" r="8.7"/></g>
+      <g fill="#57534a" stroke="#25221d" stroke-width="5"><circle cx="18" cy="952" r="40"/><circle cx="70" cy="930" r="32"/><circle cx="116" cy="944" r="30"/><circle cx="160" cy="966" r="32"/><circle cx="62" cy="984" r="40"/><circle cx="122" cy="994" r="36"/></g><g fill="#57534a"><circle cx="18" cy="952" r="40"/><circle cx="70" cy="930" r="32"/><circle cx="116" cy="944" r="30"/><circle cx="160" cy="966" r="32"/><circle cx="62" cy="984" r="40"/><circle cx="122" cy="994" r="36"/></g><g fill="#6d695d" opacity=".55"><circle cx="10.8" cy="943.2" r="24.8"/><circle cx="64.2" cy="923" r="19.8"/><circle cx="110.6" cy="937.4" r="18.6"/><circle cx="154.2" cy="959" r="19.8"/><circle cx="54.8" cy="975.2" r="24.8"/><circle cx="115.5" cy="986.1" r="22.3"/></g>
+      <g fill="#57534a" stroke="#25221d" stroke-width="5"><circle cx="424" cy="954" r="30"/><circle cx="472" cy="932" r="34"/><circle cx="524" cy="942" r="30"/><circle cx="572" cy="956" r="30"/><circle cx="498" cy="982" r="40"/><circle cx="436" cy="992" r="36"/><circle cx="590" cy="990" r="34"/></g><g fill="#57534a"><circle cx="424" cy="954" r="30"/><circle cx="472" cy="932" r="34"/><circle cx="524" cy="942" r="30"/><circle cx="572" cy="956" r="30"/><circle cx="498" cy="982" r="40"/><circle cx="436" cy="992" r="36"/><circle cx="590" cy="990" r="34"/></g><g fill="#6d695d" opacity=".55"><circle cx="418.6" cy="947.4" r="18.6"/><circle cx="465.9" cy="924.5" r="21.1"/><circle cx="518.6" cy="935.4" r="18.6"/><circle cx="566.6" cy="949.4" r="18.6"/><circle cx="490.8" cy="973.2" r="24.8"/><circle cx="429.5" cy="984.1" r="22.3"/><circle cx="583.9" cy="982.5" r="21.1"/></g>
+      <g fill="#465030" stroke="#20251a" stroke-width="5"><circle cx="388" cy="968" r="16"/><circle cx="404" cy="956" r="13"/><circle cx="412" cy="972" r="12"/></g><g fill="#465030"><circle cx="388" cy="968" r="16"/><circle cx="404" cy="956" r="13"/><circle cx="412" cy="972" r="12"/></g><g fill="#5d6a3d" opacity=".55"><circle cx="385.1" cy="964.5" r="9.9"/><circle cx="401.7" cy="953.1" r="8.1"/><circle cx="409.8" cy="969.4" r="7.4"/></g>
+    </g>
+    <!-- Pliegue central -->
+    <path d="M300 16 V984" stroke="#fff4dc" stroke-opacity=".10" stroke-width="3"/>
+    <path d="M301.5 16 V984" stroke="#1a120b" stroke-opacity=".22" stroke-width="1.2"/>
+    <!-- Bordes quemados y contorno -->
+    <g clip-path="url(#c-papel)">
+      <use href="#borde-portada" fill="none" stroke="#1d140c" stroke-width="110" opacity=".45" filter="url(#f-sombra-ancha)"/>
+      <use href="#borde-portada" fill="none" stroke="#1d140c" stroke-width="30" opacity=".9" filter="url(#f-quemado)"/>
+    </g>
+    <use href="#borde-portada" fill="none" stroke="#120c07" stroke-width="3.2" stroke-linejoin="round"/>
+    </symbol>
+
+    <symbol id="interior-papel" viewBox="0 0 1200 1000">
+    <use href="#borde-interior" fill="url(#g-papel-int)"/>
+    <g clip-path="url(#c-papel-int)">
+      <rect x="0" y="0" width="1200" height="1000" filter="url(#f-manchas)" opacity=".38"/>
+      <rect x="0" y="0" width="1200" height="1000" filter="url(#f-grano)" opacity=".35"/>
+      <!-- pliegues del pergamino -->
+      <g stroke-width="2.4">
+        <path d="M300 14 V986 M600 14 V986 M900 14 V986 M10 500 H1190" stroke="#fff6df" stroke-opacity=".28"/>
+        <path d="M301.6 14 V986 M601.6 14 V986 M901.6 14 V986 M10 501.6 H1190" stroke="#3b2415" stroke-opacity=".16" stroke-width="1.4"/>
+      </g>
+      <use href="#borde-interior" fill="none" stroke="#3a2715" stroke-width="80" opacity=".35" filter="url(#f-sombra-ancha)"/>
+      <use href="#borde-interior" fill="none" stroke="#3a2715" stroke-width="22" opacity=".7" filter="url(#f-quemado)"/>
+    </g>
+    <use href="#borde-interior" fill="none" stroke="#2a1a0e" stroke-width="3" stroke-linejoin="round"/>
+    </symbol>
+
+    <symbol id="interior-tinta" viewBox="0 0 1200 1000">
+    <g fill="none" stroke="#3b2415" stroke-linecap="round" stroke-linejoin="round">
+      <!-- marco -->
+      <path d="M34 36 H1166 V964 H34 Z" stroke-width="2.4" opacity=".75"/>
+      <path d="M44 46 H1156 V954 H44 Z" stroke-width="1.1" opacity=".6"/>
+      <!-- rosa de los vientos -->
+      <g transform="translate(96 104)" stroke-width="1.4">
+        <circle r="30" opacity=".7"/><circle r="22" opacity=".5"/>
+        <path d="M0 -40 L6 -6 L40 0 L6 6 L0 40 L-6 6 L-40 0 L-6 -6 Z" fill="#3b2415" fill-opacity=".15"/>
+        <path d="M0 -40 L6 -6 L0 0 Z M40 0 L6 6 L0 0 Z M0 40 L-6 6 L0 0 Z M-40 0 L-6 -6 L0 0 Z" fill="#3b2415" stroke="none"/>
+      </g>
+      <!-- decoraciones del titulo -->
+      <path d="M392 108 C430 90 452 120 488 104 M808 108 C770 90 748 120 712 104" stroke-width="2"/>
+      <!-- bosque y lago -->
+      <g stroke-width="2" fill="#3b2415" fill-opacity=".18"><path d="M60 878 L49 900 H71 Z M60 900 V907"/><path d="M95 858 L84 880 H106 Z M95 880 V887"/><path d="M128 883 L117 905 H139 Z M128 905 V912"/><path d="M165 863 L154 885 H176 Z M165 885 V892"/><path d="M200 883 L189 905 H211 Z M200 905 V912"/><path d="M238 866 L227 888 H249 Z M238 888 V895"/><path d="M80 913 L69 935 H91 Z M80 935 V942"/><path d="M150 908 L139 930 H161 Z M150 930 V937"/><path d="M220 913 L209 935 H231 Z M220 935 V942"/></g>
+      <path d="M880 880 q12 -8 24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 M902 897 q12 -8 24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 M880 914 q12 -8 24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 M902 931 q12 -8 24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0" stroke-width="1.8" opacity=".8"/>
+      <!-- cabana de Hagrid y sauce boxeador -->
+      <path d="M430 930 V906 L446 892 L462 906 V930 Z M440 930 V916 H452 V930" stroke-width="2"/>
+      <path d="M760 934 V912 M760 912 C744 900 736 884 742 872 M760 912 C776 898 784 884 778 872 M760 906 C754 890 760 876 768 868" stroke-width="2.4"/>
+    </g>
+    <mask id="m-muros" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="1000">
+      <path d="M170 240 L440 190 L760 190 L1030 240 L1080 520 L1010 790 L600 850 L190 790 L120 520 Z M175 360 H1025 M160 660 H1040 M600 190 V420 M600 600 V850 M170 240 L330 360 M1030 240 L870 360 M190 790 L330 660 M1010 790 L870 660 M330 360 V660 M870 360 V660 M480 420 H720 V600 H480 Z M905 400 H1030 V500 H905 Z M185 400 H305 V500 H185 Z M360 700 H520 V800 H360 Z M680 700 H840 V800 H680 Z M130 240 a40 40 0 1 0 80 0 a40 40 0 1 0 -80 0 M990 240 a40 40 0 1 0 80 0 a40 40 0 1 0 -80 0 M90 520 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0 M1050 520 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0 M158 790 a32 32 0 1 0 64 0 a32 32 0 1 0 -64 0 M978 790 a32 32 0 1 0 64 0 a32 32 0 1 0 -64 0" fill="none" stroke="#fff" stroke-width="15" stroke-linejoin="round" stroke-linecap="square"/>
+      <path d="M170 240 L440 190 L760 190 L1030 240 L1080 520 L1010 790 L600 850 L190 790 L120 520 Z M175 360 H1025 M160 660 H1040 M600 190 V420 M600 600 V850 M170 240 L330 360 M1030 240 L870 360 M190 790 L330 660 M1010 790 L870 660 M330 360 V660 M870 360 V660 M480 420 H720 V600 H480 Z M905 400 H1030 V500 H905 Z M185 400 H305 V500 H185 Z M360 700 H520 V800 H360 Z M680 700 H840 V800 H680 Z M130 240 a40 40 0 1 0 80 0 a40 40 0 1 0 -80 0 M990 240 a40 40 0 1 0 80 0 a40 40 0 1 0 -80 0 M90 520 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0 M1050 520 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0 M158 790 a32 32 0 1 0 64 0 a32 32 0 1 0 -64 0 M978 790 a32 32 0 1 0 64 0 a32 32 0 1 0 -64 0" fill="none" stroke="#000" stroke-width="8.5" stroke-linejoin="round" stroke-linecap="square"/>
+    </mask>
+    <rect width="1200" height="1000" fill="#3b2415" mask="url(#m-muros)"/>
+    <g font-family="MedievalSharp, Georgia, serif" fill="#3b2415">
+      <text x="600" y="98" font-family="'Cinzel Decorative', Georgia, serif" font-weight="900" font-size="46" text-anchor="middle">Hogwarts</text>
+      <text x="600" y="132" font-size="20" text-anchor="middle">Colegio de Magia y Hechicería</text>
+      <text x="96" y="56" font-size="14" text-anchor="middle">N</text>
+      <g font-size="17" text-anchor="middle">
+        <text x="600" y="452" font-size="22">Gran Comedor</text>
+        <text x="967" y="440">Biblioteca</text>
+        <text x="245" y="440" font-size="14">Sala de Trofeos</text>
+        <text x="440" y="728">Mazmorras</text>
+        <text x="760" y="728">Enfermería</text>
+        <text x="612" y="636" font-size="14" text-anchor="start">Vestíbulo</text>
+        <text x="170" y="178" font-size="15">Torre de Gryffindor</text>
+        <text x="1030" y="178" font-size="15">Torre de Astronomía</text>
+        <text x="76" y="472" font-size="13">Lechucería</text>
+        <text x="1112" y="472" font-size="13">Torre de Ravenclaw</text>
+        <text x="150" y="966" font-size="15">Bosque Prohibido</text>
+        <text x="1030" y="966" font-size="15">Lago Negro</text>
+        <text x="446" y="956" font-size="13">Cabaña de Hagrid</text>
+        <text x="760" y="956" font-size="13">Sauce Boxeador</text>
+      </g>
+    </g>
+    <!-- Huellas con nombre (como en el mapa original) -->
+    <g fill="#3b2415">
+        <use href="#pie" transform="translate(541.4 569.1) rotate(65.7) scale(0.9)"/>
+        <use href="#pie" transform="translate(549.5 557.9) rotate(65.6) scale(0.9)"/>
+        <use href="#pie" transform="translate(563.3 559.2) rotate(65.7) scale(0.9)"/>
+        <use href="#pie" transform="translate(571.4 548.1) rotate(66) scale(0.9)"/>
+        <use href="#pie" transform="translate(585.1 549.5) rotate(66.6) scale(0.9)"/>
+        <use href="#pie" transform="translate(593.5 538.5) rotate(67) scale(0.9)"/>
+        <use href="#pie" transform="translate(607.2 540.1) rotate(67) scale(0.9)"/>
+        <use href="#pie" transform="translate(615.6 529.1) rotate(66.6) scale(0.9)"/>
+        <use href="#pie" transform="translate(629.3 530.5) rotate(66) scale(0.9)"/>
+        <use href="#pie" transform="translate(637.4 519.4) rotate(65.8) scale(0.9)"/>
+        <use href="#pie" transform="translate(651.2 520.6) rotate(65.6) scale(0.9)"/>
+        <use href="#pie" transform="translate(659.3 509.5) rotate(65.7) scale(0.9)"/>
+        <use href="#pie" transform="translate(380.7 787.3) rotate(78.6) scale(0.9)"/>
+        <use href="#pie" transform="translate(391 778.2) rotate(78.1) scale(0.9)"/>
+        <use href="#pie" transform="translate(404.2 782.5) rotate(78.6) scale(0.9)"/>
+        <use href="#pie" transform="translate(414.7 773.5) rotate(79.6) scale(0.9)"/>
+        <use href="#pie" transform="translate(427.6 778.3) rotate(82.1) scale(0.9)"/>
+        <use href="#pie" transform="translate(438.6 770) rotate(83) scale(0.9)"/>
+        <use href="#pie" transform="translate(451.4 775.2) rotate(81.9) scale(0.9)"/>
+        <use href="#pie" transform="translate(462.1 766.5) rotate(78.4) scale(0.9)"/>
+        <use href="#pie" transform="translate(475.3 770.4) rotate(75.7) scale(0.9)"/>
+        <use href="#pie" transform="translate(485.1 760.7) rotate(74.3) scale(0.9)"/>
+        <use href="#pie" transform="translate(498.5 763.9) rotate(74.3) scale(0.9)"/>
+        <use href="#pie" transform="translate(372 355.4) rotate(90) scale(0.85)"/>
+        <use href="#pie" transform="translate(384 348.6) rotate(90) scale(0.85)"/>
+        <use href="#pie" transform="translate(396 355.4) rotate(90) scale(0.85)"/>
+        <use href="#pie" transform="translate(408 348.6) rotate(90) scale(0.85)"/>
+        <use href="#pie" transform="translate(420 355.4) rotate(90) scale(0.85)"/>
+        <use href="#pie" transform="translate(432 348.6) rotate(90) scale(0.85)"/>
+        <use href="#pie" transform="translate(444 355.4) rotate(90) scale(0.85)"/>
+        <use href="#pie" transform="translate(456 348.6) rotate(90) scale(0.85)"/>
+        <use href="#pie" transform="translate(603.4 828) rotate(0) scale(0.9)"/>
+        <use href="#pie" transform="translate(596.6 816) rotate(0) scale(0.9)"/>
+        <use href="#pie" transform="translate(603.4 804) rotate(0) scale(0.9)"/>
+        <use href="#pie" transform="translate(596.6 792) rotate(0) scale(0.9)"/>
+        <use href="#pie" transform="translate(603.4 780) rotate(0) scale(0.9)"/>
+        <use href="#pie" transform="translate(596.6 768) rotate(0) scale(0.9)"/>
+        <use href="#pie" transform="translate(603.4 756) rotate(0) scale(0.9)"/>
+        <use href="#pie" transform="translate(596.6 744) rotate(0) scale(0.9)"/>
+        <use href="#pie" transform="translate(603.4 732) rotate(0) scale(0.9)"/>
+        <use href="#pie" transform="translate(596.6 720) rotate(0) scale(0.9)"/>
+    </g>
+    <g font-family="MedievalSharp, Georgia, serif" fill="#3b2415">
+      <g><rect x="535" y="570.7" width="130" height="19.6" rx="4" fill="#efe2bf" fill-opacity=".85" stroke="#3b2415" stroke-width="1.2"/><text x="600" y="584" font-size="14" text-anchor="middle">Albus Dumbledore</text></g>
+      <g><rect x="388.8" y="749.6" width="102.5" height="18.2" rx="4" fill="#efe2bf" fill-opacity=".85" stroke="#3b2415" stroke-width="1.2"/><text x="440" y="762" font-size="13" text-anchor="middle">Severus Snape</text></g>
+      <g><rect x="369.2" y="325.6" width="89.5" height="18.2" rx="4" fill="#efe2bf" fill-opacity=".85" stroke="#3b2415" stroke-width="1.2"/><text x="414" y="338" font-size="13" text-anchor="middle">Argus Filch</text></g>
+      <g><rect x="937.5" y="463.6" width="57" height="18.2" rx="4" fill="#efe2bf" fill-opacity=".85" stroke="#3b2415" stroke-width="1.2"/><text x="966" y="476" font-size="13" text-anchor="middle">Peeves</text></g>
+      <g><rect x="541" y="686.7" width="118" height="19.6" rx="4" fill="#efe2bf" fill-opacity=".85" stroke="#3b2415" stroke-width="1.2"/><text id="nombre-jugador" x="600" y="700" font-size="14" text-anchor="middle">Tú</text></g>
+    </g>
+    </symbol>
+  </svg>
+  <script src="js/juramento.js"></script>
+</body>
+</html>

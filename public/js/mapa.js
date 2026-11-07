@@ -4,8 +4,8 @@
      - Genera los 8 puntos de interes
      - Movimiento con flechas + niebla de guerra que sigue al jugador
      - Proximidad: lejos = huellas / cerca = personaje + pop-up "Iniciar mision"
-     - Reto de la frase oculta -> disipa niebla + revela la Espada de Gryffindor
      - Completar mision -> anillo verde + animacion de destruccion de Horrocrux
+   (El reto de la frase oculta y la carta viven ahora en juramento.html.)
    ============================================================================= */
 
 (function () {
@@ -25,7 +25,6 @@
     { x: 38, y: 88, emoji: '🕷️', nombre: 'Aragog',             pista: 'No sigas a las arañas… sigue el rastro de datos.' },
   ];
 
-  const FRASE_SECRETA = 'juro solemnemente que mis intenciones no son buenas';
   const RADIO_PROXIMIDAD = 90; // px para considerar "cerca"
   const VELOCIDAD = 3.2;       // px por frame
 
@@ -41,7 +40,6 @@
   let jugador = { x: 100, y: 100 };
   const teclas = {};
   let poiCercano = null;     // POI actualmente en rango
-  let espadaObtenida = false;
 
   // Misiones completadas (persisten entre recargas)
   const completadas = new Set(
@@ -129,7 +127,7 @@
       const c = centroPOI(i);
       const d = Math.hypot(c.x - jugador.x, c.y - jugador.y);
       const cerca = d < RADIO_PROXIMIDAD;
-      el.classList.toggle('cerca', cerca || espadaObtenida);
+      el.classList.toggle('cerca', cerca);
 
       if (cerca && d < distMin) { distMin = d; nuevoCercano = i; }
     });
@@ -167,54 +165,7 @@
   document.getElementById('popup-cancelar').addEventListener('click', ocultarPopup);
 
   /* --------------------------------------------------------------------------
-     7) Reto de la frase oculta -> disipar niebla + Espada de Gryffindor
-     -------------------------------------------------------------------------- */
-  const cajaSecreto = document.getElementById('caja-secreto');
-  const inputSecreto = document.getElementById('input-secreto');
-
-  function normalizar(s) {
-    return (s || '').trim().toLowerCase().replace(/[.\s]+$/g, '');
-  }
-
-  async function intentarFrase() {
-    if (normalizar(inputSecreto.value) === FRASE_SECRETA) {
-      espadaObtenida = true;
-      cajaSecreto.classList.add('resuelto');
-      setTimeout(() => cajaSecreto.classList.add('oculto'), 600);
-
-      // La oscuridad se disipa por completo
-      niebla.classList.add('disipada');
-
-      // Revela la espada (animacion)
-      if (window.Animaciones) await window.Animaciones.revelarEspada();
-
-      localStorage.setItem('howgarts_espada', '1');
-    } else {
-      inputSecreto.value = '';
-      inputSecreto.placeholder = 'Ese no es el juramento… inspecciona la fuente 🔍';
-    }
-  }
-
-  document.getElementById('btn-secreto').addEventListener('click', intentarFrase);
-  inputSecreto.addEventListener('keydown', (e) => { if (e.key === 'Enter') intentarFrase(); });
-
-  // Si ya se obtuvo la espada en una partida anterior, restaurar estado
-  if (localStorage.getItem('howgarts_espada') === '1') {
-    espadaObtenida = true;
-    cajaSecreto.classList.add('oculto');
-    niebla.classList.add('disipada');
-  }
-
-  /* --------------------------------------------------------------------------
-     8) Carta de Hogwarts (abrir/cerrar el pergamino)
-     -------------------------------------------------------------------------- */
-  const cartaIcono = document.getElementById('carta-icono');
-  function abrirCarta() { document.getElementById('modal-carta').classList.remove('oculto'); }
-  cartaIcono.addEventListener('click', abrirCarta);
-  cartaIcono.addEventListener('keydown', (e) => { if (e.key === 'Enter') abrirCarta(); });
-
-  /* --------------------------------------------------------------------------
-     9) Completar mision (anillo verde + Horrocrux)
+     7) Completar mision (anillo verde + Horrocrux)
         - Se activa al volver con ?completada=N, o llamando completarMision(n).
      -------------------------------------------------------------------------- */
   async function completarMision(n) {
@@ -248,7 +199,7 @@
   })();
 
   /* --------------------------------------------------------------------------
-     10) Bucle principal
+     8) Bucle principal
      -------------------------------------------------------------------------- */
   function loop() {
     actualizarJugador();

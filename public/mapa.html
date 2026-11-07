@@ -6,6 +6,8 @@
   <!-- Titulo de pestana solicitado -->
   <title>Mapa del Merodeador</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%97%BA%EF%B8%8F</text></svg>" />
+  <!-- Ruta del juego: exige haber pronunciado el juramento (juramento.html) -->
+  <script src="js/flujo.js" data-pagina="mapa.html"></script>
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/mapa.css" />
 </head>
@@ -46,15 +48,6 @@
     <div id="niebla"></div>
   </div>
 
-  <!-- ======================= CARTA DE HOGWARTS ======================= -->
-  <div id="carta-icono" title="Tienes una carta sin leer" role="button" tabindex="0">✉️</div>
-
-  <!-- Caja del secreto (reto de inspeccion de codigo). Se oculta al resolverse -->
-  <div id="caja-secreto">
-    <input type="text" id="input-secreto" placeholder="¿Conoces el juramento del Mapa del Merodeador?" />
-    <button id="btn-secreto" class="btn-magico">Conjurar</button>
-  </div>
-
   <!-- ======================= POP-UP INICIAR MISION ======================= -->
   <div id="popup-mision">
     <h3 id="popup-titulo">Profesor McGonagall</h3>
@@ -62,27 +55,6 @@
     <div class="fila">
       <button id="popup-aceptar" class="btn-magico">Iniciar misión</button>
       <button id="popup-cancelar" class="btn-no">Ahora no</button>
-    </div>
-  </div>
-
-  <!-- ======================= MODAL: CARTA (pergamino) ======================= -->
-  <div id="modal-carta" class="overlay-modal oculto">
-    <div class="pergamino">
-      <button class="cerrar" data-cerrar="modal-carta" aria-label="Cerrar">×</button>
-      <h2>Colegio Hogwarts de Magia y Hechicería</h2>
-      <p>
-        Estimado(a) alumno(a):<br/><br/>
-        Tenemos el placer de informarle de que ha sido <strong>aceptado(a)</strong> en el
-        Colegio Hogwarts de Magia y Hechicería. Encontrará adjunta la lista de todos los
-        libros y el equipo necesarios. (…)
-      </p>
-      <div class="acertijo">
-        «Si a nuestra escuela quieres entrar,<br/>
-        en la <strong>fuente</strong> del castillo debes mirar.»
-      </div>
-      <p style="margin-top:1rem;font-size:.95rem;opacity:.8">
-        — La "fuente" es el origen. A veces lo que buscas no está en la pantalla… sino detrás de ella.
-      </p>
     </div>
   </div>
 
@@ -97,7 +69,7 @@
 
   <!-- ======================= ESCENARIOS DE ANIMACION (placeholders) ======================= -->
 
-  <!-- Espada de Gryffindor (recompensa del reto de la frase) -->
+  <!-- Espada de Gryffindor (placeholder: Animaciones.revelarEspada(), aun sin disparador) -->
   <div id="anim-espada" class="cinematica oculto">
     <div class="escena-2d" style="display:grid;place-items:center;text-align:center">
       <div class="espada">🗡️</div>
@@ -138,16 +110,6 @@
     </div>
     <button class="btn-magico" onclick="location.href='/'">Fin de la aventura ✦</button>
   </div>
-
-  <!-- =========================================================================
-       SECRETO DEL CTF — FRASE OCULTA EN EL DOM
-       El jugador, guiado por la carta ("en la fuente... debes mirar"), debe
-       abrir las herramientas de desarrollador (inspeccionar codigo fuente),
-       encontrar esta frase y escribirla en la caja de texto para disipar la
-       niebla y obtener la espada de Gryffindor.
-       (Esto es parte de la mecanica del CTF: no eliminar.)
-       ========================================================================= -->
-  <div id="secreto-merodeador" style="display:none" aria-hidden="true" data-flag="map">Juro solemnemente que mis intenciones no son buenas</div>
 
   <!-- Scripts: primero animaciones y HUD, luego la logica del mapa -->
   <script src="js/animaciones.js"></script>

@@ -3,7 +3,9 @@
    Vista superior estilo plataformas clasicas + niebla de guerra + HUD.
    ============================================================================= */
 
-body.mapa-body { overflow: hidden; }
+body.mapa-body { overflow: hidden; animation: entrar-mapa .9s ease both; }
+/* Llegada desde el juramento: el mapa aparece desde la oscuridad */
+@keyframes entrar-mapa { from { opacity: 0; } }
 
 /* --- HUD superior fijo ----------------------------------------------------- */
 .hud {
@@ -119,7 +121,7 @@ body.mapa-body { overflow: hidden; }
    La posicion se actualiza por JS con las variables --fx / --fy.            */
 #niebla {
   position: absolute;
-  top: 64px; left: 0; right: 0; bottom: 0;
+  inset: 0; /* dentro de #mundo, que ya empieza bajo el HUD */
   z-index: 20;
   pointer-events: none;
   background: radial-gradient(
@@ -128,10 +130,8 @@ body.mapa-body { overflow: hidden; }
     transparent calc(var(--radio-vision, 140px) - 40px),
     rgba(5,4,15,.96) var(--radio-vision, 140px)
   );
-  transition: background .3s ease, opacity 1.2s ease;
+  transition: background .3s ease;
 }
-/* Cuando se consigue la espada, la niebla se disipa */
-#niebla.disipada { opacity: 0; }
 
 /* --- Pop-up "Iniciar mision" ---------------------------------------------- */
 #popup-mision {
@@ -157,80 +157,7 @@ body.mapa-body { overflow: hidden; }
   color: var(--oro-claro); border-radius: 999px; padding: .6rem 1.4rem; cursor: pointer;
 }
 
-/* --- Carta de Hogwarts (icono + modal pergamino) --------------------------- */
-#carta-icono {
-  position: fixed;
-  right: 24px; bottom: 24px;
-  z-index: 35;
-  font-size: 2.6rem;
-  cursor: pointer;
-  filter: drop-shadow(0 0 12px rgba(217,182,78,.8));
-  animation: flotar 3s ease-in-out infinite;
-}
-#carta-icono::after {
-  content: "!"; position: absolute; top: -6px; right: -6px;
-  width: 20px; height: 20px; background: var(--rojo-gryff); color: #fff;
-  border-radius: 50%; display: grid; place-items: center; font-size: .8rem; font-weight: 700;
-}
-
-/* --- Caja de la frase secreta (reto de inspeccion de codigo) --------------- */
-#caja-secreto {
-  position: fixed;
-  left: 50%; top: 80px;
-  transform: translateX(-50%);
-  z-index: 34;
-  display: flex; gap: .5rem;
-  background: rgba(11,10,26,.85);
-  border: 1.5px dashed rgba(217,182,78,.5);
-  border-radius: 999px;
-  padding: .5rem .6rem;
-  backdrop-filter: blur(4px);
-}
-#caja-secreto input {
-  width: min(360px, 60vw);
-  background: transparent; border: none; outline: none;
-  color: #fff; font-family: var(--fuente-texto); font-size: .95rem; padding: .4rem .8rem;
-}
-#caja-secreto input::placeholder { color: rgba(244,228,184,.4); }
-#caja-secreto button { padding: .45rem 1.1rem; font-size: .9rem; }
-#caja-secreto.resuelto { animation: fundido-salida .6s ease forwards; }
-
-/* --- Modales genericos (pergamino / pistas) -------------------------------- */
-.overlay-modal {
-  position: fixed; inset: 0; z-index: 60;
-  display: grid; place-items: center;
-  background: rgba(0,0,0,.65);
-  backdrop-filter: blur(3px);
-  animation: aparecer .3s ease;
-}
-.pergamino {
-  width: min(560px, 92vw);
-  max-height: 80vh; overflow: auto;
-  background:
-    linear-gradient(135deg, #f3e2b8, #e7cf94);
-  color: #3a2a12;
-  border-radius: 14px;
-  padding: 2.4rem 2.2rem;
-  box-shadow: 0 30px 80px rgba(0,0,0,.7), inset 0 0 60px rgba(120,80,20,.25);
-  font-family: var(--fuente-magica);
-  position: relative;
-  border: 3px solid #b48a3c;
-}
-.pergamino h2 {
-  font-family: var(--fuente-titulo);
-  text-align: center; margin: 0 0 1rem; color: #5a3d12; font-size: 1.4rem;
-}
-.pergamino p { line-height: 1.6; font-size: 1.1rem; }
-.pergamino .acertijo {
-  margin-top: 1.2rem; padding: 1rem; border-left: 4px solid #b48a3c;
-  background: rgba(120,80,20,.12); font-style: italic; border-radius: 6px;
-}
-.pergamino .cerrar {
-  position: absolute; top: 10px; right: 14px;
-  background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #5a3d12;
-}
-
-/* Lista de pistas */
+/* --- Lista de pistas (modal; el estilo .pergamino vive en global.css) ------ */
 .lista-pistas { list-style: none; padding: 0; margin: 0; display: grid; gap: .7rem; }
 .lista-pistas li {
   background: rgba(120,80,20,.1); border-radius: 8px; padding: .7rem 1rem;

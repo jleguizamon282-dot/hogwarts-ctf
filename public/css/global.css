@@ -115,6 +115,42 @@ html, body {
 body.saliendo { animation: fundido-salida .4s ease forwards; }
 @keyframes fundido-salida { to { opacity: 0; transform: scale(1.02); } }
 
+/* --- Modales genericos (pergamino) -----------------------------------------
+   Los usan el juramento (carta de Hogwarts) y el mapa (pistas).             */
+.overlay-modal {
+  position: fixed; inset: 0; z-index: 60;
+  display: grid; place-items: center;
+  background: rgba(0,0,0,.65);
+  backdrop-filter: blur(3px);
+  animation: aparecer .3s ease;
+}
+.pergamino {
+  width: min(560px, 92vw);
+  max-height: 80vh; overflow: auto;
+  background:
+    linear-gradient(135deg, #f3e2b8, #e7cf94);
+  color: #3a2a12;
+  border-radius: 14px;
+  padding: 2.4rem 2.2rem;
+  box-shadow: 0 30px 80px rgba(0,0,0,.7), inset 0 0 60px rgba(120,80,20,.25);
+  font-family: var(--fuente-magica);
+  position: relative;
+  border: 3px solid #b48a3c;
+}
+.pergamino h2 {
+  font-family: var(--fuente-titulo);
+  text-align: center; margin: 0 0 1rem; color: #5a3d12; font-size: 1.4rem;
+}
+.pergamino p { line-height: 1.6; font-size: 1.1rem; }
+.pergamino .acertijo {
+  margin-top: 1.2rem; padding: 1rem; border-left: 4px solid #b48a3c;
+  background: rgba(120,80,20,.12); font-style: italic; border-radius: 6px;
+}
+.pergamino .cerrar {
+  position: absolute; top: 10px; right: 14px;
+  background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #5a3d12;
+}
+
 /* --- Utilidades ----------------------------------------------------------- */
 .oculto { display: none !important; }
 .centrado { display: grid; place-items: center; min-height: 100vh; }

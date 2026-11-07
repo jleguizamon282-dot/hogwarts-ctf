@@ -1,7 +1,7 @@
 /* =============================================================================
    personalizacion.js — Creación del personaje
    Actualiza el avatar SVG en vivo (peinado, gafas, bufanda de casa) y guarda
-   la configuración en localStorage antes de ir al mapa.
+   la configuración en localStorage antes de ir al pergamino (juramento.html).
    ============================================================================= */
 
 // Colores de bufanda por casa (a = principal, b = secundario)
@@ -69,7 +69,7 @@ document.getElementById('btn-comenzar').addEventListener('click', () => {
   };
   localStorage.setItem('howgarts_personaje', JSON.stringify(guardar));
   document.body.classList.add('saliendo');
-  setTimeout(() => (location.href = 'mapa.html'), 400);
+  setTimeout(() => (location.href = 'juramento.html'), 400);
 });
 
 pintar();

@@ -103,16 +103,26 @@ app.get('/mision/:id', (req, res) => {
     return res.status(404).send('Mision no encontrada.');
   }
   // Placeholder: mas adelante aqui cargaremos cada reto/nivel.
+  // Mientras no exista el reto, dos botones de prueba simulan el resultado:
+  //   superar -> /mapa.html?completada=N   |   fallar -> /mapa.html?fallo=N (pierde una vida)
+  // (El reto real llamara a Estado.completarMision(N) / Estado.perderVida(), ver js/estado.js)
   res.send(`<!doctype html><html lang="es"><head><meta charset="utf-8">
     <title>Mision ${id}</title>
     <style>
       body{margin:0;height:100vh;display:grid;place-items:center;
            background:#0b0a1a;color:#f4e4b8;font-family:system-ui,sans-serif;text-align:center}
       a{color:#c9a84a}
+      .pruebas{display:flex;gap:1rem;justify-content:center;margin:1.6rem 0}
+      .pruebas a{padding:.7rem 1.2rem;border-radius:999px;text-decoration:none;font-weight:700}
+      .ok{background:#2d8a4e;color:#fff}.ko{background:#9b1c1c;color:#fff}
     </style></head>
     <body><div>
       <h1>&#129668; Mision ${id}</h1>
       <p>Nivel en construccion. Aqui ira el reto del personaje ${id}.</p>
+      <div class="pruebas">
+        <a class="ok" href="/mapa.html?completada=${id}">&#10004; Superar (prueba)</a>
+        <a class="ko" href="/mapa.html?fallo=${id}">&#10008; Fallar (prueba: pierdes una vida)</a>
+      </div>
       <p><a href="/mapa.html">&larr; Volver al Mapa del Merodeador</a></p>
     </div></body></html>`);
 });

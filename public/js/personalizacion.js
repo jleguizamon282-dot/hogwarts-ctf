@@ -1,55 +1,21 @@
 /* =============================================================================
    personalizacion.js — Creación del personaje
-     1) Catálogo de opciones (colores de piel, pelo, ojos y casas)
+     1) Opciones válidas (el catálogo de colores vive en js/avatar.js)
      2) Recupera la última elección guardada (si existe y es válida)
-     3) Pinta el personaje: variables CSS en #creador + data-atributos en #avatar
-     4) Muestras de color y miniaturas (clonadas del propio SVG del personaje)
-     5) Pestañas, botón "Sorpréndeme" y efectos al cambiar
+     3) Dibuja el personaje y lo pinta con cada elección
+     4) Muestras de color y miniaturas (piezas clonadas del propio personaje)
+     5) Nombre de mago, pestañas, "Sorpréndeme" y efectos al cambiar
      6) Guarda la configuración y pasa al pergamino (juramento.html)
    ============================================================================= */
 
 (function () {
   'use strict';
 
-  /* --------------------------------------------------------------------------
-     1) Catálogo. Cada color: [luz, base, sombra]
-     -------------------------------------------------------------------------- */
-  const PIELES = {
-    porcelana: { nombre: 'Porcelana', c: ['#ffeadb', '#f8d6c0', '#e6b49b'] },
-    melocoton: { nombre: 'Melocotón', c: ['#ffe1c4', '#f6c49c', '#e2a27a'] },
-    miel:      { nombre: 'Miel',      c: ['#f3c99b', '#e0a774', '#c58553'] },
-    canela:    { nombre: 'Canela',    c: ['#dba574', '#bf8152', '#9c6438'] },
-    cacao:     { nombre: 'Cacao',     c: ['#ad774e', '#8a5733', '#6a3f22'] },
-    ebano:     { nombre: 'Ébano',     c: ['#80553a', '#5e3b25', '#432817'] },
-  };
-  const PELOS = {
-    castano:   { nombre: 'Castaño',     c: ['#a0703f', '#6b4423', '#432a14'] },
-    negro:     { nombre: 'Negro',       c: ['#5a4f5a', '#2a242d', '#141016'] },
-    pelirrojo: { nombre: 'Pelirrojo',   c: ['#ee9550', '#c2582a', '#8c3a17'] },
-    rubio:     { nombre: 'Rubio',       c: ['#f8dc94', '#dfb25a', '#b8873a'] },
-    platino:   { nombre: 'Platino',     c: ['#fffaf0', '#e7dcc6', '#bfae90'] },
-    rosa:      { nombre: 'Rosa chicle', c: ['#fbc0dc', '#e46fa8', '#ab3f77'] },
-  };
-  const OJOS = {
-    verde:    { nombre: 'Verde',    c: ['#9ae8b0', '#2f9a57', '#14532d'] },
-    marron:   { nombre: 'Marrón',   c: ['#d39a60', '#6e4422', '#3b230f'] },
-    azul:     { nombre: 'Azul',     c: ['#a6d0ff', '#3a78d0', '#1d3f75'] },
-    gris:     { nombre: 'Gris',     c: ['#e0e6ee', '#8592a3', '#4b5563'] },
-    avellana: { nombre: 'Avellana', c: ['#ead07a', '#9b7a2c', '#5a4413'] },
-  };
-  // a = color principal, b = secundario, chispa = luz de la punta de la varita
-  const CASAS = {
-    Gryffindor: { a: '#8b1a1a', b: '#e8b830', chispa: '#ffb347',
-      texto: 'fundada por Godric Gryffindor. Valentía, osadía y nobleza. Elemento: fuego.' },
-    Slytherin:  { a: '#1a5c34', b: '#c0c7cc', chispa: '#7dffb0',
-      texto: 'fundada por Salazar Slytherin. Astucia, ambición y determinación. Elemento: agua.' },
-    Ravenclaw:  { a: '#233a7a', b: '#c69a4e', chispa: '#8ec5ff',
-      texto: 'fundada por Rowena Ravenclaw. Ingenio, creatividad y sabiduría. Elemento: aire.' },
-    Hufflepuff: { a: '#e8b72a', b: '#2b2520', chispa: '#ffe27a',
-      texto: 'fundada por Helga Hufflepuff. Lealtad, paciencia y esfuerzo. Elemento: tierra.' },
-  };
+  const { PIELES, PELOS, OJOS, CASAS } = Avatar.CATALOGO;
 
-  // Valores válidos de cada opción (sirven para validar lo guardado y para el azar)
+  /* --------------------------------------------------------------------------
+     1) Valores válidos de cada opción (para validar lo guardado y para el azar)
+     -------------------------------------------------------------------------- */
   const VALORES = {
     piel: Object.keys(PIELES),
     colorPelo: Object.keys(PELOS),
@@ -68,49 +34,63 @@
 
   const creador = document.getElementById('creador');
   const avatar = document.getElementById('avatar');
-  const svgAvatar = avatar.querySelector('svg');
   const casaNombre = document.getElementById('stage-casa-nombre');
   const casaDescripcion = document.getElementById('casa-descripcion');
+  const etiquetaNombre = document.getElementById('stage-nombre');
+  const campoNombre = document.getElementById('nombre-mago');
   const interruptor = document.getElementById('interruptor-cicatriz');
+
+  // El nombre solo admite letras, números, espacios, guiones y apóstrofos
+  const limpiarNombre = (texto) => String(texto || '')
+    .replace(/[^\p{L}\p{N} '\-]/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 18);
+
+  function nombreDelLogin() {
+    try {
+      const usuario = JSON.parse(localStorage.getItem('howgarts_sesion') || '{}').user.username;
+      const limpio = limpiarNombre(usuario);
+      return limpio ? limpio.charAt(0).toUpperCase() + limpio.slice(1) : '';
+    } catch {
+      return '';
+    }
+  }
 
   /* --------------------------------------------------------------------------
      2) Última elección guardada (lo que no sea válido vuelve al valor por defecto)
      -------------------------------------------------------------------------- */
   function cargar() {
-    const config = { ...POR_DEFECTO };
+    const config = { ...POR_DEFECTO, nombre: '' };
     try {
       const guardado = JSON.parse(localStorage.getItem('howgarts_personaje') || '{}');
       for (const clave of Object.keys(VALORES)) {
         if (VALORES[clave].includes(guardado[clave])) config[clave] = guardado[clave];
       }
+      config.nombre = limpiarNombre(guardado.nombre);
     } catch { /* nada guardado o ilegible */ }
+    if (!config.nombre) config.nombre = nombreDelLogin();
     return config;
   }
   const config = cargar();
 
   /* --------------------------------------------------------------------------
-     3) Pintar el personaje y el estado de los controles
+     3) Dibujar y pintar
      -------------------------------------------------------------------------- */
-  function pintar() {
-    const variable = (nombre, valor) => creador.style.setProperty(nombre, valor);
-    const [pielLuz, piel, pielSombra] = PIELES[config.piel].c;
-    variable('--piel-luz', pielLuz); variable('--piel', piel); variable('--piel-sombra', pielSombra);
-    const [peloBrillo, pelo, peloSombra] = PELOS[config.colorPelo].c;
-    variable('--pelo-brillo', peloBrillo); variable('--pelo', pelo); variable('--pelo-sombra', peloSombra);
-    const [ojosClaro, ojos, ojosOscuro] = OJOS[config.ojos].c;
-    variable('--ojos-claro', ojosClaro); variable('--ojos', ojos); variable('--ojos-oscuro', ojosOscuro);
-    const casa = CASAS[config.casa];
-    variable('--casa-a', casa.a); variable('--casa-b', casa.b); variable('--chispa', casa.chispa);
+  avatar.innerHTML = Avatar.svg('yo', 'Tu personaje');
+  const svgAvatar = avatar.querySelector('svg');
 
-    avatar.dataset.pelo = config.pelo;
-    avatar.dataset.gafas = config.gafas;
-    avatar.dataset.varita = config.varita;
-    avatar.dataset.mascota = config.mascota;
-    avatar.dataset.cicatriz = config.cicatriz ? 'si' : 'no';
+  function pintar() {
+    // Los colores van en #creador para que también los hereden las miniaturas
+    Avatar.colores(creador, config);
+    Avatar.variantes(avatar, config);
+
+    const casa = CASAS[config.casa];
     casaNombre.textContent = config.casa;
-    const nombre = document.createElement('strong');
-    nombre.textContent = config.casa;
-    casaDescripcion.replaceChildren(nombre, ', ' + casa.texto);
+    const nombreCasa = document.createElement('strong');
+    nombreCasa.textContent = config.casa;
+    casaDescripcion.replaceChildren(nombreCasa, ', ' + casa.texto);
+    etiquetaNombre.textContent = config.nombre || 'Mago sin nombre';
     interruptor.setAttribute('aria-checked', String(config.cicatriz));
 
     document.querySelectorAll('[data-opcion]').forEach((grupo) => {
@@ -143,8 +123,9 @@
   }
 
   /* --------------------------------------------------------------------------
-     4b) Miniaturas: se clonan piezas del propio personaje, así siempre se
-         parecen a él y toman los colores elegidos (heredan las variables CSS)
+     4b) Miniaturas: cada una es un pequeño mago con su variante fijada; se
+         clonan piezas del personaje, así siempre se parecen a él y toman los
+         colores elegidos (heredan las variables CSS de #creador)
      -------------------------------------------------------------------------- */
   const NS = 'http://www.w3.org/2000/svg';
   const SIN_MASCOTA =
@@ -152,36 +133,25 @@
     '<circle cx="33" cy="43" r="6"/><circle cx="45" cy="34" r="6"/><circle cx="57" cy="34" r="6"/><circle cx="68" cy="43" r="6"/></g>' +
     '<path d="M26 76 L74 24" stroke="#7a2a20" stroke-width="5" stroke-linecap="round" opacity=".7"/>';
 
+  const ENCUADRE = { pelo: '44 12 232 232', gafas: '84 92 152 152', varita: '14 206 106 106', mascota: '216 286 112 112' };
+  const PIEZAS = {
+    pelo: ['.pelo-atras', '.cabeza', '.pelo-frente'],
+    gafas: ['.cabeza', '.gafas'],
+    varita: ['.varita'],
+    mascota: ['.mascota'],
+  };
+
   function miniatura(tipo, variante) {
     const svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('aria-hidden', 'true');
-    const copiar = (selector) => {
-      const pieza = svgAvatar.querySelector(selector);
-      if (pieza) svg.appendChild(pieza.cloneNode(true));
-    };
-    if (tipo === 'pelo') {
-      svg.setAttribute('viewBox', '44 12 232 232');
-      copiar(`.pelo-atras .pelo-${variante}`);
-      copiar('.cabeza');
-      copiar(`.pelo-frente .pelo-${variante}`);
-    } else if (tipo === 'gafas') {
-      svg.setAttribute('viewBox', '84 92 152 152');
-      copiar('.cabeza');
-      if (variante !== 'ninguna') copiar(`.gafas-${variante}`);
-    } else if (tipo === 'varita') {
-      svg.setAttribute('viewBox', '14 206 106 106');
-      copiar(`.varita-${variante}`);
-      copiar('.chispa-punta');
-      copiar('.chispitas');
-    } else if (tipo === 'mascota') {
-      if (variante === 'ninguna') {
-        svg.setAttribute('viewBox', '0 0 100 100');
-        svg.innerHTML = SIN_MASCOTA;
-      } else {
-        svg.setAttribute('viewBox', '216 286 112 112');
-        copiar(`.mascota-${variante}`);
-      }
+    if (tipo === 'mascota' && variante === 'ninguna') {
+      svg.setAttribute('viewBox', '0 0 100 100');
+      svg.innerHTML = SIN_MASCOTA;
+      return svg;
     }
+    svg.setAttribute('viewBox', ENCUADRE[tipo]);
+    Avatar.variantes(svg, { [tipo]: variante, varita: tipo === 'varita' ? variante : 'acebo' });
+    for (const selector of PIEZAS[tipo]) svg.appendChild(svgAvatar.querySelector(selector).cloneNode(true));
     return svg;
   }
 
@@ -211,6 +181,13 @@
     celebrar(false);
   });
 
+  campoNombre.value = config.nombre;
+  campoNombre.addEventListener('input', () => {
+    config.nombre = limpiarNombre(campoNombre.value);
+    etiquetaNombre.textContent = config.nombre || 'Mago sin nombre';
+  });
+  campoNombre.addEventListener('blur', () => { campoNombre.value = config.nombre; });
+
   // Pestañas (clic y flechas del teclado)
   const pestanas = [...document.querySelectorAll('.pestana')];
   function mostrarPestana(pestana) {
@@ -233,7 +210,7 @@
     });
   });
 
-  // Sorpréndeme: todo al azar
+  // Sorpréndeme: todo al azar (menos el nombre)
   const alAzar = (lista) => lista[Math.floor(Math.random() * lista.length)];
   document.getElementById('btn-azar').addEventListener('click', () => {
     for (const clave of Object.keys(VALORES)) config[clave] = alAzar(VALORES[clave]);
@@ -245,12 +222,16 @@
      6) Comenzar aventura: guardar y pasar al pergamino
      -------------------------------------------------------------------------- */
   document.getElementById('btn-comenzar').addEventListener('click', () => {
+    if (!config.nombre) {
+      config.nombre = nombreDelLogin() || 'Mago';
+      campoNombre.value = config.nombre;
+    }
     const casa = CASAS[config.casa];
     const guardar = {
       ...config,
       scarfA: casa.a,
       scarfB: casa.b,
-      color: casa.a, // compatibilidad con el mapa (color de túnica del jugador)
+      color: casa.a, // color de la casa (lo usa el mapa)
     };
     localStorage.setItem('howgarts_personaje', JSON.stringify(guardar));
     document.body.classList.add('saliendo');

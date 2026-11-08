@@ -1,0 +1,78 @@
+/* =============================================================================
+   avatar.css — Estilos del mago chibi (jugador y personajes del mapa)
+   El contenedor (.mago) recibe los colores como variables CSS y las
+   variantes como data-atributos (ver js/avatar.js).
+   ============================================================================= */
+
+:root {
+  --sombra-suelo: #3b2a17;
+  --gato-luz: #f4a95e; --gato: #c8692a; --ojos-gato: #9be15d;
+}
+
+/* Colores que toman las piezas */
+.st-piel-luz { stop-color: var(--piel-luz); }
+.st-piel { stop-color: var(--piel); }
+.st-piel-sombra { stop-color: var(--piel-sombra); }
+.st-pelo-brillo { stop-color: var(--pelo-brillo); }
+.st-pelo { stop-color: var(--pelo); }
+.st-pelo-sombra { stop-color: var(--pelo-sombra); }
+.st-ojos-claro { stop-color: var(--ojos-claro); }
+.st-ojos { stop-color: var(--ojos); }
+.st-ojos-oscuro { stop-color: var(--ojos-oscuro); }
+.st-tunica-a { stop-color: var(--tunica-a, #3b3947); }
+.st-tunica-b { stop-color: var(--tunica-b, #17161e); }
+.st-chispa { stop-color: var(--chispa); }
+.st-gato-luz { stop-color: var(--gato-luz); }
+.st-gato { stop-color: var(--gato); }
+.f-casa-a { fill: var(--casa-a); }
+.f-casa-b { fill: var(--casa-b); }
+.f-piel-sombra { fill: var(--piel-sombra); }
+.f-ojos-gato { fill: var(--ojos-gato); }
+.trazo-casa-a { fill: none; stroke: var(--casa-a); }
+.trazo-casa-b { stroke: var(--casa-b); }
+.trazo-ceja { fill: none; stroke: var(--pelo-sombra); }
+.sombra-suelo { fill: var(--sombra-suelo); opacity: .35; }
+.pelo-forma, .rizos-contorno { stroke: #2b1a12; stroke-width: 2.6; stroke-linejoin: round; }
+.brillo-pelo { fill: none; stroke: var(--pelo-brillo); stroke-width: 5; stroke-linecap: round; opacity: .8; }
+.brillo-pelo.fino { stroke-width: 2.4; opacity: .75; }
+.mago-svg, .sombrero-svg, .espada-svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+/* Variantes: dentro de un .mago solo se ve la elegida.
+   (Fuera de un .mago, p. ej. en una pieza clonada suelta, se ven todas.) */
+.mago .variante { display: none; }
+.mago[data-pelo="1"] .pelo-1, .mago[data-pelo="2"] .pelo-2,
+.mago[data-pelo="3"] .pelo-3, .mago[data-pelo="4"] .pelo-4,
+.mago[data-gafas="redondas"] .gafas-redondas,
+.mago[data-gafas="cuadradas"] .gafas-cuadradas,
+.mago[data-gafas="media-luna"] .gafas-media-luna,
+.mago[data-varita="acebo"] .varita-acebo, .mago[data-varita="sauco"] .varita-sauco,
+.mago[data-varita="vid"] .varita-vid, .mago[data-varita="tejo"] .varita-tejo,
+.mago:not([data-varita="ninguna"]) .punta-varita,
+.mago[data-mascota="lechuza"] .mascota-lechuza, .mago[data-mascota="gato"] .mascota-gato,
+.mago[data-mascota="sapo"] .mascota-sapo, .mago[data-mascota="serpiente"] .mascota-serpiente,
+.mago[data-uniforme="si"] .uniforme, .mago[data-uniforme="no"] .sin-uniforme,
+.mago[data-barba="si"] .barba, .mago[data-sombrero="si"] .sombrero-mago,
+.mago[data-nariz="normal"] .nariz-normal, .mago[data-nariz="ganchuda"] .nariz-ganchuda,
+.mago[data-nariz="serpiente"] .nariz-serpiente,
+.mago[data-pecas="si"] .pecas, .mago[data-pendientes="si"] .pendientes,
+.mago[data-mejillas="si"] .mejillas, .mago[data-cicatriz="si"] .cicatriz,
+.mago[data-cejas="si"][data-ceno="no"] .cejas-normales,
+.mago[data-cejas="si"][data-ceno="si"] .cejas-enfado,
+.mago[data-ceno="si"] .parpados-enfado,
+.mago[data-estado="normal"] .ojos-normales, .mago[data-estado="derrotado"] .ojos-x,
+.mago[data-estado="normal"][data-boca="sonrisa"] .boca-sonrisa,
+.mago[data-estado="normal"][data-boca="seria"] .boca-seria,
+.mago[data-estado="normal"][data-boca="malvada"] .boca-malvada,
+.mago[data-estado="derrotado"] .boca-lengua { display: inline; }
+
+/* Pequeñas animaciones */
+.chispa-punta { transform-box: fill-box; transform-origin: center; animation: pulso-chispa 1.8s ease-in-out infinite; }
+@keyframes pulso-chispa { 50% { transform: scale(1.28); opacity: .75; } }
+.chispitas { animation: titilar-chispas 2.4s ease-in-out infinite; }
+@keyframes titilar-chispas { 50% { opacity: .15; } }
+.ojos-lechuza { transform-box: fill-box; transform-origin: center; animation: parpadeo 5s infinite; }
+@keyframes parpadeo { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+.cola-gato { transform-box: view-box; transform-origin: 294px 386px; animation: cola 2.8s ease-in-out infinite; }
+@keyframes cola { 50% { transform: rotate(-9deg); } }
+.hablando .sombrero-boca { transform-box: fill-box; transform-origin: 50% 30%; animation: hablar-sombrero .22s ease-in-out infinite alternate; }
+@keyframes hablar-sombrero { to { transform: scaleY(.45); } }

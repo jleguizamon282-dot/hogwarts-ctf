@@ -1,69 +1,138 @@
 /* =============================================================================
-   animaciones.js — Modulo de animaciones / cinematicas
-   Funciones base (placeholders funcionales) para:
-     - Revelar la Espada de Gryffindor
-     - Destruir un Horrocrux con la espada
-     - Cinematica de Game Over (Voldemort gana)
-     - Cinematica de Victoria (Avada Kedavra del jugador)
-   Todas estan preparadas para enriquecerse con mas arte/sprites mas adelante.
-   Se exponen en window.Animaciones.
+   animaciones.js — Cinemáticas del Mapa del Merodeador
+
+     Animaciones.revelarEspada()                 el Sombrero entrega la espada
+     Animaciones.destruirHorrocrux(mision)       al completar una misión
+     Animaciones.gameOver({ jugador, motivo })   Voldemort vence al jugador
+     Animaciones.victoria({ jugador })           el jugador vence a Voldemort
+
+   Todas devuelven una promesa. Las dos primeras se cierran solas (o con un
+   clic); las de final se resuelven al pulsar su botón (Reintentar / Jugar de
+   nuevo). El ritmo de cada escena está en mapa.css (sección CINEMÁTICAS).
    ============================================================================= */
 
 (function () {
   'use strict';
 
-  const $ = (sel) => document.querySelector(sel);
+  const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cine = () => document.getElementById('cine');
 
-  function mostrar(el) { el && el.classList.remove('oculto'); }
-  function ocultar(el) { el && el.classList.add('oculto'); }
+  function mostrar(html, clase) {
+    const c = cine();
+    c.className = 'cinematica ' + (clase || '');
+    c.innerHTML = html;
+    return c;
+  }
+  function ocultar() {
+    const c = cine();
+    c.className = 'cinematica oculto';
+    c.innerHTML = '';
+  }
 
-  const Animaciones = {
+  // Se cierra sola tras `ms`, o antes con un clic o Enter (pasado un mínimo)
+  function hastaClicOTiempo(c, ms) {
+    return new Promise((resolve) => {
+      let hecho = false;
+      const tecla = (e) => { if (['Enter', ' ', 'Escape'].includes(e.key)) terminar(); };
+      function terminar() {
+        if (hecho) return;
+        hecho = true;
+        document.removeEventListener('keydown', tecla);
+        resolve();
+      }
+      setTimeout(() => {
+        c.addEventListener('click', terminar, { once: true });
+        document.addEventListener('keydown', tecla);
+      }, reducido ? 0 : 900);
+      setTimeout(terminar, reducido ? 600 : ms);
+    });
+  }
 
-    /* --- Espada de Gryffindor (recompensa del reto de la frase oculta) ------ */
-    revelarEspada() {
-      return new Promise((resolve) => {
-        const esc = $('#anim-espada');
-        mostrar(esc);
-        // Placeholder: aqui podrian agregarse destellos, sonido, particulas…
-        setTimeout(() => { ocultar(esc); resolve(); }, 3200);
-      });
-    },
+  /* --- La espada del Sombrero ------------------------------------------------ */
+  async function revelarEspada() {
+    const c = mostrar(`
+      <div class="cine-espada">
+        <div class="rayos"></div>
+        <div class="espada-caida">${Avatar.espadaSvg('cine-espada')}</div>
+        <p class="cine-titulo">Has recibido la Espada de Gryffindor</p>
+        <p class="cine-sub">«Te será útil más adelante en tu estancia en Hogwarts»</p>
+      </div>`, 'espada');
+    await hastaClicOTiempo(c, 3800);
+    ocultar();
+  }
 
-    /* --- Destruccion de Horrocrux ------------------------------------------- */
-    // Se dispara al completar una mision. El heroe golpea el horrocrux con la
-    // espada y la magia oscura se diluye en el aire.
-    destruirHorrocrux() {
-      return new Promise((resolve) => {
-        const esc = $('#anim-horrocrux');
-        const humo = esc.querySelector('.humo-oscuro');
-        mostrar(esc);
-        // Reinicia la animacion del humo
-        humo.classList.remove('activo');
-        void humo.offsetWidth; // fuerza reflow
-        setTimeout(() => humo.classList.add('activo'), 500);
-        setTimeout(() => { ocultar(esc); resolve(); }, 2600);
-      });
-    },
+  /* --- Horrocrux destruido -------------------------------------------------- */
+  async function destruirHorrocrux(mision) {
+    const c = mostrar(`
+      <div class="cine-horrocrux">
+        <div class="aura-oscura"></div>
+        <div class="objeto"></div>
+        <div class="espada-golpe">${Avatar.espadaSvg('cine-golpe')}</div>
+        <p class="cine-titulo">¡Horrocrux destruido!</p>
+        <p class="cine-sub"></p>
+      </div>`, 'horrocrux');
+    c.querySelector('.objeto').textContent = mision.icono;
+    c.querySelector('.cine-sub').textContent = mision.horrocrux;
+    await hastaClicOTiempo(c, 3400);
+    ocultar();
+  }
 
-    /* --- Cinematica de Derrota (Game Over) ---------------------------------- */
-    // Voldemort lanza un hechizo y elimina a nuestro personaje.
-    gameOver() {
-      const esc = $('#anim-gameover');
-      // Reinicia el rayo para que la animacion se vea siempre
-      const rayo = esc.querySelector('.rayo-hechizo');
-      rayo.style.animation = 'none'; void rayo.offsetWidth; rayo.style.animation = '';
-      mostrar(esc);
-    },
+  /* --- Duelo final (derrota o victoria) ------------------------------------- */
+  // gana = 'villano' (game over) o 'heroe' (victoria)
+  function duelo({ jugador, gana, titulo, texto, boton }) {
+    return new Promise((resolve) => {
+      const heroeGana = gana === 'heroe';
+      const c = mostrar(`
+        <div class="cine-duelo ${heroeGana ? 'victoria-duelo' : ''}">
+          <div class="duelista izquierda villano ${heroeGana ? 'cae' : 'lanza'}"><div class="volteo"></div></div>
+          <div class="rayo"></div>
+          <div class="duelista heroe ${heroeGana ? 'lanza' : 'cae'}"><div class="volteo"></div></div>
+          <p class="grito">¡Avada Kedavra!</p>
+          <div class="fogonazo"></div>
+        </div>
+        <div class="cine-final">
+          <h2 class="game-over ${heroeGana ? 'victoria' : ''}"></h2>
+          <p class="cine-sub"></p>
+          <button type="button" class="btn-magico boton-final"></button>
+        </div>`, heroeGana ? 'duelo victoria' : 'duelo derrota');
 
-    /* --- Cinematica de Victoria (Avada Kedavra) ----------------------------- */
-    // Mismo estilo que el Game Over pero invertido: el heroe vence a Voldemort.
-    victoria() {
-      const esc = $('#anim-victoria');
-      const rayo = esc.querySelector('.rayo-hechizo');
-      rayo.style.animation = 'none'; void rayo.offsetWidth; rayo.style.animation = '';
-      mostrar(esc);
-    },
-  };
+      const villano = c.querySelector('.villano .volteo');
+      villano.innerHTML = Avatar.svg('cine-villano', Historia.VOLDEMORT.nombre);
+      Avatar.aplicar(villano, Historia.VOLDEMORT.apariencia);
+      const heroe = c.querySelector('.heroe .volteo');
+      heroe.innerHTML = Avatar.svg('cine-heroe', jugador.nombre || 'Tú');
+      Avatar.aplicar(heroe, jugador);
 
-  window.Animaciones = Animaciones;
+      c.querySelector('.game-over').textContent = titulo;
+      c.querySelector('.cine-sub').textContent = texto;
+      const btn = c.querySelector('.boton-final');
+      btn.textContent = boton;
+
+      // Al recibir el hechizo: ojos en X y lengua fuera
+      const [perdedor, cfg] = heroeGana ? [villano, Historia.VOLDEMORT.apariencia] : [heroe, jugador];
+      setTimeout(() => Avatar.variantes(perdedor, { ...cfg, estado: 'derrotado' }), reducido ? 0 : 1750);
+      setTimeout(() => btn.focus(), reducido ? 0 : 3500);
+      btn.addEventListener('click', () => resolve(), { once: true });
+    });
+  }
+
+  const gameOver = ({ jugador, motivo }) => duelo({
+    jugador,
+    gana: 'villano',
+    titulo: 'GAME OVER',
+    texto: motivo === 'tiempo'
+      ? 'Se acabó el tiempo… y Lord Voldemort te encontró.'
+      : 'Te has quedado sin vidas.',
+    boton: '↻ Reintentar',
+  });
+
+  const victoria = ({ jugador }) => duelo({
+    jugador,
+    gana: 'heroe',
+    titulo: '¡VICTORIA!',
+    texto: 'Lord Voldemort ha sido derrotado. Hogwarts está a salvo.',
+    boton: '✦ Jugar de nuevo',
+  });
+
+  window.Animaciones = { revelarEspada, destruirHorrocrux, gameOver, victoria, ocultar };
 })();

@@ -32,9 +32,12 @@
     if (!texto) return;
     let nombre = 'Tú';
     try {
+      // El nombre de mago elegido en la personalización; si no hay, el del login
+      const personaje = JSON.parse(localStorage.getItem('howgarts_personaje') || '{}');
       const sesion = JSON.parse(localStorage.getItem('howgarts_sesion') || '{}');
-      if (sesion.user && sesion.user.username) nombre = String(sesion.user.username).slice(0, 18);
-    } catch { /* sesion ilegible: se queda "Tú" */ }
+      const elegido = personaje.nombre || (sesion.user && sesion.user.username);
+      if (elegido) nombre = String(elegido).slice(0, 18);
+    } catch { /* datos ilegibles: se queda "Tú" */ }
     texto.textContent = nombre; // textContent: el nombre nunca se interpreta como HTML
     const marco = texto.previousElementSibling;
     if (marco) {

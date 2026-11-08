@@ -55,60 +55,9 @@
 
 .perso-grid { display:grid; grid-template-columns:440px 1fr; gap:1.6rem; align-items:stretch; }
 
-/* =============================================================================
-   COLORES DEL PERSONAJE (variables que cambia personalizacion.js)
-   ============================================================================= */
-#creador {
-  --piel-luz:#ffe1c4; --piel:#f6c49c; --piel-sombra:#e2a27a;
-  --pelo-brillo:#a0703f; --pelo:#6b4423; --pelo-sombra:#432a14;
-  --ojos-claro:#9ae8b0; --ojos:#2f9a57; --ojos-oscuro:#14532d;
-  --casa-a:#8b1a1a; --casa-b:#e8b830; --chispa:#ffb347;
-}
-.st-piel-luz { stop-color:var(--piel-luz); }
-.st-piel { stop-color:var(--piel); }
-.st-piel-sombra { stop-color:var(--piel-sombra); }
-.st-pelo-brillo { stop-color:var(--pelo-brillo); }
-.st-pelo { stop-color:var(--pelo); }
-.st-pelo-sombra { stop-color:var(--pelo-sombra); }
-.st-ojos-claro { stop-color:var(--ojos-claro); }
-.st-ojos { stop-color:var(--ojos); }
-.st-ojos-oscuro { stop-color:var(--ojos-oscuro); }
-.st-chispa { stop-color:var(--chispa); }
-.f-casa-a { fill:var(--casa-a); }
-.f-casa-b { fill:var(--casa-b); }
-.f-piel-sombra { fill:var(--piel-sombra); }
-.trazo-casa-a { fill:none; stroke:var(--casa-a); }
-.trazo-casa-b { stroke:var(--casa-b); }
-.trazo-ceja { fill:none; stroke:var(--pelo-sombra); }
-.pelo-forma, .rizos circle { fill:url(#av-pelo); stroke:#2b1a12; stroke-width:2.6; stroke-linejoin:round; }
-.rizos-relleno circle { stroke:none; }
-.brillo-pelo { fill:none; stroke:var(--pelo-brillo); stroke-width:5; stroke-linecap:round; opacity:.8; }
-.brillo-pelo.fino { stroke-width:2.4; opacity:.75; }
-
-/* Variantes: solo se ve la elegida (las miniaturas, fuera de #avatar, se ven siempre) */
-#avatar .variante { display:none; }
-#avatar[data-pelo="1"] .pelo-1, #avatar[data-pelo="2"] .pelo-2,
-#avatar[data-pelo="3"] .pelo-3, #avatar[data-pelo="4"] .pelo-4,
-#avatar[data-gafas="redondas"] .gafas-redondas,
-#avatar[data-gafas="cuadradas"] .gafas-cuadradas,
-#avatar[data-gafas="media-luna"] .gafas-media-luna,
-#avatar[data-varita="acebo"] .varita-acebo,
-#avatar[data-varita="sauco"] .varita-sauco,
-#avatar[data-varita="vid"] .varita-vid,
-#avatar[data-mascota="lechuza"] .mascota-lechuza,
-#avatar[data-mascota="gato"] .mascota-gato,
-#avatar[data-mascota="sapo"] .mascota-sapo,
-#avatar[data-cicatriz="si"] .cicatriz { display:inline; }
-
-/* Pequeñas animaciones del personaje */
-.chispa-punta { transform-box:fill-box; transform-origin:center; animation:pulso-chispa 1.8s ease-in-out infinite; }
-@keyframes pulso-chispa { 50% { transform:scale(1.28); opacity:.75; } }
-.chispitas { animation:titilar-chispas 2.4s ease-in-out infinite; }
-@keyframes titilar-chispas { 50% { opacity:.15; } }
-.ojos-lechuza { transform-box:fill-box; transform-origin:center; animation:parpadeo 5s infinite; }
-@keyframes parpadeo { 0%, 92%, 100% { transform:scaleY(1); } 96% { transform:scaleY(.1); } }
-.cola-gato { transform-box:view-box; transform-origin:294px 386px; animation:cola 2.8s ease-in-out infinite; }
-@keyframes cola { 50% { transform:rotate(-9deg); } }
+/* Los colores y las variantes del personaje viven en css/avatar.css.
+   personalizacion.js pone los colores elegidos en #creador para que los
+   hereden también las miniaturas de las tarjetas. */
 
 /* =============================================================================
    ESCENARIO
@@ -149,11 +98,21 @@
 
 .avatar { position:relative; z-index:1; animation:flotar 5s ease-in-out infinite; }
 @keyframes flotar { 50% { transform:translateY(-8px); } }
-.avatar-svg { display:block; width:100%; height:auto; overflow:visible; filter:drop-shadow(0 10px 14px rgba(30,18,6,.45)); }
-.avatar.cambio .avatar-svg { animation:rebote .35s ease; }
-.avatar.cambio-grande .avatar-svg { animation:giro-magico .6s ease; }
+.avatar .mago-svg { filter:drop-shadow(0 10px 14px rgba(30,18,6,.45)); }
+.avatar.cambio .mago-svg { animation:rebote .35s ease; }
+.avatar.cambio-grande .mago-svg { animation:giro-magico .6s ease; }
 @keyframes rebote { 40% { transform:translateY(-6px) scale(1.035); } }
 @keyframes giro-magico { 0% { transform:scale(1); } 45% { transform:scale(.88) rotate(-6deg); filter:brightness(1.6); } 100% { transform:scale(1); } }
+
+/* Etiqueta con el nombre, como las del Mapa del Merodeador */
+.stage-nombre {
+  position:relative; z-index:2; margin:-1.1rem 0 .55rem; max-width:88%;
+  padding:.18rem .9rem; border-radius:6px;
+  font-family:var(--fuente-magica); font-size:1rem; color:#3a2412;
+  background:linear-gradient(135deg, #f3e2b8, #dcc28a);
+  border:1.5px solid #8a6a36; box-shadow:0 4px 10px rgba(0,0,0,.45);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
 
 /* Cinta con el nombre de la casa */
 .stage-casa {
@@ -187,6 +146,22 @@
   box-shadow:0 30px 70px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,207,138,.2);
   backdrop-filter:blur(14px);
 }
+
+/* Nombre de mago */
+.campo-nombre {
+  display:flex; align-items:center; gap:.8rem;
+  padding:.45rem .5rem .45rem 1rem;
+  background:rgba(12,8,22,.62); border:1.5px solid rgba(217,181,102,.45); border-radius:14px;
+  transition:border-color .2s, box-shadow .25s;
+}
+.campo-nombre:focus-within { border-color:var(--ambar); box-shadow:0 0 0 3px rgba(240,168,80,.2); }
+.campo-nombre-titulo { flex:none; font-family:var(--fuente-titulo); font-size:.9rem; color:var(--oro-claro); }
+.campo-nombre input {
+  flex:1; min-width:0; padding:.5rem .2rem;
+  background:transparent; border:none; outline:none;
+  color:var(--texto-fr); font-family:var(--fuente-magica); font-size:1.08rem;
+}
+.campo-nombre input::placeholder { color:rgba(244,228,184,.42); }
 
 /* Pestañas */
 .pestanas {

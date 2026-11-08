@@ -33,18 +33,23 @@ hogwarts-ctf/
     ├── mapa.html             # 4) Mapa del Merodeador (pestaña: "Mapa del Merodeador")
     ├── css/
     │   ├── global.css        # Tema compartido (fondo, botones, modales, transiciones)
+    │   ├── avatar.css        # Colores y variantes del mago chibi (jugador y personajes)
     │   ├── login.css
     │   ├── personalizacion.css  # Medallón, pestañas, tarjetas y estandartes
     │   ├── juramento.css     # Pergamino en 3D, sobre lacrado, barra del conjuro
-    │   └── mapa.css          # HUD, niebla de guerra, animaciones
+    │   └── mapa.css          # HUD, plano, niebla, huellas, diálogos, cinemáticas
     └── js/
         ├── flujo.js          # Orden de las pantallas y guardias de ruta
+        ├── avatar.js         # Dibujo SVG del mago (jugador y personajes), Sombrero, espada
         ├── login.js
-        ├── personalizacion.js   # Opciones, miniaturas, "Sorpréndeme", guardado
+        ├── personalizacion.js   # Opciones, miniaturas, nombre, "Sorpréndeme", guardado
         ├── juramento.js      # Carta, validación del juramento, apertura del mapa
-        ├── animaciones.js    # Placeholders: espada, horrocrux, cinemáticas
-        ├── hud.js            # Temporizador, vidas (perderVida()), pistas
-        └── mapa.js           # Movimiento, niebla, POIs, misiones
+        ├── estado.js         # Partida: vidas, reloj de 40 min, misiones, pistas
+        ├── castillo.js       # Plano de Hogwarts: salas, pasillos, puertas, colisiones
+        ├── historia.js       # Personajes, diálogos, misiones y pistas (contenido)
+        ├── animaciones.js    # Cinemáticas: espada, horrocrux, game over, victoria
+        ├── hud.js            # Barra superior: misiones, pistas, tiempo, vidas, pausa
+        └── mapa.js           # Motor: movimiento, cámara, huellas, diálogos, patrullas
 ```
 
 ## 🧭 Ruta del juego
@@ -64,6 +69,9 @@ primero pendiente antes de pintar la página.
 | Login | `howgarts_sesion` | `personalizacion.html` |
 | Personaje creado | `howgarts_personaje` | `juramento.html` |
 | Juramento pronunciado | `howgarts_juramento` | `mapa.html` |
+
+La partida del mapa (vidas, reloj, misiones, pistas, posición) se guarda en
+`howgarts_partida` (ver `js/estado.js`).
 
 > Es un control de navegación para ordenar el recorrido, no una medida de
 > seguridad: cualquiera puede editar `localStorage` desde la consola.
@@ -179,6 +187,57 @@ externas): portada en español, interior del castillo y sobre.
 
 ---
 
+## 🗺️ El Mapa del Merodeador
+
+**Inicio.** El jugador aparece en el Gran Comedor junto al **Sombrero
+Seleccionador**, que le dice su casa («Veo que eres… ¡GRYFFINDOR!») y le
+entrega la **Espada de Gryffindor** («te será útil más adelante en tu estancia
+en Hogwarts»). En ese momento empieza a correr el reloj.
+
+**El mapa.** Es sombrío, con la paleta del login: solo se ve con claridad
+alrededor del mago del jugador (el mismo de la personalización, con su
+nombre). Bajo la sombra se ven las **huellas con el nombre** de cada personaje;
+al acercarse aparece el personaje y al alejarse vuelve a ser huellas. Se
+camina por los pasillos y las salas: **las paredes no se atraviesan**.
+
+**Personajes y misiones** (cada uno pide ayuda con un horrocrux):
+
+| # | Personaje | Misión | Dónde está |
+|---|---|---|---|
+| 1 | Ginny Weasley | Diario de Tom Riddle | Baño de Myrtle la Llorona |
+| 2 | Albus Dumbledore | Anillo de Sorvolo Gaunt | Despacho del director |
+| 3 | Ron Weasley | Guardapelo de Slytherin | Sala común de Gryffindor |
+| 4 | Hermione Granger | Copa de Hufflepuff | Biblioteca |
+| 5 | Luna Lovegood | Diadema de Ravenclaw | Torre de Ravenclaw |
+| 6 | Neville Longbottom | Nagini | Invernaderos |
+| 7 | Severus Snape | El último horrocrux: el propio jugador | Mazmorras |
+| 8 | Lord Voldemort | Duelo final (aparece al completar las 7) | Gran Comedor |
+
+Al acercarse sale un bocadillo («¡Nombre! Tengo una misión para ti»). El
+diálogo termina con **Cerrar** (entrega la pista) o **Aceptar misión** (entrega
+la pista y lleva a `/mision/N`). La misión aparece en la lista al hablar y se
+tacha al completarla. Voldemort tiene su propio diálogo desafiante y termina
+con **Aceptar duelo**.
+
+**Barra superior.** Misiones (n/7), Pistas, barra de **tiempo de 40 minutos**
+(global: sigue corriendo dentro de las misiones y no se reinicia al recargar),
+**3 vidas**, la espada y **Pausa** («¡Travesura realizada!»: tapa el mapa y
+detiene el reloj).
+
+**Vidas.** Se pierde una al fallar dentro de una misión, o si te pillan **Argus
+Filch** o la **Señora Norris**, que patrullan los pasillos (sus huellas se ven
+en rojo). Las vidas no restan tiempo.
+
+**Fin de partida.** Sin vidas o sin tiempo, Voldemort lanza su hechizo, el mago
+del jugador cae con los ojos en X y la lengua fuera, y aparece **GAME OVER**
+con **Reintentar**, que empieza la partida desde cero. Al superar el duelo
+final aparece la victoria.
+
+**Controles.** Flechas o WASD para moverse, **E** (o Enter) para hablar,
+**P** o Esc para pausar.
+
+---
+
 ## 🧩 Qué está hecho y qué queda como placeholder
 
 **Completo y funcional:**
@@ -190,28 +249,29 @@ externas): portada en español, interior del castillo y sobre.
   "Sorpréndeme" y recuerdo de la última elección en `localStorage`.
 - Pergamino: carta de Hogwarts en sobre lacrado, reto de la frase oculta y
   animación del mapa que se abre (respeta `prefers-reduced-motion`).
-- Mapa: movimiento con flechas, niebla de guerra, 8 POIs (huellas→personaje),
-  pop-up "Iniciar misión", HUD (temporizador 20:00, 3 vidas, pistas).
+- Mapa del Merodeador completo (ver la sección de abajo): Sombrero
+  Seleccionador, 7 misiones con diálogo, Voldemort final, pasillos con
+  paredes, niebla, huellas con nombre, Filch y la Señora Norris, barra de
+  misiones / pistas / tiempo (40 min) / vidas / pausa, game over y victoria.
 - Ruta ordenada entre pantallas (`js/flujo.js`).
 
-**Placeholders listos para ampliar** (funciones ya cableadas):
-- `Animaciones.revelarEspada()` — Espada de Gryffindor; ya no la dispara la
-  frase (ahora abre el mapa), queda lista para la misión que la entregue.
-- `Animaciones.destruirHorrocrux()` — al completar una misión (anillo azul→verde).
-- `Animaciones.gameOver()` — Voldemort vence (reloj a 00:00 o 0 corazones).
-- `Animaciones.victoria()` — Avada Kedavra del héroe (al completar las 8 misiones).
-- `/mision/:id` — vistas de nivel vacías (1..8) por construir.
+**Pendiente de construir:**
+- `/mision/:id` — los retos de cada misión (1..7) y el duelo final (8). Hoy son
+  pantallas provisionales con dos botones de prueba: **Superar** (vuelve a
+  `/mapa.html?completada=N`) y **Fallar** (vuelve a `/mapa.html?fallo=N` y
+  quita una vida). Cuando exista el reto, debe llamar a
+  `Estado.completarMision(N)` o `Estado.perderVida()` (ver `js/estado.js`).
+- Las pistas de `js/historia.js` son provisionales: cámbialas por pistas de
+  cada reto.
 
-### Funciones globales útiles (consola del navegador en el mapa)
+### Funciones útiles (consola del navegador en el mapa)
 ```js
-perderVida();        // quita 1 corazón y resta 5:00 al reloj
-completarMision(3);  // marca la misión 3 (anillo verde + horrocrux)
-Animaciones.victoria();
-Animaciones.gameOver();
+perderVida();        // quita 1 corazón (a 0: game over)
+completarMision(3);  // completa la misión 3 (horrocrux destruido, tachada)
 ```
 
-Para simular el regreso de una misión completada, redirige a:
-`/mapa.html?completada=3`
+También se puede simular el regreso de una misión con `/mapa.html?completada=3`
+o `/mapa.html?fallo=3`.
 
 Para empezar el recorrido desde cero (consola del navegador):
 ```js

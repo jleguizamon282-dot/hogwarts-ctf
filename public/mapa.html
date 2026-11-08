@@ -9,109 +9,107 @@
   <!-- Ruta del juego: exige haber pronunciado el juramento (juramento.html) -->
   <script src="js/flujo.js" data-pagina="mapa.html"></script>
   <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/avatar.css" />
   <link rel="stylesheet" href="css/mapa.css" />
 </head>
 <body class="mapa-body">
 
-  <!-- ======================= HUD SUPERIOR ======================= -->
-  <header class="hud">
-    <div class="hud-bloque">
-      <span>⏳</span>
-      <span id="temporizador">20:00</span>
-    </div>
-
-    <div class="hud-bloque vidas" id="vidas" aria-label="Vidas restantes">
-      <span class="vida">❤️</span>
-      <span class="vida">❤️</span>
-      <span class="vida">❤️</span>
-    </div>
-
-    <div class="hud-bloque">
-      <button id="btn-pistas" class="btn-magico">
-        📜 Pistas <span class="pistas-contador" id="pistas-contador">0/8</span>
+  <!-- ======================= BARRA SUPERIOR ======================= -->
+  <header class="hud" id="hud">
+    <div class="hud-grupo">
+      <button type="button" class="hud-boton" id="btn-misiones" aria-haspopup="dialog" aria-controls="panel-misiones">
+        📜 Misiones <span class="hud-contador" id="contador-misiones">0/7</span>
       </button>
+      <button type="button" class="hud-boton" id="btn-pistas" aria-haspopup="dialog" aria-controls="modal-pistas">
+        🔍 Pistas <span class="hud-contador" id="contador-pistas">0</span>
+      </button>
+    </div>
+
+    <div class="hud-tiempo" title="Tiempo restante">
+      <span aria-hidden="true">⏳</span>
+      <div class="barra-tiempo" role="progressbar" aria-label="Tiempo restante" aria-valuemin="0" aria-valuemax="100" id="barra">
+        <div class="barra-relleno" id="barra-tiempo"></div>
+      </div>
+      <span class="hud-cifra" id="temporizador">40:00</span>
+    </div>
+
+    <div class="hud-grupo">
+      <div class="vidas" id="vidas" aria-label="Vidas restantes">
+        <span class="vida">❤️</span><span class="vida">❤️</span><span class="vida">❤️</span>
+      </div>
+      <div class="hud-espada" id="hud-espada" title="Espada de Gryffindor" aria-label="Espada de Gryffindor"></div>
+      <button type="button" class="hud-boton" id="btn-pausa" aria-label="Pausa (tecla P)"><span aria-hidden="true">❚❚</span> Pausa</button>
     </div>
   </header>
 
-  <!-- ======================= MUNDO / MAPA ======================= -->
-  <div id="mundo">
-    <div id="escena">
-      <!-- Jugador (su tunica usa --tunica segun la casa elegida) -->
-      <div id="jugador">
-        <div class="jug-tunica"></div>
-        <div class="jug-cara"></div>
+  <!-- Lista de misiones (desplegable) -->
+  <section class="panel-misiones oculto" id="panel-misiones" aria-label="Misiones">
+    <h3>Misiones</h3>
+    <ol class="lista-misiones" id="lista-misiones"></ol>
+  </section>
+
+  <!-- ======================= EL MAPA ======================= -->
+  <!-- capa-plano: el castillo (debajo de la niebla)
+       capa-alta: huellas, nombres y personajes (se ven a través de la niebla) -->
+  <main class="vista" id="vista" aria-label="Mapa del Merodeador">
+    <div class="capa-mundo" id="capa-plano"></div>
+    <div class="niebla" id="niebla"></div>
+    <div class="capa-mundo" id="capa-alta">
+      <svg class="huellas-svg" viewBox="0 0 2400 1800" width="2400" height="1800" aria-hidden="true">
+        <defs><g id="huella"><ellipse cy="-2.2" rx="2.7" ry="4.2" /><ellipse cy="4.8" rx="2.1" ry="2" /></g></defs>
+        <g id="huellas"></g>
+      </svg>
+      <div id="antorchas"></div>
+      <div id="entidades"></div>
+    </div>
+  </main>
+
+  <!-- Avisos breves -->
+  <div class="avisos" id="avisos" aria-live="polite"></div>
+
+  <!-- ======================= DIÁLOGO ======================= -->
+  <section class="dialogo oculto" id="dialogo" aria-labelledby="dialogo-nombre">
+    <div class="dialogo-retrato" id="dialogo-retrato" aria-hidden="true"></div>
+    <div class="dialogo-cuerpo">
+      <h3 class="dialogo-nombre" id="dialogo-nombre"></h3>
+      <p class="dialogo-texto" id="dialogo-texto" aria-live="polite"></p>
+      <div class="dialogo-pie">
+        <span class="dialogo-pasos" id="dialogo-pasos"></span>
+        <div class="dialogo-acciones" id="dialogo-acciones"></div>
       </div>
-      <!-- Los 8 puntos de interes se generan por JS dentro de #escena -->
     </div>
+  </section>
 
-    <!-- Niebla de guerra (overlay con agujero de vision sobre el jugador) -->
-    <div id="niebla"></div>
-  </div>
-
-  <!-- ======================= POP-UP INICIAR MISION ======================= -->
-  <div id="popup-mision">
-    <h3 id="popup-titulo">Profesor McGonagall</h3>
-    <p id="popup-texto">¿Deseas iniciar esta misión?</p>
-    <div class="fila">
-      <button id="popup-aceptar" class="btn-magico">Iniciar misión</button>
-      <button id="popup-cancelar" class="btn-no">Ahora no</button>
+  <!-- ======================= PAUSA ======================= -->
+  <div class="pausa oculto" id="pausa" role="dialog" aria-modal="true" aria-labelledby="pausa-titulo">
+    <div class="pausa-pergamino">
+      <div class="pausa-icono" aria-hidden="true">🗺️</div>
+      <h2 id="pausa-titulo">¡Travesura realizada!</h2>
+      <p>El mapa se ha cerrado y el reloj está detenido.</p>
+      <button type="button" class="btn-magico" id="btn-reanudar">Juro solemnemente… ✦ Reanudar</button>
+      <p class="pausa-ayuda">Tecla P o Esc</p>
     </div>
   </div>
 
-  <!-- ======================= MODAL: PISTAS ======================= -->
-  <div id="modal-pistas" class="overlay-modal oculto">
+  <!-- ======================= PISTAS ======================= -->
+  <div id="modal-pistas" class="overlay-modal oculto" role="dialog" aria-modal="true" aria-labelledby="pistas-titulo">
     <div class="pergamino">
-      <button class="cerrar" data-cerrar="modal-pistas" aria-label="Cerrar">×</button>
-      <h2>📜 Pistas recolectadas</h2>
-      <ul class="lista-pistas" id="lista-pistas"><!-- se rellena por JS --></ul>
+      <button type="button" class="cerrar" data-cerrar aria-label="Cerrar">×</button>
+      <h2 id="pistas-titulo">📜 Pistas recolectadas</h2>
+      <ul class="lista-pistas" id="lista-pistas"></ul>
     </div>
   </div>
 
-  <!-- ======================= ESCENARIOS DE ANIMACION (placeholders) ======================= -->
+  <!-- ======================= CINEMÁTICAS (las rellena animaciones.js) ======================= -->
+  <div class="cinematica oculto" id="cine"></div>
 
-  <!-- Espada de Gryffindor (placeholder: Animaciones.revelarEspada(), aun sin disparador) -->
-  <div id="anim-espada" class="cinematica oculto">
-    <div class="escena-2d" style="display:grid;place-items:center;text-align:center">
-      <div class="espada">🗡️</div>
-      <div class="mensaje-magico">Has conseguido la espada de Gryffindor</div>
-    </div>
-  </div>
+  <p class="ayuda-controles" aria-hidden="true">Flechas o WASD: moverse · E: hablar · P: pausa</p>
 
-  <!-- Destruccion de Horrocrux con la espada -->
-  <div id="anim-horrocrux" class="cinematica oculto">
-    <div class="escena-2d" style="display:grid;place-items:center">
-      <div class="humo-oscuro"></div>
-      <div style="font-size:3rem">🧙‍♂️🗡️ ⚔️ <span class="horrocrux">🏺</span></div>
-    </div>
-  </div>
-
-  <!-- Game Over: Voldemort elimina al jugador -->
-  <div id="anim-gameover" class="cinematica oculto">
-    <div class="titulo-final derrota">Has caído…</div>
-    <div class="escena-2d">
-      <div class="duelo">
-        <div class="mago" id="go-villano">🧙‍♂️</div>
-        <div class="rayo-hechizo" style="--rayo-color:#2ecc71"></div>
-        <div class="mago golpeado" id="go-heroe">🧑‍🎓</div>
-      </div>
-    </div>
-    <button class="btn-magico" onclick="location.reload()">Volver a intentarlo</button>
-  </div>
-
-  <!-- Victoria: el jugador lanza Avada Kedavra sobre Voldemort -->
-  <div id="anim-victoria" class="cinematica oculto">
-    <div class="titulo-final victoria">¡Avada Kedavra!</div>
-    <div class="escena-2d">
-      <div class="duelo">
-        <div class="mago" id="vic-heroe">🧑‍🎓</div>
-        <div class="rayo-hechizo" style="--rayo-color:#2ecc71"></div>
-        <div class="mago golpeado" id="vic-villano">🧙‍♂️</div>
-      </div>
-    </div>
-    <button class="btn-magico" onclick="location.href='/'">Fin de la aventura ✦</button>
-  </div>
-
-  <!-- Scripts: primero animaciones y HUD, luego la logica del mapa -->
+  <!-- Scripts: primero datos y piezas, después HUD y el motor del mapa -->
+  <script src="js/avatar.js"></script>
+  <script src="js/estado.js"></script>
+  <script src="js/castillo.js"></script>
+  <script src="js/historia.js"></script>
   <script src="js/animaciones.js"></script>
   <script src="js/hud.js"></script>
   <script src="js/mapa.js"></script>

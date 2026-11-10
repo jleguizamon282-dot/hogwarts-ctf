@@ -1,0 +1,362 @@
+/* =============================================================================
+   flags.css — Tema compartido de "flags_content" (Howgarts CTF)
+   -----------------------------------------------------------------------------
+   Estetica alineada con el resto del proyecto: noche magica, oro calido,
+   cielo estrellado, luna, brasas flotantes y tarjetas de cristal violeta.
+   Oscura y misteriosa, pero viva y amable (estilo cartoon / videojuego).
+
+   Cada pagina pinta un acento propio con una clase en <body>:
+     .portal          -> Inicio (violeta / oro)
+     .sala-slytherin  -> Sala comun de Slytherin (verde esmeralda / plata)
+     .boveda          -> Boveda de Gringotts (oro viejo / rojizo)
+     .sensor          -> Sensor de red (turquesa arcano / consola)
+   ============================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=MedievalSharp&family=Quicksand:wght@500;700&display=swap');
+
+:root {
+  /* Paleta magica (misma del tema global) */
+  --noche-1:#0b0a1a;
+  --noche-2:#141233;
+  --noche-3:#1e1b4b;
+  --oro:#d9b64e;
+  --oro-claro:#f4e4b8;
+  --magia:#7c5cff;
+  --magia-2:#38bdf8;
+  --rojo-gryff:#9b1c1c;
+  --verde-ok:#3ddc84;
+
+  /* Casas */
+  --slytherin-1:#0d6218; --slytherin-2:#aaaaaa;
+
+  --fuente-titulo:'Cinzel Decorative', serif;
+  --fuente-magica:'MedievalSharp', cursive;
+  --fuente-texto:'Quicksand', system-ui, sans-serif;
+
+  --radio:18px;
+  --transicion:.45s cubic-bezier(.22,.61,.36,1);
+
+  /* Acento por defecto (lo sobreescribe cada pagina) */
+  --acento:var(--magia);
+  --acento-suave:rgba(124,92,255,.35);
+}
+
+* { box-sizing:border-box; }
+
+html, body {
+  margin:0; padding:0; min-height:100vh;
+  font-family:var(--fuente-texto);
+  color:var(--oro-claro);
+  background:radial-gradient(ellipse at 50% -10%, var(--noche-3), var(--noche-1) 60%);
+  overflow-x:hidden;
+}
+
+/* ---- Acentos por pagina --------------------------------------------------- */
+.portal          { --acento:#8b74ff; --acento-suave:rgba(139,116,255,.35); }
+.sala-slytherin  { --acento:#2fae59; --acento-suave:rgba(47,174,89,.32);
+                   background:radial-gradient(ellipse at 50% -10%, #0f2a1c, var(--noche-1) 62%); }
+.boveda          { --acento:#e9c25a; --acento-suave:rgba(233,194,90,.32);
+                   background:radial-gradient(ellipse at 50% -10%, #241a0b, var(--noche-1) 62%); }
+.sensor          { --acento:#36d6c4; --acento-suave:rgba(54,214,196,.30);
+                   background:radial-gradient(ellipse at 50% -10%, #0a2630, var(--noche-1) 62%); }
+
+/* =============================================================================
+   CAPAS DE AMBIENTE (cielo, luna, brasas, niebla)
+   ============================================================================= */
+
+/* Cielo estrellado que titila */
+.cielo {
+  position:fixed; inset:0; z-index:-3;
+  background:
+    radial-gradient(2px 2px at 20% 30%, #fff, transparent),
+    radial-gradient(2px 2px at 60% 70%, #fff, transparent),
+    radial-gradient(1px 1px at 80% 20%, #cfe8ff, transparent),
+    radial-gradient(1.5px 1.5px at 35% 80%, #fff, transparent),
+    radial-gradient(1px 1px at 90% 60%, #fff, transparent),
+    radial-gradient(2px 2px at 10% 60%, #ffe9a8, transparent),
+    radial-gradient(1px 1px at 48% 18%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 72% 42%, #e9d9ff, transparent);
+  background-repeat:repeat; background-size:420px 420px;
+  animation:parpadeo 6s ease-in-out infinite alternate; opacity:.8;
+}
+@keyframes parpadeo { from{opacity:.5} to{opacity:.95} }
+
+/* Luna con halo tenido del acento */
+.luna {
+  position:fixed; top:6vh; right:8vw; width:92px; height:92px; border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, #fff7d6, #e9d08a 70%, #c9a84a);
+  box-shadow:0 0 60px 20px rgba(249,231,159,.3), 0 0 120px 40px var(--acento-suave);
+  z-index:-2;
+}
+
+/* Niebla baja que deriva */
+.niebla {
+  position:fixed; left:-20%; right:-20%; bottom:-6%; height:38vh; z-index:-2;
+  pointer-events:none;
+  background:radial-gradient(60% 100% at 30% 100%, var(--acento-suave), transparent 70%),
+             radial-gradient(60% 100% at 75% 100%, rgba(124,92,255,.18), transparent 72%);
+  filter:blur(26px); opacity:.6;
+  animation:derivar-niebla 24s ease-in-out infinite alternate;
+}
+@keyframes derivar-niebla { from{transform:translateX(-4%)} to{transform:translateX(4%)} }
+
+/* Brasas doradas que suben */
+.brasas { position:fixed; inset:0; z-index:-1; pointer-events:none; }
+.brasas i {
+  position:absolute; bottom:-12px; width:5px; height:5px; border-radius:50%;
+  background:var(--oro-claro);
+  box-shadow:0 0 10px 2px rgba(255,220,140,.8), 0 0 18px 4px var(--acento-suave);
+  opacity:0; animation:subir 11s linear infinite;
+}
+.brasas i:nth-child(1){ left:7%;  animation-delay:0s   }
+.brasas i:nth-child(2){ left:18%; animation-delay:1.7s }
+.brasas i:nth-child(3){ left:29%; animation-delay:3.4s }
+.brasas i:nth-child(4){ left:41%; animation-delay:.9s  }
+.brasas i:nth-child(5){ left:53%; animation-delay:2.5s }
+.brasas i:nth-child(6){ left:64%; animation-delay:4.4s }
+.brasas i:nth-child(7){ left:75%; animation-delay:1.3s }
+.brasas i:nth-child(8){ left:85%; animation-delay:3.9s }
+.brasas i:nth-child(9){ left:93%; animation-delay:5.6s }
+.brasas i:nth-child(10){left:38%; animation-delay:6.8s }
+@keyframes subir {
+  0%   { opacity:0; transform:translateY(0) scale(.6); }
+  12%  { opacity:.9; }
+  100% { opacity:0; transform:translateY(-92vh) scale(1.1); }
+}
+
+/* =============================================================================
+   LAYOUT Y TARJETAS
+   ============================================================================= */
+.envoltura {
+  position:relative; z-index:1;
+  min-height:100vh;
+  display:grid; place-items:center;
+  padding:clamp(1.4rem, 5vw, 3.5rem);
+}
+
+/* Entrada suave de la pantalla */
+.pantalla { animation:aparecer var(--transicion) both; }
+@keyframes aparecer {
+  from { opacity:0; transform:translateY(18px) scale(.985); }
+  to   { opacity:1; transform:none; }
+}
+
+/* Tarjeta: cristal violeta con doble borde dorado y acento por pagina */
+.tarjeta {
+  position:relative;
+  width:min(640px, 94vw);
+  padding:clamp(1.8rem, 4vw, 3rem) clamp(1.5rem, 4vw, 2.8rem) clamp(2rem, 4vw, 2.6rem);
+  border-radius:var(--radio);
+  background:linear-gradient(160deg, rgba(34,25,58,.86), rgba(13,10,26,.94));
+  border:1px solid rgba(217,181,102,.5);
+  box-shadow:
+    0 30px 70px rgba(0,0,0,.6),
+    0 0 0 6px rgba(217,181,102,.07),
+    0 0 48px var(--acento-suave),
+    inset 0 1px 0 rgba(255,207,138,.2),
+    inset 0 0 44px rgba(120,90,170,.14);
+  backdrop-filter:blur(14px) saturate(1.1);
+  text-align:center;
+}
+/* Filo superior luminoso con el color del acento */
+.tarjeta::before {
+  content:""; position:absolute; left:14%; right:14%; top:0; height:2px; border-radius:2px;
+  background:linear-gradient(90deg, transparent, var(--acento), transparent);
+  box-shadow:0 0 16px var(--acento); opacity:.85;
+}
+
+/* Emblema circular sobre la tarjeta */
+.crest {
+  width:62px; height:62px; margin:-3.4rem auto .4rem; border-radius:50%;
+  display:grid; place-items:center; font-size:1.7rem; line-height:1;
+  background:radial-gradient(circle at 38% 34%, #1d1836, #0d0a1a 72%);
+  border:2px solid var(--acento);
+  box-shadow:0 8px 20px rgba(0,0,0,.5), 0 0 26px var(--acento-suave), inset 0 2px 6px rgba(255,255,255,.12);
+}
+
+/* Titulos y textos */
+.tarjeta h1 {
+  font-family:var(--fuente-titulo);
+  font-size:clamp(1.5rem, 3.4vw, 2.5rem);
+  line-height:1.16; margin:.2rem 0 .3rem; color:var(--oro-claro); letter-spacing:1px;
+  text-shadow:0 0 28px var(--acento-suave), 0 3px 0 #241905, 0 10px 30px rgba(0,0,0,.7);
+}
+.tarjeta h2 {
+  font-family:var(--fuente-titulo);
+  font-size:clamp(1.2rem, 2.6vw, 1.6rem); margin:.4rem 0; color:var(--oro-claro);
+  text-shadow:0 0 18px var(--acento-suave);
+}
+.tarjeta p { font-family:var(--fuente-texto); line-height:1.65; font-size:1.02rem; color:#ece8f8; }
+.susurro {
+  font-family:var(--fuente-magica);
+  color:var(--oro); opacity:.85; font-style:italic; font-size:1.05rem;
+  margin:.6rem auto 0; max-width:48ch;
+}
+
+/* Separador rúnico */
+.runa {
+  display:flex; align-items:center; justify-content:center; gap:.8rem;
+  margin:1.4rem auto; color:var(--acento); opacity:.8; font-size:1.1rem;
+}
+.runa::before, .runa::after {
+  content:""; height:1px; width:min(120px, 22vw);
+  background:linear-gradient(90deg, transparent, var(--acento), transparent);
+}
+
+/* =============================================================================
+   NAVEGACION (pagina de inicio): la <ul> de enlaces como tarjetas-portal
+   ============================================================================= */
+.portales { list-style:none; margin:1.2rem 0 0; padding:0; display:grid; gap:1rem; text-align:left; }
+.portales li { margin:0; }
+.portales a {
+  position:relative; display:flex; align-items:center; gap:.95rem;
+  padding:1.05rem 1.3rem; border-radius:14px; text-decoration:none;
+  color:var(--oro-claro); font-weight:700; font-size:1.08rem;
+  background:linear-gradient(145deg, rgba(30,27,75,.7), rgba(13,10,26,.6));
+  border:1px solid rgba(217,181,102,.28);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 8px 22px rgba(0,0,0,.35);
+  transition:transform .18s ease, border-color .25s ease, box-shadow .3s ease, background .3s ease;
+}
+.portales a::before {
+  content:"✦"; display:grid; place-items:center; flex:0 0 2.1rem; height:2.1rem; width:2.1rem;
+  border-radius:50%; font-size:1rem; color:#0d0a1a;
+  background:radial-gradient(circle at 38% 34%, #f6dd8e, var(--oro) 60%, #a9812f);
+  box-shadow:0 0 16px var(--acento-suave);
+  transition:transform .3s ease;
+}
+.portales a::after {
+  content:"›"; margin-left:auto; font-size:1.5rem; color:var(--acento);
+  opacity:.6; transform:translateX(0); transition:transform .25s ease, opacity .25s ease;
+}
+.portales a:hover {
+  transform:translateY(-3px);
+  border-color:var(--acento);
+  background:linear-gradient(145deg, rgba(40,34,92,.85), rgba(16,12,32,.7));
+  box-shadow:0 14px 30px rgba(0,0,0,.45), 0 0 26px var(--acento-suave);
+}
+.portales a:hover::before { transform:rotate(-12deg) scale(1.08); }
+.portales a:hover::after  { transform:translateX(5px); opacity:1; }
+.portales a:focus-visible { outline:2px solid var(--acento); outline-offset:3px; }
+
+/* =============================================================================
+   FORMULARIOS Y BOTONES
+   ============================================================================= */
+.conjuro { margin-top:1.4rem; display:flex; flex-direction:column; gap:1rem; align-items:center; }
+.conjuro p { margin:0; font-family:var(--fuente-magica); color:var(--oro); opacity:.9; }
+
+/* Campo de texto (mismo idioma visual que el login) */
+.campo-magico {
+  display:flex; align-items:center; gap:.55rem; width:min(380px, 100%);
+  background:rgba(12,8,22,.74);
+  border:1.5px solid rgba(217,181,102,.35);
+  border-radius:12px; padding:0 .9rem;
+  transition:border-color .2s, box-shadow .25s, background .2s;
+}
+.campo-magico .icono { font-size:1.05rem; opacity:.85; }
+.campo-magico input[type="text"] {
+  flex:1; min-width:0; background:transparent; border:none; outline:none;
+  color:var(--oro-claro); font-family:var(--fuente-texto); font-size:1rem; padding:.85rem 0;
+}
+.campo-magico input::placeholder { color:rgba(222,214,244,.42); }
+.campo-magico:focus-within {
+  border-color:var(--acento);
+  background:rgba(18,12,30,.86);
+  box-shadow:0 0 0 3px var(--acento-suave), 0 0 26px var(--acento-suave);
+}
+
+/* Boton magico reutilizable (tambien aplica a input[type=submit]) */
+.btn-magico {
+  font-family:var(--fuente-titulo); font-size:1.02rem; letter-spacing:.5px;
+  color:#231a05; cursor:pointer;
+  background:linear-gradient(145deg, #f6dd8e, var(--oro) 60%, #a9812f);
+  border:2px solid #f8edc0; border-radius:999px;
+  padding:.82rem 2rem;
+  box-shadow:0 6px 0 #6e521b, 0 10px 24px rgba(0,0,0,.4);
+  transition:transform .12s ease, box-shadow .12s ease, filter .2s ease;
+}
+.btn-magico:hover  { filter:brightness(1.07); transform:translateY(-2px); }
+.btn-magico:active { transform:translateY(4px); box-shadow:0 2px 0 #6e521b, 0 4px 10px rgba(0,0,0,.4); }
+.btn-magico:focus-visible { outline:2px solid #fff3cf; outline-offset:3px; }
+
+/* =============================================================================
+   RETRATO / IMAGEN ENMARCADA (Sala de Slytherin)
+   ============================================================================= */
+.retrato {
+  position:relative; display:inline-block; margin:1.4rem auto .4rem; padding:12px;
+  border-radius:16px;
+  background:linear-gradient(145deg, rgba(47,174,89,.18), rgba(13,10,26,.6));
+  border:2px solid rgba(170,170,170,.4);
+  box-shadow:0 20px 50px rgba(0,0,0,.6), 0 0 36px var(--acento-suave), inset 0 0 30px rgba(13,98,24,.25);
+}
+.retrato::after {
+  content:""; position:absolute; inset:0; border-radius:16px; pointer-events:none;
+  box-shadow:inset 0 0 40px rgba(0,0,0,.45);
+}
+.retrato img {
+  display:block; max-width:100%; height:auto; border-radius:9px;
+  filter:saturate(1.05) contrast(1.02);
+}
+.retrato figcaption {
+  margin-top:.7rem; font-family:var(--fuente-magica); color:var(--slytherin-2);
+  font-size:.9rem; letter-spacing:.5px; opacity:.85;
+}
+
+/* =============================================================================
+   VEREDICTO (salida PHP de la boveda) y CONSOLA (salida PHP del sensor)
+   ============================================================================= */
+
+/* Caja donde cae el echo de vault.php (runa grabada en piedra) */
+.veredicto {
+  margin-top:1.4rem; padding:1.2rem 1.4rem; border-radius:14px;
+  background:linear-gradient(160deg, rgba(20,16,10,.7), rgba(8,6,4,.8));
+  border:1px solid rgba(217,181,102,.4);
+  box-shadow:inset 0 0 36px rgba(0,0,0,.6), 0 0 26px var(--acento-suave);
+}
+.veredicto:empty { display:none; }
+.veredicto h2 { margin:.1rem 0 .5rem; }
+.veredicto p  { margin:.3rem 0; font-size:1.05rem; }
+.veredicto b  { color:var(--oro); text-shadow:0 0 14px rgba(233,194,90,.8); letter-spacing:1px; }
+
+/* Consola donde cae la salida de ping.php (pantalla arcana) */
+.consola {
+  margin:1.3rem 0 0; padding:1.1rem 1.2rem; border-radius:12px; text-align:left;
+  min-height:3.2rem;
+  font-family:'Courier New', ui-monospace, monospace; font-size:.92rem; line-height:1.55;
+  color:#bff7ee; white-space:pre-wrap; word-break:break-word;
+  background:linear-gradient(180deg, #06161b, #04100f);
+  border:1px solid rgba(54,214,196,.4);
+  box-shadow:inset 0 0 40px rgba(0,0,0,.6), 0 0 26px var(--acento-suave);
+  overflow-x:auto;
+}
+.consola::before {
+  content:"◈ lectura del sensor"; display:block; margin-bottom:.5rem;
+  font-family:var(--fuente-texto); font-size:.72rem; letter-spacing:2px; text-transform:uppercase;
+  color:var(--acento); opacity:.75;
+}
+
+/* =============================================================================
+   PIE Y UTILIDADES
+   ============================================================================= */
+.nota-pie {
+  margin-top:1.5rem; font-size:.78rem; font-style:italic;
+  color:rgba(222,214,244,.5); text-align:center;
+}
+.nota-pie a { color:var(--acento); text-decoration:none; }
+.nota-pie a:hover { text-decoration:underline; }
+
+/* Scrollbar tematica */
+::-webkit-scrollbar { width:10px; height:10px; }
+::-webkit-scrollbar-thumb { background:var(--oro); border-radius:999px; }
+::-webkit-scrollbar-track { background:var(--noche-2); }
+
+/* Responsive */
+@media (max-width:560px) {
+  .luna { width:66px; height:66px; top:4vh; right:6vw; }
+  .portales a { font-size:1rem; padding:.9rem 1rem; }
+  .conjuro { gap:.9rem; }
+}
+
+/* Respeta la preferencia de menos movimiento */
+@media (prefers-reduced-motion:reduce) {
+  * { animation:none !important; transition:none !important; }
+}

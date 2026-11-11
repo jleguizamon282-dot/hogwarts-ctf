@@ -2,6 +2,7 @@
    estado.js — Estado de la partida (se guarda en el navegador)
 
      vidas (3) · reloj global de 40 min · misiones · pistas · espada · posición
+     Al llegar Voldemort el reloj se recorta a 5 min (recortarTiempo).
 
    Lo usan el mapa y, más adelante, las pantallas de cada misión:
      Estado.perderVida()         el jugador falla en una misión  -> quita 1 vida
@@ -33,6 +34,9 @@
     pistas: [],         // números de misión cuya pista ya tiene
     jugador: null,      // última posición en el mapa { x, y }
     fin: null,          // "derrota" | "victoria"
+    ajuste: 0,          // ms que se suman (o restan) a la duración del reloj
+    recorte: false,     // ya se recortó el reloj al llegar Voldemort
+    intentos: {},       // { "3": ["alohomora", …] } hechizos fallidos por misión
   });
 
   function leer() {
@@ -58,7 +62,21 @@
     const pausaActual = estado.pausaDesde ? ahora - estado.pausaDesde : 0;
     return Math.max(0, ahora - estado.inicio - estado.pausado - pausaActual);
   }
-  const restante = (estado = leer(), ahora = Date.now()) => Math.max(0, DURACION_MS - transcurrido(estado, ahora));
+  const restante = (estado = leer(), ahora = Date.now()) =>
+    Math.max(0, DURACION_MS + (estado.ajuste || 0) - transcurrido(estado, ahora));
+  // Deja como máximo `maxMs` en el reloj (una sola vez por partida).
+  // Devuelve cuánto tiempo se quitó (0 si ya quedaba menos) o null si ya se hizo antes.
+  function recortarTiempo(maxMs) {
+    let quitado = null;
+    cambiar((e) => {
+      if (e.recorte) return;
+      const sobra = restante(e) - maxMs;
+      quitado = Math.max(0, sobra);
+      e.ajuste = (e.ajuste || 0) - quitado;
+      e.recorte = true;
+    });
+    return quitado;
+  }
   const iniciarReloj = () => cambiar((e) => { if (!e.inicio) e.inicio = Date.now(); });
   const pausar = () => cambiar((e) => { if (e.inicio && !e.pausaDesde) e.pausaDesde = Date.now(); });
   const reanudar = () => cambiar((e) => {
@@ -82,6 +100,13 @@
     if (Number(n) === FINAL) e.fin = 'victoria';
   });
   const darPista = (n) => cambiar((e) => { if (!e.pistas.includes(n)) e.pistas.push(n); });
+  // Hechizos fallidos de cada misión (repetir uno ya fallado no cuesta vida)
+  const yaIntentado = (n, hechizo, estado = leer()) => ((estado.intentos || {})[n] || []).includes(hechizo);
+  const anotarIntento = (n, hechizo) => cambiar((e) => {
+    e.intentos = e.intentos || {};
+    const lista = e.intentos[n] || (e.intentos[n] = []);
+    if (!lista.includes(hechizo)) lista.push(hechizo);
+  });
   const completadas = (estado = leer()) =>
     Object.entries(estado.misiones).filter(([n, v]) => v === 'completada' && Number(n) <= MISIONES).length;
 
@@ -89,8 +114,8 @@
 
   window.Estado = {
     CLAVE, DURACION_MS, VIDAS, MISIONES, FINAL,
-    leer, guardar, cambiar, restante, iniciarReloj, pausar, reanudar,
+    leer, guardar, cambiar, restante, recortarTiempo, iniciarReloj, pausar, reanudar,
     perderVida, marcarFin, conocerMision, aceptarMision, completarMision, darPista,
-    completadas, reiniciar,
+    yaIntentado, anotarIntento, completadas, reiniciar,
   };
 })();

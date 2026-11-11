@@ -31,7 +31,7 @@
       `¡Ajá! Otra cabeza que examinar… Quieto, ${n}, que esto no duele nada.`,
       'Mmm… difícil, muy difícil. Veo valor, una mente despierta, lealtad… y no poca ambición.',
       `Pero tú ya lo has decidido. ${COMENTARIO_CASA[casa] || ''} Veo que eres… ¡${String(casa).toUpperCase()}!`,
-      'Escucha bien: siete fragmentos de un alma oscura se esconden en este castillo. Sigue las huellas y habla con quienes te esperan.',
+      'Escucha bien: siete fragmentos de un alma oscura se esconden en este castillo. Para destruir los horrocruxes tendrás que descubrir los ocho hechizos. Sigue las huellas y habla con quienes te esperan.',
       'Toma esto. La Espada de Godric Gryffindor se presenta ante quien la necesita… Te será útil más adelante en tu estancia en Hogwarts.',
     ],
     accion: 'Recibir la espada',

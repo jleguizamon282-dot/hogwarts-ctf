@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Misión</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%AA%84</text></svg>" />
+  <!-- Ruta del juego: como el mapa, exige haber pronunciado el juramento.
+       Esta página se sirve desde /mision/N, por eso las rutas son absolutas. -->
+  <script src="/js/flujo.js" data-pagina="mapa.html"></script>
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/mision.css" />
+</head>
+<body class="mision-body">
+
+  <!-- ======================= LA SALA (decoración) ======================= -->
+  <div class="sala" aria-hidden="true">
+    <div class="sala-fondo" id="sala-fondo"></div>
+    <div class="sala-arriba" id="sala-arriba"></div>
+    <div class="sala-abajo" id="sala-abajo"></div>
+    <div class="sala-izq" id="sala-izq"></div>
+    <div class="sala-der" id="sala-der"></div>
+    <div class="ambiente" id="ambiente"></div>
+  </div>
+
+  <!-- ======================= EL TABLERO ======================= -->
+  <main class="tablero" id="tablero">
+    <span class="esquina sup-izq" aria-hidden="true"></span><span class="esquina sup-der" aria-hidden="true"></span>
+    <span class="esquina inf-izq" aria-hidden="true"></span><span class="esquina inf-der" aria-hidden="true"></span>
+
+    <header class="tablero-cabecera">
+      <div>
+        <p class="tablero-sala" id="nombre-sala">Hogwarts</p>
+        <h1 class="tablero-titulo" id="titulo">Misión</h1>
+      </div>
+      <div class="tablero-estado">
+        <div class="reloj" id="reloj" title="Tiempo restante">
+          <span aria-hidden="true">⏳</span><span class="reloj-cifra" id="tiempo">--:--</span>
+        </div>
+        <div class="vidas" id="vidas" aria-label="Vidas restantes">
+          <span class="vida">❤️</span><span class="vida">❤️</span><span class="vida">❤️</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="tablero-centro">
+      <div class="objetivo">
+        <div class="altar" id="altar">
+          <div class="altar-aura"></div>
+          <svg class="runas" id="runas" viewBox="0 0 200 200" aria-hidden="true"></svg>
+          <span class="altar-icono" id="icono" role="img" aria-label="Horrocrux"></span>
+          <svg class="grietas" viewBox="0 0 100 100" aria-hidden="true">
+            <path d="M50 8 L44 30 L56 42 L46 58 L54 74 L48 92"/>
+            <path d="M44 30 L26 24 M56 42 L76 34 M46 58 L24 66 M54 74 L74 82"/>
+          </svg>
+          <div class="destello"></div>
+          <div class="esquirlas" id="esquirlas"></div>
+        </div>
+        <p class="objetivo-nombre" id="nombre-horrocrux"></p>
+      </div>
+
+      <aside class="pista" aria-label="Pista">
+        <div class="retrato" id="retrato"></div>
+        <div class="pista-texto">
+          <p class="pista-quien"><span id="pista-quien"></span> te dejó una pista:</p>
+          <p class="pista-frase" id="pista"></p>
+          <p class="pista-nota">Solo el hechizo correcto destruirá el horrocrux. Si fallas, el hechizo rebota y pierdes una vida.</p>
+        </div>
+      </aside>
+    </section>
+
+    <form class="conjuro" id="conjuro" autocomplete="off">
+      <label class="conjuro-etiqueta" for="hechizo">Pronuncia el hechizo</label>
+      <div class="conjuro-fila">
+        <span class="varita" id="varita" aria-hidden="true">
+          <svg viewBox="0 0 60 60"><path d="M8 52 L44 16" stroke="#5a3a22" stroke-width="7" stroke-linecap="round"/><path d="M8 52 L20 40" stroke="#2a1a0e" stroke-width="8" stroke-linecap="round"/>
+            <circle cx="47" cy="13" r="6" fill="#fff3c4"/><circle cx="47" cy="13" r="12" fill="#ffd27a" opacity=".35"/></svg>
+        </span>
+        <input id="hechizo" name="hechizo" type="text" maxlength="40" spellcheck="false" autocapitalize="off" autocorrect="off"
+               placeholder="Escribe el hechizo…" aria-describedby="mensaje" />
+        <button type="submit" class="btn-magico" id="lanzar">Lanzar ✦</button>
+      </div>
+      <p class="mensaje" id="mensaje" role="status" aria-live="polite"></p>
+    </form>
+
+    <footer class="tablero-pie">
+      <button type="button" class="volver" id="volver">← Volver al mapa</button>
+      <span class="atajos">Enter: lanzar · Esc: volver al mapa (sin perder vidas)</span>
+    </footer>
+  </main>
+
+  <!-- Rayo del hechizo (va de la varita al horrocrux) -->
+  <svg class="capa-rayo" id="capa-rayo" aria-hidden="true"></svg>
+
+  <script src="/js/estado.js"></script>
+  <script src="/js/historia.js"></script>
+  <script src="/js/salas-piezas.js"></script>
+  <script src="/js/salas.js"></script>
+  <script src="/js/mision.js"></script>
+</body>
+</html>

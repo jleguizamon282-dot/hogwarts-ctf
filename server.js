@@ -95,36 +95,54 @@ app.post('/api/login', (req, res) => {
 });
 
 /* ===========================================================================
- *  RUTAS DE MISIONES (placeholders — se construiran mas adelante)
+ *  MISIONES: pantalla del tablero y comprobacion de hechizos
+ * ===========================================================================
+ *  /mision/:id sirve siempre la misma pagina (public/mision.html); el propio
+ *  script de la pagina lee el numero de la URL y decora el tablero con la sala
+ *  de esa mision.
+ *
+ *  El hechizo correcto NO viaja nunca al navegador: la pagina envia lo que
+ *  escribe el jugador a POST /api/hechizo y el servidor solo contesta si
+ *  acierta. Asi no se puede leer la respuesta inspeccionando el codigo fuente.
+ *  Se ignoran mayusculas, tildes, espacios, guiones y guiones bajos:
+ *  "Avada Kedavra", "avada_kedavra" y "AVADA-KEDAVRA" valen lo mismo.
  * =========================================================================== */
+const HECHIZOS = {
+  1: 'Alohomora',             // Diario de Tom Riddle
+  2: 'Velamentum_Scriptura',  // Anillo de Sorvolo Gaunt
+  3: 'Aparecium',             // Guardapelo de Slytherin
+  4: 'Imperio',               // Copa de Helga Hufflepuff
+  5: 'Bombarda',              // Diadema de Ravenclaw
+  6: 'Sectumsempra',          // Nagini
+  7: 'Crucio',                // El ultimo horrocrux (Harry Potter)
+  8: 'Avada Kedavra',         // Lord Voldemort (duelo final)
+};
+
+const normalizarHechizo = (texto) => String(texto || '')
+  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')  // sin tildes
+  .toLowerCase()
+  .replace(/[^a-z0-9]/g, '');                          // sin espacios, _ ni signos
+
 app.get('/mision/:id', (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (!Number.isInteger(id) || id < 1 || id > 8) {
     return res.status(404).send('Mision no encontrada.');
   }
-  // Placeholder: mas adelante aqui cargaremos cada reto/nivel.
-  // Mientras no exista el reto, dos botones de prueba simulan el resultado:
-  //   superar -> /mapa.html?completada=N   |   fallar -> /mapa.html?fallo=N (pierde una vida)
-  // (El reto real llamara a Estado.completarMision(N) / Estado.perderVida(), ver js/estado.js)
-  res.send(`<!doctype html><html lang="es"><head><meta charset="utf-8">
-    <title>Mision ${id}</title>
-    <style>
-      body{margin:0;height:100vh;display:grid;place-items:center;
-           background:#0b0a1a;color:#f4e4b8;font-family:system-ui,sans-serif;text-align:center}
-      a{color:#c9a84a}
-      .pruebas{display:flex;gap:1rem;justify-content:center;margin:1.6rem 0}
-      .pruebas a{padding:.7rem 1.2rem;border-radius:999px;text-decoration:none;font-weight:700}
-      .ok{background:#2d8a4e;color:#fff}.ko{background:#9b1c1c;color:#fff}
-    </style></head>
-    <body><div>
-      <h1>&#129668; Mision ${id}</h1>
-      <p>Nivel en construccion. Aqui ira el reto del personaje ${id}.</p>
-      <div class="pruebas">
-        <a class="ok" href="/mapa.html?completada=${id}">&#10004; Superar (prueba)</a>
-        <a class="ko" href="/mapa.html?fallo=${id}">&#10008; Fallar (prueba: pierdes una vida)</a>
-      </div>
-      <p><a href="/mapa.html">&larr; Volver al Mapa del Merodeador</a></p>
-    </div></body></html>`);
+  res.sendFile(path.join(__dirname, 'public', 'mision.html'));
+});
+
+app.post('/api/hechizo', (req, res) => {
+  const mision = parseInt(req.body.mision, 10);
+  if (!HECHIZOS[mision]) {
+    return res.status(404).json({ ok: false, mensaje: 'Esa mision no existe.' });
+  }
+  const intento = normalizarHechizo(req.body.hechizo);
+  if (!intento) {
+    return res.status(400).json({ ok: false, mensaje: 'Escribe un hechizo.' });
+  }
+  const acierto = intento === normalizarHechizo(HECHIZOS[mision]);
+  console.log(`[hechizo] mision ${mision} -> ${acierto ? 'ACIERTO' : 'fallo'}`);
+  return res.json({ ok: true, acierto });
 });
 
 /* ===========================================================================

@@ -45,7 +45,7 @@
   const pagina = document.currentScript && document.currentScript.dataset.pagina;
   if (pagina) {
     const destino = pasoPendiente(pagina);
-    if (destino) location.replace(destino);
+    if (destino) location.replace('/' + destino); // ruta absoluta: también sirve desde /mision/N
   }
 
   window.Flujo = { PASOS, pasoPendiente };

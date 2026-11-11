@@ -17,6 +17,7 @@
 
   let pausado = false;
   let agotado = false;
+  let recorte = null;     // animación del reloj al llegar Voldemort { desde, t0 }
   let opciones = { alAgotarse: null, alPausar: null };
 
   /* --- Reloj ---------------------------------------------------------------- */
@@ -30,8 +31,10 @@
     const resta = Estado.restante(partida);
     const cifra = $('#temporizador');
     const barra = $('#barra-tiempo');
-    cifra.textContent = formato(resta);
-    barra.style.width = `${(resta / Estado.DURACION_MS) * 100}%`;
+    if (!recorte) {
+      cifra.textContent = formato(resta);
+      barra.style.width = `${(resta / Estado.DURACION_MS) * 100}%`;
+    }
     $('#barra').setAttribute('aria-valuenow', String(Math.round((resta / Estado.DURACION_MS) * 100)));
     const urgente = Boolean(partida.inicio) && resta <= AVISO_MS;
     barra.classList.toggle('aviso', urgente);
@@ -40,6 +43,36 @@
       agotado = true;
       if (opciones.alAgotarse) opciones.alAgotarse();
     }
+  }
+
+  // Voldemort recorta el reloj: la cifra baja de golpe hasta el nuevo valor,
+  // el reloj tiembla en rojo y aparece el tiempo perdido ("−23:41").
+  // Si no se quitó tiempo (ya quedaban menos de 5 min) solo tiembla.
+  function recorteTiempo(quitadoMs) {
+    const caja = document.querySelector('.hud-tiempo');
+    caja.classList.remove('recorte');
+    void caja.offsetWidth;
+    caja.classList.add('recorte');
+    setTimeout(() => caja.classList.remove('recorte'), 2600);
+    if (!quitadoMs) return;
+    const marca = document.createElement('span');
+    marca.className = 'tiempo-quitado';
+    marca.textContent = `−${formato(quitadoMs)}`;
+    caja.appendChild(marca);
+    setTimeout(() => marca.remove(), 2800);
+    const cifra = $('#temporizador');
+    const barra = $('#barra-tiempo');
+    recorte = { desde: Estado.restante() + quitadoMs, t0: performance.now() };
+    const DURA = 1300;
+    (function paso(ahora) {
+      const k = Math.min(1, (ahora - recorte.t0) / DURA);
+      const suave = 1 - Math.pow(1 - k, 3);
+      const hasta = Estado.restante();
+      const valor = recorte.desde + (hasta - recorte.desde) * suave;
+      cifra.textContent = formato(valor);
+      barra.style.width = `${(valor / Estado.DURACION_MS) * 100}%`;
+      if (k < 1) requestAnimationFrame(paso); else recorte = null;
+    })(performance.now());
   }
 
   /* --- Misiones y pistas ---------------------------------------------------- */
@@ -194,7 +227,7 @@
   }
 
   window.HUD = {
-    iniciar, pintar, aviso, alternarPausa, cerrarVentanas, hayVentana,
+    iniciar, pintar, aviso, alternarPausa, cerrarVentanas, hayVentana, recorteTiempo,
     enPausa: () => pausado,
   };
 })();

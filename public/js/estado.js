@@ -36,7 +36,7 @@
     fin: null,          // "derrota" | "victoria"
     ajuste: 0,          // ms que se suman (o restan) a la duración del reloj
     recorte: false,     // ya se recortó el reloj al llegar Voldemort
-    intentos: {},       // { "3": ["alohomora", …] } hechizos fallidos por misión
+    intentos: {},       // { "3": ["lumos", …] } hechizos fallidos por misión
   });
 
   function leer() {

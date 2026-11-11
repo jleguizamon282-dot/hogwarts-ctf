@@ -104,6 +104,27 @@ sudo setcap 'cap_net_bind_service=+ep' "$(command -v node)"      # permitir el p
 PORT=3000 npm start                                              # usar otro puerto (sin privilegios)
 ```
 
+## 💻 Probar en un PC local (Windows, macOS o Linux)
+
+1. Instala **Node.js 22 LTS** (`better-sqlite3` trae binarios listos para esa
+   versión; con versiones más nuevas `npm install` puede intentar compilarlo).
+2. Descarga el código (`git clone` o *Code → Download ZIP* en GitHub) y entra
+   en la carpeta `hogwarts-ctf`.
+3. Instala las dependencias: `npm install`
+4. Crea la base de datos solo con las cuentas demo:
+   - macOS / Linux: `IMPORT_SYSTEM_USERS=false npm run initdb`
+   - Windows (PowerShell): `$env:IMPORT_SYSTEM_USERS="false"; npm run initdb`
+5. Arranca el servidor en el puerto 3000 (no necesita permisos de administrador):
+   - macOS / Linux: `PORT=3000 npm start`
+   - Windows (PowerShell): `$env:PORT="3000"; npm start`
+6. Abre <http://localhost:3000>. Para parar el servidor: `Ctrl + C`.
+
+**Opcional, retos de `flags_content` (PHP):** con PHP 8 instalado,
+`php -S 127.0.0.1:8080 -t flags_content` y abre <http://127.0.0.1:8080>.
+`ping.php` ejecuta comandos del sistema **a propósito** (es el reto): déjalo
+siempre en `127.0.0.1` y no lo expongas a la red. Usa `ping -c`, así que está
+pensado para Linux/macOS (en Windows, mejor con WSL o en la VM).
+
 ---
 
 ## 🧪 Laboratorio Kali → Ubuntu
@@ -294,12 +315,23 @@ mazmorras o Gran Comedor), con su propia decoración animada.
 - **Volver al mapa** (o Esc): sin penalización. El reloj sigue corriendo.
 
 El hechizo correcto **nunca llega al navegador**: la página envía lo que
-escribe el jugador a `POST /api/hechizo` y el servidor solo responde si acierta
-(tabla `HECHIZOS` en `server.js`). Se ignoran mayúsculas, tildes, espacios,
-guiones y guiones bajos (`Avada Kedavra` = `avada_kedavra`).
+escribe el jugador a `POST /api/hechizo` y el servidor solo responde si acierta.
+En el servidor tampoco están escritos: se guardan **cifrados** (sal aleatoria +
+scrypt) en `lib/hechizos.js`. Se ignoran mayúsculas, tildes, espacios, guiones
+y guiones bajos (`Wingardium Leviosa` = `wingardium_leviosa`).
 
-> Quien pueda leer `server.js` (por ejemplo, con una shell en la VM) verá los
-> hechizos. Es una práctica: si hiciera falta, se pueden guardar como hash.
+**Cambiar un hechizo:**
+
+```bash
+npm run hechizo -- "Nuevo hechizo"
+```
+
+Imprime una línea `{ sal: '…', hash: '…' },`: pégala en la misión que toque de
+`lib/hechizos.js` y reinicia el servidor.
+
+> El cifrado evita que se lean de un vistazo. Quien tenga el archivo y una
+> lista de hechizos candidatos podría probarlos uno a uno: scrypt hace que cada
+> prueba sea lenta, pero no lo impide.
 
 ### Funciones útiles (consola del navegador en el mapa)
 ```js

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "initdb": "node db/init.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "hechizo": "node scripts/cifrar-hechizo.js"
   },
   "keywords": ["ctf", "educativo", "seguridad", "harry-potter", "sql-injection"],
   "license": "MIT",

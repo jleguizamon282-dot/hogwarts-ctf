@@ -103,25 +103,12 @@ app.post('/api/login', (req, res) => {
  *
  *  El hechizo correcto NO viaja nunca al navegador: la pagina envia lo que
  *  escribe el jugador a POST /api/hechizo y el servidor solo contesta si
- *  acierta. Asi no se puede leer la respuesta inspeccionando el codigo fuente.
- *  Se ignoran mayusculas, tildes, espacios, guiones y guiones bajos:
- *  "Avada Kedavra", "avada_kedavra" y "AVADA-KEDAVRA" valen lo mismo.
+ *  acierta. Ademas, los hechizos tampoco estan escritos en el servidor: se
+ *  guardan cifrados (sal + scrypt) en lib/hechizos.js.
+ *  Se ignoran mayusculas, tildes, espacios, guiones y guiones bajos.
+ *  Para cambiar un hechizo:  npm run hechizo -- "Nuevo hechizo"
  * =========================================================================== */
-const HECHIZOS = {
-  1: 'Alohomora',             // Diario de Tom Riddle
-  2: 'Velamentum_Scriptura',  // Anillo de Sorvolo Gaunt
-  3: 'Aparecium',             // Guardapelo de Slytherin
-  4: 'Imperio',               // Copa de Helga Hufflepuff
-  5: 'Bombarda',              // Diadema de Ravenclaw
-  6: 'Sectumsempra',          // Nagini
-  7: 'Crucio',                // El ultimo horrocrux (Harry Potter)
-  8: 'Avada Kedavra',         // Lord Voldemort (duelo final)
-};
-
-const normalizarHechizo = (texto) => String(texto || '')
-  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')  // sin tildes
-  .toLowerCase()
-  .replace(/[^a-z0-9]/g, '');                          // sin espacios, _ ni signos
+const { HECHIZOS, normalizar, comprobar } = require('./lib/hechizos');
 
 app.get('/mision/:id', (req, res) => {
   const id = parseInt(req.params.id, 10);
@@ -131,18 +118,22 @@ app.get('/mision/:id', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'mision.html'));
 });
 
-app.post('/api/hechizo', (req, res) => {
+app.post('/api/hechizo', async (req, res) => {
   const mision = parseInt(req.body.mision, 10);
   if (!HECHIZOS[mision]) {
     return res.status(404).json({ ok: false, mensaje: 'Esa mision no existe.' });
   }
-  const intento = normalizarHechizo(req.body.hechizo);
-  if (!intento) {
+  if (!normalizar(req.body.hechizo)) {
     return res.status(400).json({ ok: false, mensaje: 'Escribe un hechizo.' });
   }
-  const acierto = intento === normalizarHechizo(HECHIZOS[mision]);
-  console.log(`[hechizo] mision ${mision} -> ${acierto ? 'ACIERTO' : 'fallo'}`);
-  return res.json({ ok: true, acierto });
+  try {
+    const acierto = await comprobar(req.body.hechizo, HECHIZOS[mision]);
+    console.log(`[hechizo] mision ${mision} -> ${acierto ? 'ACIERTO' : 'fallo'}`);
+    return res.json({ ok: true, acierto });
+  } catch (err) {
+    console.error('[hechizo] error al comprobar:', err.message);
+    return res.status(500).json({ ok: false, mensaje: 'El hechizo se ha desvanecido. Intentalo de nuevo.' });
+  }
 });
 
 /* ===========================================================================

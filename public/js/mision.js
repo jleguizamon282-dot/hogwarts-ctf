@@ -148,7 +148,7 @@
   const capaRayo = $('#capa-rayo');
 
   // Igual que en el servidor: sin mayúsculas, tildes, espacios ni guiones
-  const normalizar = (t) => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const normalizar = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 
   function mensaje(texto, tipo) {
     const m = $('#mensaje');

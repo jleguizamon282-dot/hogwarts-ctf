@@ -278,3 +278,83 @@ body.mision-body {
 @media (prefers-reduced-motion: reduce) {
   .altar.roto .altar-icono { opacity: .2; }
 }
+
+/* =============================================================================
+   EL BOMBILLO · pista de experto (revela el tema a cambio de 3 minutos)
+   ============================================================================= */
+.saber { margin-top: .6rem; display: grid; justify-items: center; gap: .6rem; width: 100%; }
+.saber-boton {
+  display: inline-flex; align-items: center; gap: .6rem; cursor: pointer;
+  padding: .45rem .9rem .45rem .55rem; border-radius: 999px;
+  background: rgba(12, 8, 22, .7); border: 1.5px solid rgba(217, 182, 78, .45);
+  color: var(--oro-claro); font-family: var(--fuente-texto); text-align: left;
+  transition: border-color .2s, transform .12s, box-shadow .2s;
+}
+.saber-boton:hover { border-color: var(--acento); transform: translateY(-1px); box-shadow: 0 0 16px var(--brillo-sala); }
+.saber-boton:focus-visible { outline: 2px solid var(--acento); outline-offset: 3px; }
+.saber-texto { display: grid; line-height: 1.15; }
+.saber-titulo { font-weight: 700; font-size: .92rem; }
+.saber-coste { font-size: .74rem; color: rgba(244, 228, 184, .62); }
+.saber.encendido .saber-coste { color: #ffcf6a; }
+
+/* El dibujo del bombillo */
+.bombillo { flex: 0 0 30px; width: 30px; display: grid; place-items: center; }
+.bombillo svg { width: 30px; height: auto; overflow: visible; }
+.bombillo .vidrio { fill: rgba(255, 245, 220, .05); stroke: #6a6480; stroke-width: 2.5; transition: fill .35s, stroke .35s, filter .35s; }
+.bombillo .filamento { fill: none; stroke: #6a6480; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: stroke .35s; }
+.bombillo .rosca { fill: #5a5668; }
+.bombillo .rosca-lineas { stroke: #2a2838; stroke-width: 1.4; fill: none; }
+.bombillo .rayos { stroke: #ffd27a; stroke-width: 2.6; stroke-linecap: round; opacity: 0; transition: opacity .35s; }
+.saber:not(.encendido) .bombillo { animation: bombillo-latido 2.6s ease-in-out infinite; }
+@keyframes bombillo-latido { 50% { filter: drop-shadow(0 0 5px rgba(217, 182, 78, .5)); } }
+.saber.encendido .bombillo .vidrio { fill: #ffd873; stroke: #fff0b8; filter: drop-shadow(0 0 9px rgba(255, 205, 95, .95)); }
+.saber.encendido .bombillo .filamento { stroke: #9a5a12; }
+.saber.encendido .bombillo .rayos { opacity: 1; animation: rayos-pulso 2.1s ease-in-out infinite; }
+@keyframes rayos-pulso { 50% { opacity: .4; } }
+
+/* Panel: confirmación y, después, el tema revelado */
+.saber-panel {
+  width: min(100%, 420px); padding: .8rem 1rem; border-radius: 12px; text-align: center;
+  background: rgba(8, 5, 16, .78); border: 1px solid rgba(217, 182, 78, .4);
+  box-shadow: inset 0 0 26px rgba(0, 0, 0, .4); animation: aparecer .3s ease;
+}
+.saber-panel.oculto { display: none; }
+.saber-aviso { margin: 0 0 .7rem; font-size: .9rem; line-height: 1.5; color: var(--oro-claro); }
+.saber-aviso b { color: #ff8a8a; }
+.saber-acciones { display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; }
+.saber-si, .saber-no {
+  padding: .5rem 1rem; border-radius: 999px; cursor: pointer;
+  font: 700 .85rem var(--fuente-texto); transition: transform .12s, filter .2s, border-color .2s;
+}
+.saber-si { color: #231a05; background: linear-gradient(145deg, #f6dd8e, var(--oro) 60%, #a9812f); border: 1.5px solid #f8edc0; }
+.saber-si:hover { transform: translateY(-1px); filter: brightness(1.07); }
+.saber-no { color: var(--oro-claro); background: rgba(34, 25, 58, .82); border: 1.5px solid rgba(217, 182, 78, .5); }
+.saber-no:hover { transform: translateY(-1px); border-color: var(--acento); }
+.saber-si:focus-visible, .saber-no:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+.saber-tema {
+  margin: 0; font-family: var(--fuente-titulo); font-size: 1.3rem; letter-spacing: .5px;
+  color: #ffe39a; text-shadow: 0 0 14px rgba(255, 205, 95, .5);
+}
+.saber-detalle { margin: .45rem 0 0; font-size: .88rem; line-height: 1.5; color: rgba(244, 228, 184, .82); }
+.saber-error { margin: 0; font-size: .9rem; color: #ff9a9a; }
+
+/* El reloj pierde 3 minutos: parpadea en rojo y cae el "−03:00" */
+.reloj { position: relative; }
+.reloj.gasto { animation: reloj-gasto .4s ease-in-out 4; border-color: #ff6b6b; }
+.reloj.gasto .reloj-cifra { color: #ff6b6b; text-shadow: 0 0 12px rgba(255, 70, 70, .9); }
+@keyframes reloj-gasto { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+.tiempo-gastado {
+  position: absolute; right: 6px; top: 100%; white-space: nowrap; pointer-events: none;
+  font-family: var(--fuente-titulo); font-size: 1.1rem; font-weight: 700; color: #ff5a5a;
+  text-shadow: 0 0 12px rgba(255, 40, 40, .9), 0 2px 0 #3a0008;
+  animation: gastado-cae 1.8s ease-out forwards;
+}
+@keyframes gastado-cae {
+  0% { opacity: 0; transform: translateY(-6px) scale(.7); }
+  18% { opacity: 1; transform: translateY(4px) scale(1.1); }
+  70% { opacity: 1; transform: translateY(12px) scale(1); }
+  100% { opacity: 0; transform: translateY(28px) scale(.95); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .saber:not(.encendido) .bombillo, .saber.encendido .bombillo .rayos { animation: none; }
+}

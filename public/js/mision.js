@@ -104,6 +104,7 @@
   /* --- Reloj y vidas -------------------------------------------------------- */
   let terminado = false;
   let ocupado = false;
+  let gastando = false;   // true mientras se anima la pérdida de tiempo del bombillo
 
   function formato(ms) {
     const s = Math.ceil(ms / 1000);
@@ -111,7 +112,7 @@
   }
   function pintarTiempo() {
     const resta = Estado.restante();
-    $('#tiempo').textContent = formato(resta);
+    if (!gastando) $('#tiempo').textContent = formato(resta);
     $('#reloj').classList.toggle('urgente', resta <= 5 * 60 * 1000);
     if (resta <= 0 && !terminado) {
       terminado = true;
@@ -136,6 +137,120 @@
   pintarTiempo();
   pintarVidas();
   setInterval(pintarTiempo, 250);
+
+  /* --------------------------------------------------------------------------
+     El bombillo: pista de experto (revela el tema real a cambio de 3 minutos)
+     -------------------------------------------------------------------------- */
+  const saber = $('#saber');
+  const saberBoton = $('#saber-boton');
+  const saberPanel = $('#saber-panel');
+  const saberCoste = $('#saber-coste');
+  let temaCache = null;
+
+  async function pedirTema() {
+    if (temaCache) return temaCache;
+    const r = await fetch(`/api/pista/${n}`);
+    temaCache = await r.json();
+    return temaCache;
+  }
+
+  function cerrarPanel() {
+    saberPanel.classList.add('oculto');
+    saberBoton.setAttribute('aria-expanded', 'false');
+  }
+
+  async function revelarTema() {
+    let tema = null;
+    try { tema = await pedirTema(); } catch { /* sin conexión */ }
+    saberPanel.textContent = '';
+    if (!tema || !tema.ok) {
+      const e = document.createElement('p');
+      e.className = 'saber-error';
+      e.textContent = 'El saber se desvanece entre la niebla… inténtalo de nuevo.';
+      saberPanel.append(e);
+      saberPanel.classList.remove('oculto');
+      return;
+    }
+    saber.classList.add('encendido');
+    saberBoton.setAttribute('aria-expanded', 'true');
+    saberCoste.textContent = 'Saber revelado';
+    const titulo = document.createElement('p');
+    titulo.className = 'saber-tema';
+    titulo.textContent = tema.tema;
+    const detalle = document.createElement('p');
+    detalle.className = 'saber-detalle';
+    detalle.textContent = tema.detalle;
+    saberPanel.append(titulo, detalle);
+    saberPanel.classList.remove('oculto');
+  }
+
+  // El reloj baja de golpe 3 minutos: se muestra descendiendo, en rojo y con "−03:00"
+  function animarGasto(desdeMs) {
+    const reloj = $('#reloj');
+    reloj.classList.remove('gasto');
+    void reloj.offsetWidth;
+    reloj.classList.add('gasto');
+    setTimeout(() => reloj.classList.remove('gasto'), 1600);
+    const flotante = document.createElement('span');
+    flotante.className = 'tiempo-gastado';
+    flotante.textContent = `−${formato(Estado.PISTA_TECNICA_MS)}`;
+    reloj.appendChild(flotante);
+    setTimeout(() => flotante.remove(), 1900);
+    if (reducido) return;
+    gastando = true;
+    const cifra = $('#tiempo');
+    const t0 = performance.now();
+    const DUR = 1000;
+    (function paso(ahora) {
+      const k = Math.min(1, (ahora - t0) / DUR);
+      const suave = 1 - Math.pow(1 - k, 3);
+      const hasta = Estado.restante();
+      cifra.textContent = formato(desdeMs + (hasta - desdeMs) * suave);
+      if (k < 1) requestAnimationFrame(paso); else { gastando = false; pintarTiempo(); }
+    })(performance.now());
+  }
+
+  function pedirConfirmacion() {
+    saberBoton.setAttribute('aria-expanded', 'true');
+    saberPanel.textContent = '';
+    const aviso = document.createElement('p');
+    aviso.className = 'saber-aviso';
+    aviso.innerHTML = 'Un soplo de saber prohibido te dirá exactamente qué arte emplear… pero te robará <b>3 minutos</b> del reloj.';
+    const acciones = document.createElement('div');
+    acciones.className = 'saber-acciones';
+    const si = document.createElement('button');
+    si.type = 'button'; si.className = 'saber-si'; si.textContent = 'Revelar · −3 min';
+    const no = document.createElement('button');
+    no.type = 'button'; no.className = 'saber-no'; no.textContent = 'Ahora no';
+    acciones.append(si, no);
+    saberPanel.append(aviso, acciones);
+    saberPanel.classList.remove('oculto');
+    si.focus();
+    no.addEventListener('click', cerrarPanel, { once: true });
+    si.addEventListener('click', () => {
+      const desde = Estado.restante();
+      const coste = Estado.usarPistaTecnica(n);
+      if (coste > 0) animarGasto(desde);
+      revelarTema();
+    }, { once: true });
+  }
+
+  saberBoton.addEventListener('click', () => {
+    if (terminado) return;
+    if (Estado.pistaTecnicaUsada(n)) {              // ya se pagó: mostrar u ocultar, sin cobrar
+      if (saber.classList.contains('encendido') && !saberPanel.classList.contains('oculto')) cerrarPanel();
+      else revelarTema();
+      return;
+    }
+    if (!saberPanel.classList.contains('oculto')) cerrarPanel();
+    else pedirConfirmacion();
+  });
+
+  // Si ya se desbloqueó en esta partida, dejar el bombillo encendido (sin recobrar)
+  if (Estado.pistaTecnicaUsada(n)) {
+    saber.classList.add('encendido');
+    saberCoste.textContent = 'Saber revelado';
+  }
 
   /* --------------------------------------------------------------------------
      4) Lanzar el hechizo

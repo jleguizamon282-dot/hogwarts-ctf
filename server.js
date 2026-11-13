@@ -118,6 +118,31 @@ app.get('/mision/:id', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'mision.html'));
 });
 
+/* ---------------------------------------------------------------------------
+ *  PISTA DE EXPERTO (el "bombillo" de cada mision)
+ *  Revela el tema real del reto (Wireshark, Burp Suite, ...). No es el hechizo,
+ *  solo una ayuda muy clara. Se sirve aparte para que no este escrito en la
+ *  pagina: el jugador la pide y, a cambio, pierde tiempo (el coste lo aplica el
+ *  cliente en Estado, igual que el resto del reloj).
+ * ------------------------------------------------------------------------- */
+const TECNICAS = {
+  1: { tema: 'Wireshark', detalle: 'Analisis de trafico de red y reconocimiento. Localiza rutas ocultas del sitio y abre la captura .pcap para leer lo que viajo por la red.' },
+  2: { tema: 'Credenciales + SSH', detalle: 'Analisis de credenciales iniciales y acceso por SSH. Usa las credenciales del reto anterior para entrar y revisa la carpeta del usuario.' },
+  3: { tema: 'Esteganografia', detalle: 'Esteganografia y analisis de metadatos de imagenes. Descarga la imagen de Slytherin y extrae lo que lleva oculto dentro.' },
+  4: { tema: 'Burp Suite', detalle: 'Intercepta la peticion del formulario y modifica el POST (el campo role) antes de que llegue al servidor.' },
+  5: { tema: 'Metasploit', detalle: 'Usa Metasploit para obtener acceso al usuario Bellatrix y busca el archivo en su carpeta personal.' },
+  6: { tema: 'CVE (vulnerabilidad conocida)', detalle: 'Explota una vulnerabilidad conocida (CVE) de un servicio para acceder al usuario Lucius y revisa su carpeta.' },
+  7: { tema: 'SUID / Kernel', detalle: 'Escalada local mediante un binario SUID o un fallo del kernel para pasar a root y abrir el archivo protegido.' },
+  8: { tema: 'Escalada a root', detalle: 'Con el acceso de root del paso anterior, lee el archivo final en el directorio de root (/root).' },
+};
+
+app.get('/api/pista/:mision', (req, res) => {
+  const n = parseInt(req.params.mision, 10);
+  const pista = TECNICAS[n];
+  if (!pista) return res.status(404).json({ ok: false, mensaje: 'Esa mision no existe.' });
+  return res.json({ ok: true, ...pista });
+});
+
 app.post('/api/hechizo', async (req, res) => {
   const mision = parseInt(req.body.mision, 10);
   if (!HECHIZOS[mision]) {

@@ -57,6 +57,26 @@
           <div class="esquirlas" id="esquirlas"></div>
         </div>
         <p class="objetivo-nombre" id="nombre-horrocrux"></p>
+
+        <div class="saber" id="saber">
+          <button type="button" class="saber-boton" id="saber-boton" aria-expanded="false" aria-controls="saber-panel">
+            <span class="bombillo" aria-hidden="true">
+              <svg viewBox="0 0 48 64">
+                <g class="rayos"><path d="M24 2v6M6 10l4 4M42 10l-4 4M3 30h6M39 30h6"/></g>
+                <path class="vidrio" d="M24 6c-9 0-15 6-15 15 0 6 3 9 6 13 2 2 2 4 2 6h14c0-2 0-4 2-6 3-4 6-7 6-13 0-9-6-15-15-15Z"/>
+                <path class="filamento" d="M19 26c2 4 8 4 10 0M24 26v8"/>
+                <rect class="rosca" x="17" y="46" width="14" height="10" rx="2"/>
+                <path class="rosca-lineas" d="M17 49h14M17 52h14"/>
+                <rect class="rosca" x="20" y="56" width="8" height="4" rx="1.5"/>
+              </svg>
+            </span>
+            <span class="saber-texto">
+              <span class="saber-titulo">Pista de experto</span>
+              <span class="saber-coste" id="saber-coste">Revelar el tema · −3 min</span>
+            </span>
+          </button>
+          <div class="saber-panel oculto" id="saber-panel" role="region" aria-live="polite"></div>
+        </div>
       </div>
 
       <aside class="pista" aria-label="Pista">

@@ -37,6 +37,7 @@
     ajuste: 0,          // ms que se suman (o restan) a la duración del reloj
     recorte: false,     // ya se recortó el reloj al llegar Voldemort
     intentos: {},       // { "3": ["lumos", …] } hechizos fallidos por misión
+    pistasTecnica: {},  // { "4": true } misiones cuya pista de experto ya se pagó
   });
 
   function leer() {
@@ -107,6 +108,22 @@
     const lista = e.intentos[n] || (e.intentos[n] = []);
     if (!lista.includes(hechizo)) lista.push(hechizo);
   });
+
+  /* --- Pista de experto (cuesta 3 minutos, una sola vez por misión) --------- */
+  const PISTA_TECNICA_MS = 3 * 60 * 1000;
+  const pistaTecnicaUsada = (n, estado = leer()) => Boolean((estado.pistasTecnica || {})[n]);
+  // Devuelve los ms descontados (0 si ya estaba pagada antes).
+  function usarPistaTecnica(n) {
+    let coste = 0;
+    cambiar((e) => {
+      e.pistasTecnica = e.pistasTecnica || {};
+      if (e.pistasTecnica[n]) return;        // ya pagada: no se cobra de nuevo
+      e.pistasTecnica[n] = true;
+      coste = PISTA_TECNICA_MS;
+      e.ajuste = (e.ajuste || 0) - PISTA_TECNICA_MS;
+    });
+    return coste;
+  }
   const completadas = (estado = leer()) =>
     Object.entries(estado.misiones).filter(([n, v]) => v === 'completada' && Number(n) <= MISIONES).length;
 
@@ -114,8 +131,9 @@
 
   window.Estado = {
     CLAVE, DURACION_MS, VIDAS, MISIONES, FINAL,
+    PISTA_TECNICA_MS,
     leer, guardar, cambiar, restante, recortarTiempo, iniciarReloj, pausar, reanudar,
     perderVida, marcarFin, conocerMision, aceptarMision, completarMision, darPista,
-    yaIntentado, anotarIntento, completadas, reiniciar,
+    yaIntentado, anotarIntento, pistaTecnicaUsada, usarPistaTecnica, completadas, reiniciar,
   };
 })();

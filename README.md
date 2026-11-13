@@ -313,6 +313,13 @@ mazmorras o Gran Comedor), con su propia decoración animada.
   vuelve al mapa y aparece el game over.
 - **Caja vacía o hechizo ya fallado en esa misión:** aviso, sin perder vida.
 - **Volver al mapa** (o Esc): sin penalización. El reloj sigue corriendo.
+- **Bombillo "Pista de experto":** revela el tema real del reto (Wireshark,
+  Burp Suite, SUID/Kernel…) como ayuda muy clara. Cuesta **3 minutos** de
+  reloj y se cobra una sola vez por misión (después queda encendido y se puede
+  volver a mirar sin coste). El tema lo sirve el servidor en
+  `GET /api/pista/:mision` (tabla `TECNICAS` en `server.js`), así que no está
+  escrito en la página; el descuento de tiempo lo aplica el cliente en
+  `js/estado.js` (`usarPistaTecnica`), como el resto del reloj.
 
 El hechizo correcto **nunca llega al navegador**: la página envía lo que
 escribe el jugador a `POST /api/hechizo` y el servidor solo responde si acierta.

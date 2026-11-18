@@ -31,13 +31,15 @@ hogwarts-ctf/
     ├── personalizacion.html  # 2) Crea tu mago (personaje SVG + opciones)
     ├── juramento.html        # 3) El pergamino cerrado: carta + juramento (Reto 2)
     ├── mapa.html             # 4) Mapa del Merodeador (pestaña: "Mapa del Merodeador")
+    ├── mision.html           # 5) Tablero de cada misión (se sirve en /mision/1..8)
     ├── css/
     │   ├── global.css        # Tema compartido (fondo, botones, modales, transiciones)
     │   ├── avatar.css        # Colores y variantes del mago chibi (jugador y personajes)
     │   ├── login.css
     │   ├── personalizacion.css  # Medallón, pestañas, tarjetas y estandartes
     │   ├── juramento.css     # Pergamino en 3D, sobre lacrado, barra del conjuro
-    │   └── mapa.css          # HUD, plano, niebla, huellas, diálogos, cinemáticas
+    │   ├── mapa.css          # HUD, plano, niebla, huellas, diálogos, cinemáticas
+    │   └── mision.css        # Tablero de misión, salas decoradas, rayo del hechizo
     └── js/
         ├── flujo.js          # Orden de las pantallas y guardias de ruta
         ├── avatar.js         # Dibujo SVG del mago (jugador y personajes), Sombrero, espada
@@ -49,7 +51,10 @@ hogwarts-ctf/
         ├── historia.js       # Personajes, diálogos, misiones y pistas (contenido)
         ├── animaciones.js    # Cinemáticas: espada, horrocrux, game over, victoria
         ├── hud.js            # Barra superior: misiones, pistas, tiempo, vidas, pausa
-        └── mapa.js           # Motor: movimiento, cámara, huellas, diálogos, patrullas
+        ├── mapa.js           # Motor: movimiento, cámara, huellas, diálogos, patrullas
+        ├── mision.js         # Pantalla de misión: tablero, hechizo, rayo, vidas y reloj
+        ├── salas.js          # Decoración de las 8 salas alrededor del tablero
+        └── salas-piezas.js   # Piezas SVG: ventanas, estanterías, velas, calderos, plantas…
 ```
 
 ## 🧭 Ruta del juego
@@ -98,6 +103,27 @@ sudo setcap 'cap_net_bind_service=+ep' "$(command -v node)"      # permitir el p
 ```bash
 PORT=3000 npm start                                              # usar otro puerto (sin privilegios)
 ```
+
+## 💻 Probar en un PC local (Windows, macOS o Linux)
+
+1. Instala **Node.js 22 LTS** (`better-sqlite3` trae binarios listos para esa
+   versión; con versiones más nuevas `npm install` puede intentar compilarlo).
+2. Descarga el código (`git clone` o *Code → Download ZIP* en GitHub) y entra
+   en la carpeta `hogwarts-ctf`.
+3. Instala las dependencias: `npm install`
+4. Crea la base de datos solo con las cuentas demo:
+   - macOS / Linux: `IMPORT_SYSTEM_USERS=false npm run initdb`
+   - Windows (PowerShell): `$env:IMPORT_SYSTEM_USERS="false"; npm run initdb`
+5. Arranca el servidor en el puerto 3000 (no necesita permisos de administrador):
+   - macOS / Linux: `PORT=3000 npm start`
+   - Windows (PowerShell): `$env:PORT="3000"; npm start`
+6. Abre <http://localhost:3000>. Para parar el servidor: `Ctrl + C`.
+
+**Opcional, retos de `flags_content` (PHP):** con PHP 8 instalado,
+`php -S 127.0.0.1:8080 -t flags_content` y abre <http://127.0.0.1:8080>.
+`ping.php` ejecuta comandos del sistema **a propósito** (es el reto): déjalo
+siempre en `127.0.0.1` y no lo expongas a la red. Usa `ping -c`, así que está
+pensado para Linux/macOS (en Windows, mejor con WSL o en la VM).
 
 ---
 
@@ -210,8 +236,14 @@ camina por los pasillos y las salas: **las paredes no se atraviesan**.
 | 4 | Hermione Granger | Copa de Hufflepuff | Biblioteca |
 | 5 | Luna Lovegood | Diadema de Ravenclaw | Torre de Ravenclaw |
 | 6 | Neville Longbottom | Nagini | Invernaderos |
-| 7 | Severus Snape | El último horrocrux: el propio jugador | Mazmorras |
+| 7 | Severus Snape | El último horrocrux: el propio jugador (aparece al completar las 6 primeras) | Mazmorras |
 | 8 | Lord Voldemort | Duelo final (aparece al completar las 7) | Gran Comedor |
+
+Las misiones 1 a 6 se pueden hacer en cualquier orden. Snape no está en el mapa
+hasta completarlas: aparece entre una nube de humo, sin aviso, y hay que
+buscarlo. Al completar la 7 llega Voldemort y **el reloj baja a 5 minutos** (si
+quedaba menos, se mantiene); en los dos casos el reloj tiembla en rojo para
+avisar al jugador.
 
 Al acercarse sale un bocadillo («¡Nombre! Tengo una misión para ti»). El
 diálogo termina con **Cerrar** (entrega la pista) o **Aceptar misión** (entrega
@@ -227,6 +259,12 @@ detiene el reloj).
 **Vidas.** Se pierde una al fallar dentro de una misión, o si te pillan **Argus
 Filch** o la **Señora Norris**, que patrullan los pasillos (sus huellas se ven
 en rojo). Las vidas no restan tiempo.
+
+**Horrocrux destruido.** Al volver de una misión superada, el mago del jugador
+alza la Espada de Gryffindor por detrás de la cabeza y la deja caer como un
+hachazo: el horrocrux se parte y escapan almas entre humo negro. En la misión 7
+(el horrocrux es el propio jugador) el mago cae, el fragmento oscuro sale de él
+y la Piedra de la Resurrección le devuelve la vida.
 
 **Fin de partida.** Sin vidas o sin tiempo, Voldemort lanza su hechizo, el mago
 del jugador cae con los ojos en X y la lengua fuera, y aparece **GAME OVER**
@@ -254,15 +292,53 @@ final aparece la victoria.
   paredes, niebla, huellas con nombre, Filch y la Señora Norris, barra de
   misiones / pistas / tiempo (40 min) / vidas / pausa, game over y victoria.
 - Ruta ordenada entre pantallas (`js/flujo.js`).
+- Pantallas de misión (`/mision/1..8`, ver abajo).
 
-**Pendiente de construir:**
-- `/mision/:id` — los retos de cada misión (1..7) y el duelo final (8). Hoy son
-  pantallas provisionales con dos botones de prueba: **Superar** (vuelve a
-  `/mapa.html?completada=N`) y **Fallar** (vuelve a `/mapa.html?fallo=N` y
-  quita una vida). Cuando exista el reto, debe llamar a
-  `Estado.completarMision(N)` o `Estado.perderVida()` (ver `js/estado.js`).
-- Las pistas de `js/historia.js` son provisionales: cámbialas por pistas de
-  cada reto.
+**Pendiente:**
+- Las pistas y algunos diálogos de `js/historia.js` son provisionales:
+  cámbialas por pistas de cada reto.
+
+## 🪄 Pantallas de misión (`/mision/N`)
+
+Todas usan la misma página (`mision.html`): un **tablero** central con el
+horrocrux en su altar de runas, la pista del personaje, el reloj, las vidas y
+la caja del hechizo. Alrededor se dibuja la **sala** de la misión (baño de
+Myrtle, despacho, sala común, biblioteca, torre de Ravenclaw, invernaderos,
+mazmorras o Gran Comedor), con su propia decoración animada.
+
+- **Hechizo correcto:** el rayo alcanza al horrocrux, que se agrieta, y se
+  vuelve al mapa (`/mapa.html?completada=N`), donde se ve la animación de la
+  espada. En la misión 8 se gana la partida.
+- **Hechizo incorrecto:** el rayo rebota y se pierde una vida. Sin vidas, se
+  vuelve al mapa y aparece el game over.
+- **Caja vacía o hechizo ya fallado en esa misión:** aviso, sin perder vida.
+- **Volver al mapa** (o Esc): sin penalización. El reloj sigue corriendo.
+- **Bombillo "Pista de experto":** revela el tema real del reto (Wireshark,
+  Burp Suite, SUID/Kernel…) como ayuda muy clara. Cuesta **3 minutos** de
+  reloj y se cobra una sola vez por misión (después queda encendido y se puede
+  volver a mirar sin coste). El tema lo sirve el servidor en
+  `GET /api/pista/:mision` (tabla `TECNICAS` en `server.js`), así que no está
+  escrito en la página; el descuento de tiempo lo aplica el cliente en
+  `js/estado.js` (`usarPistaTecnica`), como el resto del reloj.
+
+El hechizo correcto **nunca llega al navegador**: la página envía lo que
+escribe el jugador a `POST /api/hechizo` y el servidor solo responde si acierta.
+En el servidor tampoco están escritos: se guardan **cifrados** (sal aleatoria +
+scrypt) en `lib/hechizos.js`. Se ignoran mayúsculas, tildes, espacios, guiones
+y guiones bajos (`Wingardium Leviosa` = `wingardium_leviosa`).
+
+**Cambiar un hechizo:**
+
+```bash
+npm run hechizo -- "Nuevo hechizo"
+```
+
+Imprime una línea `{ sal: '…', hash: '…' },`: pégala en la misión que toque de
+`lib/hechizos.js` y reinicia el servidor.
+
+> El cifrado evita que se lean de un vistazo. Quien tenga el archivo y una
+> lista de hechizos candidatos podría probarlos uno a uno: scrypt hace que cada
+> prueba sea lenta, pero no lo impide.
 
 ### Funciones útiles (consola del navegador en el mapa)
 ```js
@@ -272,6 +348,11 @@ completarMision(3);  // completa la misión 3 (horrocrux destruido, tachada)
 
 También se puede simular el regreso de una misión con `/mapa.html?completada=3`
 o `/mapa.html?fallo=3`.
+
+Para probar un hechizo sin el navegador:
+```bash
+curl -X POST http://localhost/api/hechizo -H 'Content-Type: application/json' -d '{"mision":1,"hechizo":"lumos"}'
+```
 
 Para empezar el recorrido desde cero (consola del navegador):
 ```js

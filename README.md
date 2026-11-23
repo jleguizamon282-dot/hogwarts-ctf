@@ -92,7 +92,7 @@ hogwarts-ctf/
         ├── login.js
         ├── personalizacion.js   # Opciones, miniaturas, nombre, "Sorpréndeme", guardado
         ├── juramento.js      # Carta, validación del juramento, apertura del mapa
-        ├── estado.js         # Partida: vidas, reloj de 40 min, misiones, pistas
+        ├── estado.js         # Partida: vidas, reloj de 2 h, misiones, pistas
         ├── castillo.js       # Plano de Hogwarts: salas, pasillos, puertas, colisiones
         ├── historia.js       # Personajes, diálogos, misiones y pistas (contenido)
         ├── animaciones.js    # Cinemáticas: espada, horrocrux, game over, victoria
@@ -214,7 +214,7 @@ la pista y lleva a `/mision/N`). La misión aparece en la lista al hablar y se
 tacha al completarla. Voldemort tiene su propio diálogo desafiante y termina
 con **Aceptar duelo**.
 
-**📊 Barra superior.** Misiones (n/7), Pistas, barra de **tiempo de 40 minutos**
+**📊 Barra superior.** Misiones (n/7), Pistas, barra de **tiempo de 2 horas**
 (global: sigue corriendo dentro de las misiones y no se reinicia al recargar),
 **3 vidas** ❤️, la espada y **Pausa** («¡Travesura realizada!»: tapa el mapa y
 detiene el reloj).
@@ -256,7 +256,7 @@ final aparece la victoria. 🏆
   animación del mapa que se abre (respeta `prefers-reduced-motion`).
 - Mapa del Merodeador completo: Sombrero Seleccionador, 7 misiones con
   diálogo, Voldemort final, pasillos con paredes, niebla, huellas con nombre,
-  Filch y la Señora Norris, barra de misiones / pistas / tiempo (40 min) /
+  Filch y la Señora Norris, barra de misiones / pistas / tiempo (2 h) /
   vidas / pausa, game over y victoria.
 - Ruta ordenada entre pantallas (`js/flujo.js`).
 - Pantallas de misión (`/mision/1..8`).

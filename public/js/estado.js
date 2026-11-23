@@ -1,7 +1,7 @@
 /* =============================================================================
    estado.js — Estado de la partida (se guarda en el navegador)
 
-     vidas (3) · reloj global de 40 min · misiones · pistas · espada · posición
+     vidas (3) · reloj global de 2 h · misiones · pistas · espada · posición
      Al llegar Voldemort el reloj se recorta a 5 min (recortarTiempo).
 
    Lo usan el mapa y, más adelante, las pantallas de cada misión:
@@ -17,7 +17,7 @@
   'use strict';
 
   const CLAVE = 'howgarts_partida';
-  const DURACION_MS = 40 * 60 * 1000;
+  const DURACION_MS = 120 * 60 * 1000;
   const VIDAS = 3;
   const MISIONES = 7;   // misiones de los personajes; la 8 es el duelo final
   const FINAL = 8;

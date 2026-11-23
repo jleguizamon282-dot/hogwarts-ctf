@@ -529,7 +529,7 @@
     Estado.cambiar((e) => { e.sombrero = true; e.espada = true; });
     Estado.iniciarReloj();
     HUD.pintar();
-    HUD.aviso('⏳ El reloj ha empezado: tienes 40 minutos.');
+    HUD.aviso('⏳ El reloj ha empezado: tienes 2 horas.');
     setTimeout(() => HUD.aviso('👣 Sigue las huellas doradas y habla con quien las deja.'), 900);
     bloqueado = false;
   }
